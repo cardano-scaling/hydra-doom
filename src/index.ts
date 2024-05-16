@@ -3,13 +3,14 @@ import { hydraSend, hydraRecv } from "./hydra";
 declare var Module: any;
 declare function callMain(args: string[]): void;
 
-// Callbacks available from doom-wasm
+// Glue together callbacks available from doom-wasm
 
-// FIXME: if we do real work on module imports, this binding comes too late..
-Module.hydraSend = hydraSend;
-Module.hydraRecv = hydraRecv;
 Module.onRuntimeInitialized = () => {
     console.log("WASM module loaded");
+
+    Module.hydraSend = hydraSend;
+    Module.hydraRecv = hydraRecv;
+
     var args = [
         "-iwad",
         "doom1.wad",

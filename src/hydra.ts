@@ -4,7 +4,11 @@ import { HydraProvider } from "./lucid-provider-hydra";
 
 // Setup a lucid instance running against hydra
 
-const lucid = await Lucid.new(new HydraProvider("localhost:4001"), "Preprod");
+console.log("Setting up a lucid instance against hydra");
+const lucid = await Lucid.new(
+  new HydraProvider("http://localhost:4001"),
+  "Preprod",
+);
 console.log(lucid);
 
 const privateKey = lucid.utils.generatePrivateKey();
@@ -38,6 +42,7 @@ let latestCmd = { forwardMove: 0 };
 export async function hydraSend(cmd: any) {
   console.log("encode and submit transaction for", cmd);
 
+  // TODO: should not need to do this, but keep track in the client
   const utxo = await getUTxO();
   console.log("spendable utxo", utxo);
 
@@ -52,12 +57,12 @@ export async function hydraSend(cmd: any) {
     assets: txOut.value,
   };
   console.log("spending from", input);
-  // FIXME: needs a custom provider to resolve UTxO against already known
-  // const tx = await lucid
-  //   .newTx()
-  //   .collectFrom([input])
-  //   .complete({ coinSelection: false });
-  // console.log(tx);
+  const tx = await lucid
+    .newTx()
+    .collectFrom([input])
+    .payToAddress(txOut.address, txOut.value)
+    .complete();
+  console.log(tx);
 }
 
 export function hydraRecv() {
