@@ -30,7 +30,6 @@ export class HydraProvider implements Provider {
     const pp = await fetch(`${this.apiUrl}/protocol-parameters`).then((res) =>
       res.json(),
     );
-    console.log(pp);
     return {
       minFeeA: pp.txFeeFixed,
       minFeeB: pp.txFeePerByte,
@@ -78,9 +77,9 @@ export class HydraProvider implements Provider {
   }
 
   async submitTx(tx: Transaction): Promise<TxHash> {
-    // throw new Error("not implemented");
     return new Promise((res, rej) => {
       // TODO: create a HTTP based submission endpoint instead?
+      // TODO: re-use event listeners?
       this.conn.addEventListener("message", (e) => {
         const msg = JSON.parse(e.data);
         switch (msg.tag) {

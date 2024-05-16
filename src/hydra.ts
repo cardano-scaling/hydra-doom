@@ -18,7 +18,7 @@ console.log(lucid);
 const privateKey =
   "ed25519_sk1l3r62rzyrk7le5pyplyysthagqkm4wgwks86rfvzwl67vg0ectuqqvv9kw";
 lucid.selectWalletFromPrivateKey(privateKey);
-console.error(
+console.info(
   "Using ad-hoc wallet",
   privateKey,
   "with address: ",
@@ -32,14 +32,6 @@ console.log("connecting to hydra head at ws://127.0.0.1:4001");
 const protocol = window.location.protocol == "https:" ? "wss:" : "ws:";
 const conn = new WebSocket(protocol + "//127.0.0.1:4001?history=no");
 
-conn.addEventListener("message", (e) => {
-  const msg = JSON.parse(e.data);
-  switch (msg.tag) {
-    default:
-      console.log("Hydra websocket", "Received", msg);
-  }
-});
-
 async function getUTxO() {
   const res = await fetch("http://127.0.0.1:4001/snapshot/utxo");
   return res.json();
@@ -47,11 +39,11 @@ async function getUTxO() {
 
 // Callbacks from forked doom-wasm
 
-let latestCmd = { forwardMove: 0 };
+type Cmd = { forwardMove: number };
 
 let latestUTxO: UTxO | null = null;
 
-export async function hydraSend(cmd: { forwardMove: number }) {
+export async function hydraSend(cmd: Cmd) {
   console.log("hydraSend", cmd);
 
   if (latestUTxO == null) {
@@ -68,7 +60,7 @@ export async function hydraSend(cmd: { forwardMove: number }) {
       assets: txOut.value,
     };
   }
-  console.log("spending from", latestUTxO);
+  // console.log("spending from", latestUTxO);
   const tx = await lucid
     .newTx()
     .collectFrom([latestUTxO])
@@ -78,16 +70,41 @@ export async function hydraSend(cmd: { forwardMove: number }) {
       latestUTxO.assets,
     )
     .complete();
-  console.log("tx", tx);
+  // console.log("tx", tx);
   const signedTx = await tx.sign().complete();
-  console.log("signed", tx);
+  // console.log("signed", tx);
   const txid = await signedTx.submit();
-  console.log("submitted", txid);
+  // console.log("submitted", txid);
   latestUTxO.txHash = txid;
 }
 
-export function hydraRecv() {
-  const cmd = latestCmd;
-  console.log("receive next decoded command from head", cmd);
-  return cmd;
+export async function hydraRecv(): Promise<Cmd> {
+  console.log("hydraRecv");
+  return new Promise((res, rej) => {
+    // TODO: re-use event listeners?
+    conn.addEventListener("message", (e) => {
+      const msg = JSON.parse(e.data);
+      switch (msg.tag) {
+        case "TxValid":
+          const tx = lucid.fromTx(msg.transaction.cborHex);
+          const datum = tx.txComplete
+            .body()
+            .outputs()
+            .get(0)
+            .datum()
+            ?.as_data()
+            ?.to_js_value().datum;
+          const cmd = { forwardMove: datum.Integer };
+          console.log("received", cmd);
+          res(cmd);
+          break;
+        // XXX: Learning: ideally we should be only acting on snapshot confirmed, but I was
+        // inclined to use TxValid instead because it requires less book-keeping.
+        case "SnapshotConfirmed":
+          break;
+        default:
+          rej("Unexpected message: " + e.data);
+      }
+    });
+  });
 }
