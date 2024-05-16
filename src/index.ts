@@ -1,14 +1,12 @@
+import { hydraSend, hydraRecv } from "./hydra";
+
 declare var Module: any;
 declare function callMain(args: string[]): void;
 
-Module.hydraSend = () => {
-    console.log("hydraSend");
-};
+// Callbacks available from doom-wasm
 
-Module.hydraRecv = () => {
-    console.log("hydraRecv");
-};
-
+Module.hydraSend = hydraSend;
+Module.hydraRecv = hydraRecv;
 Module.onRuntimeInitialized = () => {
     console.log("WASM module loaded");
     var args = [

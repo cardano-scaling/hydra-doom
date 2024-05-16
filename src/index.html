@@ -37,15 +37,6 @@
       setStatus: (text) => {
         console.log("setStatus", text);
       },
-      totalDependencies: 0,
-      monitorRunDependencies: function (left) {
-        this.totalDependencies = Math.max(this.totalDependencies, left);
-        Module.setStatus(
-          left
-            ? "Preparing... (" + (this.totalDependencies - left) + "/" + this.totalDependencies + ")"
-            : "All downloads complete.",
-        );
-      },
     };
   </script>
   <script type="text/javascript" src="websockets-doom.js"></script>

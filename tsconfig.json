@@ -4,7 +4,8 @@
     "strict": true,
     "sourceMap": true,
     "module": "esnext",
-    "target": "es2020"
+    "target": "es2020",
+    "allowJs": true
   },
   "exclude": ["node_modules"]
 }
