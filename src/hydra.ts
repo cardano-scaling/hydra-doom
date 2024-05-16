@@ -1,4 +1,4 @@
-import { Lucid } from "lucid-cardano";
+import { Lucid, UTxO } from "lucid-cardano";
 
 import { HydraProvider } from "./lucid-provider-hydra";
 
@@ -13,16 +13,10 @@ console.log(lucid);
 
 // Private key of the wallet used in hydra devnet:
 //
-// cat /tmp/hydra-cluster-Nothing-2bf845ef1b4b44aa/wallet.sk
-//  {
-//      "type": "PaymentSigningKeyShelley_ed25519",
-//      "description": "",
-//      "cborHex": "5820<bytes>"
-//  }
-//
-// bech32 ed25519_sk <<< <bytes>
+// Using a carddano-cli envelope file with a PaymentSigningKeyShelley_ed25519 type:
+// cat /tmp/hydra-cluster-Nothing-2bf845ef1b4b44aa/wallet.sk | jq -r .cborHex | cut -c 5- | bech32 ed25519_sk
 const privateKey =
-  "ed25519_sk1jj5y0j002ygeyhpj6v6ss8784thq7lkj4t2spzxlkvlf4qvyrvuqjqux8g";
+  "ed25519_sk1l3r62rzyrk7le5pyplyysthagqkm4wgwks86rfvzwl67vg0ectuqqvv9kw";
 lucid.selectWalletFromPrivateKey(privateKey);
 console.error(
   "Using ad-hoc wallet",
@@ -55,34 +49,37 @@ async function getUTxO() {
 
 let latestCmd = { forwardMove: 0 };
 
+let spendableUTxO: UTxO | null = null;
+
 export async function hydraSend(cmd: any) {
   console.log("encode and submit transaction for", cmd);
 
-  // TODO: should not need to do this, but keep track in the client
-  const utxo = await getUTxO();
-  console.log("spendable utxo", utxo);
-
-  const txIn = Object.keys(utxo)[0];
-  const [txHash, ixStr] = txIn.split("#");
-  const txOut = utxo[txIn];
-  console.log("selected txOut", txOut);
-  const input = {
-    txHash,
-    outputIndex: Number.parseInt(ixStr),
-    address: txOut.address,
-    assets: txOut.value,
-  };
-  console.log("spending from", input);
+  if (spendableUTxO == null) {
+    const utxo = await getUTxO();
+    console.log("query spendable utxo", utxo);
+    const txIn = Object.keys(utxo)[0];
+    const [txHash, ixStr] = txIn.split("#");
+    const txOut = utxo[txIn];
+    console.log("selected txOut", txOut);
+    spendableUTxO = {
+      txHash,
+      outputIndex: Number.parseInt(ixStr),
+      address: txOut.address,
+      assets: txOut.value,
+    };
+  }
+  console.log("spending from", spendableUTxO);
   const tx = await lucid
     .newTx()
-    .collectFrom([input])
-    .payToAddress(txOut.address, txOut.value)
+    .collectFrom([spendableUTxO])
+    .payToAddress(spendableUTxO.address, spendableUTxO.assets)
     .complete();
   console.log("tx", tx);
   const signedTx = await tx.sign().complete();
   console.log("signed", tx);
   const txid = await signedTx.submit();
   console.log("submitted", txid);
+  spendableUTxO.txHash = txid;
 }
 
 export function hydraRecv() {

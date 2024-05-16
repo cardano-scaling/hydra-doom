@@ -17,10 +17,13 @@ import {
 
 export class HydraProvider implements Provider {
   apiUrl: string;
+  conn: WebSocket;
 
   constructor(apiUrl: string) {
-    console.log("HydraProvider", apiUrl);
     this.apiUrl = apiUrl;
+    const wsUrl = apiUrl.replace("http", "ws") + "?history=no";
+    console.log("HydraProvider", apiUrl, wsUrl);
+    this.conn = new WebSocket(wsUrl);
   }
 
   async getProtocolParameters(): Promise<ProtocolParameters> {
@@ -77,11 +80,8 @@ export class HydraProvider implements Provider {
   async submitTx(tx: Transaction): Promise<TxHash> {
     // throw new Error("not implemented");
     return new Promise((res, rej) => {
-      // TODO: create a HTTP based submission endpoint and/or re-use this websocket
-      const wsUrl = this.apiUrl.replace("http", "ws") + "?history=no";
-      console.log(wsUrl);
-      const conn = new WebSocket(wsUrl);
-      conn.addEventListener("message", (e) => {
+      // TODO: create a HTTP based submission endpoint instead?
+      this.conn.addEventListener("message", (e) => {
         const msg = JSON.parse(e.data);
         switch (msg.tag) {
           case "Greetings":
@@ -92,21 +92,22 @@ export class HydraProvider implements Provider {
           case "TxInvalid":
             rej("Transaction invalid: " + msg.validationError.reason);
             break;
+          case "SnapshotConfirmed":
+            console.log("Snapshot confirmed", msg.snapshot.snapshotNumber);
+            break;
           default:
             rej("Unexpected message: " + e.data);
         }
       });
-      conn.addEventListener("open", () => {
-        conn.send(
-          JSON.stringify({
-            tag: "NewTx",
-            transaction: {
-              type: "Tx BabbageEra",
-              cborHex: tx,
-            },
-          }),
-        );
-      });
+      this.conn.send(
+        JSON.stringify({
+          tag: "NewTx",
+          transaction: {
+            type: "Tx BabbageEra",
+            cborHex: tx,
+          },
+        }),
+      );
     });
   }
 
