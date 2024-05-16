@@ -86,7 +86,9 @@ export class HydraProvider implements Provider {
         switch (msg.tag) {
           case "Greetings":
             break;
-          // FIXME: resolve promise on TxValid
+          case "TxValid":
+            res(msg.transaction.txId);
+            break;
           case "TxInvalid":
             rej("Transaction invalid: " + msg.validationError.reason);
             break;

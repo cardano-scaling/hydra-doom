@@ -11,9 +11,25 @@ const lucid = await Lucid.new(
 );
 console.log(lucid);
 
-const privateKey = lucid.utils.generatePrivateKey();
-console.log("Setting up an ad-hoc wallet", privateKey);
+// Private key of the wallet used in hydra devnet:
+//
+// cat /tmp/hydra-cluster-Nothing-2bf845ef1b4b44aa/wallet.sk
+//  {
+//      "type": "PaymentSigningKeyShelley_ed25519",
+//      "description": "",
+//      "cborHex": "5820<bytes>"
+//  }
+//
+// bech32 ed25519_sk <<< <bytes>
+const privateKey =
+  "ed25519_sk1jj5y0j002ygeyhpj6v6ss8784thq7lkj4t2spzxlkvlf4qvyrvuqjqux8g";
 lucid.selectWalletFromPrivateKey(privateKey);
+console.error(
+  "Using ad-hoc wallet",
+  privateKey,
+  "with address: ",
+  await lucid.wallet.address(),
+);
 
 // Makeshift hydra client
 
