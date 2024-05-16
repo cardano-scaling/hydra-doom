@@ -24,6 +24,8 @@ module.exports = {
     new HtmlWebpackPlugin({ template: "./src/index.html" }),
     new CopyWebpackPlugin({
       patterns: [
+        "assets/doom1.wad",
+        "assets/default.cfg",
         "assets/websockets-doom.js",
         "assets/websockets-doom.wasm",
         "assets/websockets-doom.wasm.map",

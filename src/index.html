@@ -6,11 +6,47 @@
   <meta name="viewport" content="minimal-ui, width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 </html>
 <body>
-  <canvas
-    id="canvas"
-    oncontextmenu="event.preventDefault()"
-    tabindex="-1"
-    ></canvas>
-  <div>App is loading...</div>
+  <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+  <script type="text/javascript">
+    // Setup configuration for doom-wasm
+    var Module = {
+      noInitialRun: true,
+      preRun: () => {
+        Module.FS.createPreloadedFile("", "doom1.wad", "doom1.wad", true, true);
+        Module.FS.createPreloadedFile("", "default.cfg", "default.cfg", true, true);
+      },
+      printErr: (text) => {
+        console.error(text);
+      },
+      postRun: () => {},
+      canvas: (function () {
+        var canvas = document.getElementById("canvas");
+        canvas.addEventListener(
+          "webglcontextlost",
+          function (e) {
+            alert("WebGL context lost. You will need to reload the page.");
+            e.preventDefault();
+          },
+          false,
+        );
+        return canvas;
+      })(),
+      print: (text) => {
+        console.log("stdout", text);
+      },
+      setStatus: (text) => {
+        console.log("setStatus", text);
+      },
+      totalDependencies: 0,
+      monitorRunDependencies: function (left) {
+        this.totalDependencies = Math.max(this.totalDependencies, left);
+        Module.setStatus(
+          left
+            ? "Preparing... (" + (this.totalDependencies - left) + "/" + this.totalDependencies + ")"
+            : "All downloads complete.",
+        );
+      },
+    };
+  </script>
   <script type="text/javascript" src="websockets-doom.js"></script>
 </body>
