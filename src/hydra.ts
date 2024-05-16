@@ -1,4 +1,4 @@
-import { Lucid, UTxO } from "lucid-cardano";
+import { Data, Lucid, UTxO } from "lucid-cardano";
 
 import { HydraProvider } from "./lucid-provider-hydra";
 
@@ -49,37 +49,41 @@ async function getUTxO() {
 
 let latestCmd = { forwardMove: 0 };
 
-let spendableUTxO: UTxO | null = null;
+let latestUTxO: UTxO | null = null;
 
-export async function hydraSend(cmd: any) {
-  console.log("encode and submit transaction for", cmd);
+export async function hydraSend(cmd: { forwardMove: number }) {
+  console.log("hydraSend", cmd);
 
-  if (spendableUTxO == null) {
+  if (latestUTxO == null) {
     const utxo = await getUTxO();
     console.log("query spendable utxo", utxo);
     const txIn = Object.keys(utxo)[0];
     const [txHash, ixStr] = txIn.split("#");
     const txOut = utxo[txIn];
     console.log("selected txOut", txOut);
-    spendableUTxO = {
+    latestUTxO = {
       txHash,
       outputIndex: Number.parseInt(ixStr),
       address: txOut.address,
       assets: txOut.value,
     };
   }
-  console.log("spending from", spendableUTxO);
+  console.log("spending from", latestUTxO);
   const tx = await lucid
     .newTx()
-    .collectFrom([spendableUTxO])
-    .payToAddress(spendableUTxO.address, spendableUTxO.assets)
+    .collectFrom([latestUTxO])
+    .payToAddressWithData(
+      latestUTxO.address,
+      { inline: Data.to(BigInt(cmd.forwardMove)) },
+      latestUTxO.assets,
+    )
     .complete();
   console.log("tx", tx);
   const signedTx = await tx.sign().complete();
   console.log("signed", tx);
   const txid = await signedTx.submit();
   console.log("submitted", txid);
-  spendableUTxO.txHash = txid;
+  latestUTxO.txHash = txid;
 }
 
 export function hydraRecv() {
