@@ -1,8 +1,19 @@
-import { Lucid, Blockfrost } from "lucid-cardano";
+import { Lucid } from "lucid-cardano";
 
-console.log("connecting to hydra head at ws://127.0.0.1:4001");
+import { HydraProvider } from "./lucid-provider-hydra";
+
+// Setup a lucid instance running against hydra
+
+const lucid = await Lucid.new(new HydraProvider("localhost:4001"), "Preprod");
+console.log(lucid);
+
+const privateKey = lucid.utils.generatePrivateKey();
+console.log("Setting up an ad-hoc wallet", privateKey);
+lucid.selectWalletFromPrivateKey(privateKey);
 
 // Makeshift hydra client
+
+console.log("connecting to hydra head at ws://127.0.0.1:4001");
 
 const protocol = window.location.protocol == "https:" ? "wss:" : "ws:";
 const conn = new WebSocket(protocol + "//127.0.0.1:4001?history=no");
@@ -20,25 +31,11 @@ async function getUTxO() {
   return res.json();
 }
 
-// Setup a lucid instance running against hydra
-
-const lucid = await Lucid.new(
-  new Blockfrost(
-    "https://cardano-preprod.blockfrost.io/api/v0",
-    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  ),
-  "Preprod",
-);
-
-const privateKey = lucid.utils.generatePrivateKey();
-console.log("Setting up an ad-hoc wallet", privateKey);
-lucid.selectWalletFromPrivateKey(privateKey);
-
 // Callbacks from forked doom-wasm
 
 let latestCmd = { forwardMove: 0 };
 
-export async function hydraSend(cmd) {
+export async function hydraSend(cmd: any) {
   console.log("encode and submit transaction for", cmd);
 
   const utxo = await getUTxO();

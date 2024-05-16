@@ -5,7 +5,8 @@
     "sourceMap": true,
     "module": "esnext",
     "target": "es2020",
-    "allowJs": true
+    "allowJs": true,
+    "moduleResolution": "bundler"
   },
   "exclude": ["node_modules"]
 }
