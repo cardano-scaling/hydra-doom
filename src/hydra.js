@@ -1,3 +1,5 @@
+import { Lucid, Blockfrost } from "lucid-cardano";
+
 console.log("connecting to hydra head at ws://127.0.0.1:4001");
 
 // Makeshift hydra client
@@ -17,6 +19,20 @@ async function getUTxO() {
   const res = await fetch("http://127.0.0.1:4001/snapshot/utxo");
   return res.json();
 }
+
+// Setup a lucid instance running against hydra
+
+const lucid = await Lucid.new(
+  new Blockfrost(
+    "https://cardano-preprod.blockfrost.io/api/v0",
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  ),
+  "Preprod",
+);
+
+const privateKey = lucid.utils.generatePrivateKey();
+console.log("Setting up an ad-hoc wallet", privateKey);
+lucid.selectWalletFromPrivateKey(privateKey);
 
 // Callbacks from forked doom-wasm
 
@@ -39,6 +55,12 @@ export async function hydraSend(cmd) {
     assets: txOut.value,
   };
   console.log("spending from", input);
+  // FIXME: needs a custom provider to resolve UTxO against already known
+  // const tx = await lucid
+  //   .newTx()
+  //   .collectFrom([input])
+  //   .complete({ coinSelection: false });
+  // console.log(tx);
 }
 
 export function hydraRecv() {

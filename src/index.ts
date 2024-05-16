@@ -5,6 +5,7 @@ declare function callMain(args: string[]): void;
 
 // Callbacks available from doom-wasm
 
+// FIXME: if we do real work on module imports, this binding comes too late..
 Module.hydraSend = hydraSend;
 Module.hydraRecv = hydraRecv;
 Module.onRuntimeInitialized = () => {
