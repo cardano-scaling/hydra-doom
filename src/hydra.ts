@@ -62,7 +62,11 @@ export async function hydraSend(cmd: any) {
     .collectFrom([input])
     .payToAddress(txOut.address, txOut.value)
     .complete();
-  console.log(tx);
+  console.log("tx", tx);
+  const signedTx = await tx.sign().complete();
+  console.log("signed", tx);
+  const txid = await signedTx.submit();
+  console.log("submitted", txid);
 }
 
 export function hydraRecv() {

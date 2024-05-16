@@ -75,8 +75,37 @@ export class HydraProvider implements Provider {
   }
 
   async submitTx(tx: Transaction): Promise<TxHash> {
-    // TODO: implement
-    throw new Error("not implemented");
+    // throw new Error("not implemented");
+    return new Promise((res, rej) => {
+      // TODO: create a HTTP based submission endpoint and/or re-use this websocket
+      const wsUrl = this.apiUrl.replace("http", "ws") + "?history=no";
+      console.log(wsUrl);
+      const conn = new WebSocket(wsUrl);
+      conn.addEventListener("message", (e) => {
+        const msg = JSON.parse(e.data);
+        switch (msg.tag) {
+          case "Greetings":
+            break;
+          // FIXME: resolve promise on TxValid
+          case "TxInvalid":
+            rej("Transaction invalid: " + msg.validationError.reason);
+            break;
+          default:
+            rej("Unexpected message: " + e.data);
+        }
+      });
+      conn.addEventListener("open", () => {
+        conn.send(
+          JSON.stringify({
+            tag: "NewTx",
+            transaction: {
+              type: "Tx BabbageEra",
+              cborHex: tx,
+            },
+          }),
+        );
+      });
+    });
   }
 
   getDatum(datumHash: DatumHash): Promise<Datum> {
