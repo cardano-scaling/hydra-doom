@@ -80,24 +80,29 @@ export class HydraProvider implements Provider {
     return new Promise((res, rej) => {
       // TODO: create a HTTP based submission endpoint instead?
       // TODO: re-use event listeners?
-      this.conn.addEventListener("message", (e) => {
+      const onMessage = (e: MessageEvent) => {
         const msg = JSON.parse(e.data);
         switch (msg.tag) {
           case "Greetings":
             break;
           case "TxValid":
+            this.conn.removeEventListener("message", onMessage);
             res(msg.transaction.txId);
             break;
           case "TxInvalid":
+            this.conn.removeEventListener("message", onMessage);
             rej("Transaction invalid: " + msg.validationError.reason);
             break;
           case "SnapshotConfirmed":
             console.log("Snapshot confirmed", msg.snapshot.snapshotNumber);
             break;
           default:
+            this.conn.removeEventListener("message", onMessage);
             rej("Unexpected message: " + e.data);
+            break;
         }
-      });
+      };
+      this.conn.addEventListener("message", onMessage);
       this.conn.send(
         JSON.stringify({
           tag: "NewTx",

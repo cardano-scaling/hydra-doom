@@ -82,7 +82,7 @@ export async function hydraRecv(): Promise<Cmd> {
   console.log("hydraRecv");
   return new Promise((res, rej) => {
     // TODO: re-use event listeners?
-    conn.addEventListener("message", (e) => {
+    const onMessage = (e: MessageEvent) => {
       const msg = JSON.parse(e.data);
       switch (msg.tag) {
         case "TxValid":
@@ -96,6 +96,7 @@ export async function hydraRecv(): Promise<Cmd> {
             ?.to_js_value().datum;
           const cmd = { forwardMove: datum.Integer };
           console.log("received", cmd);
+          conn.removeEventListener("message", onMessage);
           res(cmd);
           break;
         // XXX: Learning: ideally we should be only acting on snapshot confirmed, but I was
@@ -103,8 +104,10 @@ export async function hydraRecv(): Promise<Cmd> {
         case "SnapshotConfirmed":
           break;
         default:
+          conn.removeEventListener("message", onMessage);
           rej("Unexpected message: " + e.data);
       }
-    });
+    };
+    conn.addEventListener("message", onMessage);
   });
 }
