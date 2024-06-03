@@ -1,5 +1,6 @@
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const Dotenv = require("dotenv-webpack");
 
 module.exports = {
   mode: "development",
@@ -47,6 +48,7 @@ module.exports = {
   },
   devtool: "inline-source-map",
   plugins: [
+    new Dotenv(),
     new HtmlWebpackPlugin({ template: "./src/index.html" }),
     new CopyWebpackPlugin({
       patterns: [

@@ -1,13 +1,14 @@
 import { Data, Lucid, UTxO } from "lucid-cardano";
 
 import { HydraProvider } from "./lucid-provider-hydra";
+import { GameData, PlayerState, buildDatum, initialGameData } from "./datum";
 
 // Setup a lucid instance running against hydra
 
 console.log("Setting up a lucid instance against hydra");
 const lucid = await Lucid.new(
   new HydraProvider("http://3.15.33.186:4001"),
-  "Preprod"
+  "Preprod",
 );
 console.log(lucid);
 
@@ -16,14 +17,19 @@ console.log(lucid);
 // Using a cardano-cli envelope file with a PaymentSigningKeyShelley_ed25519 type:
 // cat /tmp/hydra-cluster-Nothing-2bf845ef1b4b44aa/wallet.sk | jq -r .cborHex | cut -c 5- | bech32 ed25519_sk
 const privateKey =
-  "ed25519_sk1t7dezxnrv3u7mqa6vqwvljaq4wd9tqnfmsvlm653p5n7tndmtlyqk9sww8";
+  process.env.SIGNING_KEY ||
+  "ed25519_sk1l3r62rzyrk7le5pyplyysthagqkm4wgwks86rfvzwl67vg0ectuqqvv9kw";
 lucid.selectWalletFromPrivateKey(privateKey);
+
 console.info(
   "Using ad-hoc wallet",
   privateKey,
   "with address: ",
-  await lucid.wallet.address()
+  await lucid.wallet.address(),
 );
+
+const pkh = lucid.utils.getAddressDetails(await lucid.wallet.address())
+  .paymentCredential?.hash;
 
 // Makeshift hydra client
 
@@ -45,6 +51,7 @@ let latestUTxO: UTxO | null = null;
 let lastTime: number = 0;
 let frameNumber = 0;
 
+let gameData: GameData = initialGameData(pkh ?? "");
 export async function hydraSend(cmd: Cmd) {
   console.log("hydraSend", cmd);
 
@@ -54,7 +61,10 @@ export async function hydraSend(cmd: Cmd) {
     const txIn = Object.keys(utxo)[0];
     const [txHash, ixStr] = txIn.split("#");
     const txOut = utxo[txIn];
+    const datum = txOut.inlineDatum;
     console.log("selected txOut", txOut);
+    console.log("Datum", JSON.stringify(datum));
+
     latestUTxO = {
       txHash,
       outputIndex: Number.parseInt(ixStr),
@@ -62,15 +72,14 @@ export async function hydraSend(cmd: Cmd) {
       assets: txOut.value,
     };
   }
+
+  const inline = buildDatum(gameData);
+  console.log("Inline Datum", inline);
   // console.log("spending from", latestUTxO);
   const tx = await lucid
     .newTx()
     .collectFrom([latestUTxO])
-    .payToAddressWithData(
-      latestUTxO.address,
-      { inline: Data.to(BigInt(cmd.forwardMove)) },
-      latestUTxO.assets
-    )
+    .payToAddressWithData(latestUTxO.address, { inline }, latestUTxO.assets)
     .complete();
   // console.log("tx", tx);
   const signedTx = await tx.sign().complete();

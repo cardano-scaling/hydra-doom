@@ -4,13 +4,19 @@ import "./styles.css";
 declare var Module: any;
 declare function callMain(args: string[]): void;
 
-// Glue together callbacks available from doom-wasm
-
 const startButton: HTMLButtonElement | null = document.querySelector("#start");
 const txPerSecond: HTMLDataListElement | null = document.querySelector("#txps");
 const bytesPerSecond: HTMLDataListElement | null =
   document.querySelector("#bps");
 console.log({ txPerSecond, bytesPerSecond });
+
+// Glue together callbacks available from doom-wasm
+
+// For some reason, injecting into Module doesn't work but this does?
+// @ts-ignore
+window.hydraSend = hydraSend;
+// @ts-ignore
+window.hydraRecv = hydraRecv;
 
 startButton?.addEventListener("click", () => {
   // Hide the button
@@ -22,6 +28,7 @@ startButton?.addEventListener("click", () => {
   Module.hydraRecv = hydraRecv;
   (window as any).hydraSend = hydraSend;
   (window as any).hydraRecv = hydraRecv;
+
   var args = [
     "-iwad",
     "doom1.wad",
@@ -55,7 +62,7 @@ async function fetchData() {
 function updateUI(data: any) {
   if (txPerSecond && data.transactions !== undefined) {
     txPerSecond.innerText = new Intl.NumberFormat("en").format(
-      data.transactions
+      data.transactions,
     );
   }
   if (bytesPerSecond && data.bytes !== undefined) {
