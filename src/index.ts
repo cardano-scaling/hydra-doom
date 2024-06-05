@@ -17,6 +17,7 @@ console.log({ txPerSecond, bytesPerSecond });
 window.hydraSend = hydraSend;
 // @ts-ignore
 window.hydraRecv = hydraRecv;
+startButton!.disabled = false;
 
 startButton?.addEventListener("click", () => {
   // Hide the button

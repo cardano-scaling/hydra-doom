@@ -1,7 +1,23 @@
-import { Data, Lucid, UTxO } from "lucid-cardano";
+import {
+  C,
+  Data,
+  Lucid,
+  UTxO,
+  valueToAssets,
+  toHex,
+  Constr,
+  TxSigned,
+} from "lucid-cardano";
 
 import { HydraProvider } from "./lucid-provider-hydra";
-import { GameData, PlayerState, buildDatum, initialGameData } from "./datum";
+import {
+  GameData,
+  PlayerState,
+  buildDatum,
+  initialGameData,
+} from "./contract/datum";
+import { CBOR } from "./contract/cbor";
+import { UTxOResponse, recordValueToAssets } from "./types";
 
 // Setup a lucid instance running against hydra
 
@@ -27,9 +43,12 @@ console.info(
   "with address: ",
   await lucid.wallet.address(),
 );
-
-const pkh = lucid.utils.getAddressDetails(await lucid.wallet.address())
-  .paymentCredential?.hash;
+const address = await lucid.wallet.address();
+const pkh = lucid.utils.getAddressDetails(address).paymentCredential?.hash;
+const scriptAddress = lucid.utils.validatorToAddress({
+  script: CBOR,
+  type: "PlutusV2",
+});
 
 // Makeshift hydra client
 
@@ -43,6 +62,61 @@ async function getUTxO() {
   return res.json();
 }
 
+// Game initialization
+let gameData: GameData = initialGameData(pkh!);
+const scriptRef = await createScriptRef();
+// if we don't wait for a second, the transaction is not confirmed yet, and thus the next transaction will fail
+await new Promise((resolve) => setTimeout(resolve, 500));
+
+// we need to create a new UTxO to use as collateral for the first script execution
+const tx = await lucid
+  .newTx()
+  .collectFrom(await getUTxOsAtAddress(address))
+  .payToAddress(address, { lovelace: BigInt(5e6) })
+  .complete();
+const collateralTx = await tx.sign().complete();
+await collateralTx.submit();
+await new Promise((resolve) => setTimeout(resolve, 500));
+
+console.log("Created collateral UTxO");
+console.log(await getUTxOsAtAddress(address));
+async function createScriptRef() {
+  const utxos = await getUTxOsAtAddress(address);
+  const tx = await lucid
+    .newTx()
+    .collectFrom(utxos)
+    .payToAddressWithData(
+      scriptAddress,
+      {
+        scriptRef: { type: "PlutusV2", script: CBOR },
+      },
+      { lovelace: BigInt(2e6) },
+    )
+    .complete();
+  const signedTx = await tx.sign().complete();
+  await signedTx.submit();
+  console.log("ScriptRef created", signedTx.toHash());
+  return {
+    hash: signedTx.toHash(),
+    index: 0,
+  };
+}
+
+async function getUTxOsAtAddress(address: string): Promise<UTxO[]> {
+  const utxos = await getUTxO();
+  return Object.entries(utxos)
+    .filter(([_, output]) => output.address === address)
+    .map((pair) => {
+      const [txIn, output] = pair;
+      const [txHash, ixStr] = txIn.split("#");
+      return {
+        txHash,
+        outputIndex: Number.parseInt(ixStr),
+        address: output.address,
+        assets: recordValueToAssets(output.value),
+      };
+    });
+}
 // Callbacks from forked doom-wasm
 
 type Cmd = { forwardMove: number };
@@ -51,46 +125,28 @@ let latestUTxO: UTxO | null = null;
 let lastTime: number = 0;
 let frameNumber = 0;
 
-let gameData: GameData = initialGameData(pkh ?? "");
 export async function hydraSend(cmd: Cmd) {
   console.log("hydraSend", cmd);
 
+  const utxos = await getUTxOsAtAddress(address);
+  console.log("Current UTxOs owned by gamer", utxos);
   if (latestUTxO == null) {
-    const utxo = await getUTxO();
-    console.log("query spendable utxo", utxo);
-    const txIn = Object.keys(utxo)[0];
-    const [txHash, ixStr] = txIn.split("#");
-    const txOut = utxo[txIn];
-    const datum = txOut.inlineDatum;
-    console.log("selected txOut", txOut);
-    console.log("Datum", JSON.stringify(datum));
-
-    latestUTxO = {
-      txHash,
-      outputIndex: Number.parseInt(ixStr),
-      address: txOut.address,
-      assets: txOut.value,
-    };
+    const utxo = utxos[0];
+    latestUTxO = utxo;
   }
+  console.log("spending from", latestUTxO);
+  const tx = await buildTx(latestUTxO!, buildDatum(gameData), utxos[0]);
 
-  const inline = buildDatum(gameData);
-  console.log("Inline Datum", inline);
-  // console.log("spending from", latestUTxO);
-  const tx = await lucid
-    .newTx()
-    .collectFrom([latestUTxO])
-    .payToAddressWithData(latestUTxO.address, { inline }, latestUTxO.assets)
-    .complete();
-  // console.log("tx", tx);
-  const signedTx = await tx.sign().complete();
   lastTime = performance.now();
   if (frameNumber % 1 == 0) {
-    // console.log("signed", tx);
-    const txid = await signedTx.submit();
-    // console.log("submitted", txid);
+    const txid = await tx.submit();
+    console.log("submitted", txid);
     latestUTxO.txHash = txid;
   }
   frameNumber++;
+
+  // if we don't wait for a second, the transaction is not confirmed yet, and thus the next transaction will fail
+  await new Promise((resolve) => setTimeout(resolve, 500));
 }
 
 export async function hydraRecv(): Promise<Cmd> {
@@ -128,3 +184,94 @@ export async function hydraRecv(): Promise<Cmd> {
     conn.addEventListener("message", onMessage);
   });
 }
+
+const buildCollateralInput = (txHash: string, txIx: number) => {
+  const transactionHash = C.TransactionHash.from_hex(txHash);
+  const input = C.TransactionInput.new(
+    transactionHash,
+    C.BigNum.from_str(txIx.toString()),
+  );
+  const inputs = C.TransactionInputs.new();
+  inputs.add(input);
+  transactionHash.free();
+  input.free();
+
+  return inputs;
+};
+
+const buildTx = async (
+  inputUtxo: UTxO,
+  datum: string,
+  collateralUtxo: UTxO,
+): Promise<TxSigned> => {
+  const tx = await lucid
+    .newTx()
+    .collectFrom([inputUtxo], Data.to(new Constr(0, [])))
+    .payToContract(scriptAddress, { inline: datum }, { lovelace: BigInt(1e6) })
+    .readFrom([
+      {
+        txHash: scriptRef.hash,
+        outputIndex: scriptRef.index,
+        address: scriptAddress,
+        assets: { lovelace: BigInt(2e6) },
+        scriptRef: {
+          type: "PlutusV2",
+          script: CBOR,
+        },
+      },
+    ])
+    .addSigner(address)
+    .complete();
+
+  const collateral = buildCollateralInput(
+    collateralUtxo.txHash,
+    collateralUtxo.outputIndex,
+  );
+  const txBody = tx.txComplete.body();
+  const witnessSet = tx.txComplete.witness_set();
+  const auxData = tx.txComplete.auxiliary_data();
+
+  txBody.set_collateral(collateral);
+  const collateralTx = C.Transaction.new(txBody, witnessSet, auxData);
+  txBody.free();
+  witnessSet.free();
+  auxData?.free();
+  collateral.free();
+  tx.txComplete = collateralTx;
+  // console.log("tx", tx);
+  const signedTx = await tx.sign().complete();
+  // console.log("signed", tx);
+  console.log(toHex(signedTx.txSigned.to_bytes()));
+  const body = signedTx.txSigned.body();
+  const outputs = body.outputs();
+  body.free();
+  for (let i = 0; i < outputs.len(); i++) {
+    const output = outputs.get(i);
+    const address = output.address();
+    if (address.to_bech32("addr_test") === scriptAddress) {
+      const amount = output.amount();
+      const datum = output.datum()!;
+      const data = datum.as_data()!;
+
+      latestUTxO = {
+        txHash: signedTx.toHash(),
+        outputIndex: i,
+        address: address.to_bech32("addr_test"),
+        assets: valueToAssets(amount),
+        datumHash: null,
+        datum: toHex(data.to_bytes()).substring(8),
+        scriptRef: null,
+      };
+      amount.free();
+      output.free();
+      data.free();
+      address.free();
+      console.log("New UTxO", latestUTxO);
+      break;
+    }
+    outputs.free();
+    body.free();
+  }
+
+  return signedTx;
+};
