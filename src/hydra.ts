@@ -6,17 +6,17 @@ import { HydraProvider } from "./lucid-provider-hydra";
 
 console.log("Setting up a lucid instance against hydra");
 const lucid = await Lucid.new(
-  new HydraProvider("http://localhost:4001"),
+  new HydraProvider("http://3.15.33.186:4001"),
   "Preprod",
 );
 console.log(lucid);
 
 // Private key of the wallet used in hydra devnet:
 //
-// Using a carddano-cli envelope file with a PaymentSigningKeyShelley_ed25519 type:
+// Using a cardano-cli envelope file with a PaymentSigningKeyShelley_ed25519 type:
 // cat /tmp/hydra-cluster-Nothing-2bf845ef1b4b44aa/wallet.sk | jq -r .cborHex | cut -c 5- | bech32 ed25519_sk
 const privateKey =
-  "ed25519_sk1l3r62rzyrk7le5pyplyysthagqkm4wgwks86rfvzwl67vg0ectuqqvv9kw";
+  "ed25519_sk1t7dezxnrv3u7mqa6vqwvljaq4wd9tqnfmsvlm653p5n7tndmtlyqk9sww8";
 lucid.selectWalletFromPrivateKey(privateKey);
 console.info(
   "Using ad-hoc wallet",
@@ -27,13 +27,13 @@ console.info(
 
 // Makeshift hydra client
 
-console.log("connecting to hydra head at ws://127.0.0.1:4001");
+console.log("connecting to hydra head at ws://3.15.33.186:4001");
 
 const protocol = window.location.protocol == "https:" ? "wss:" : "ws:";
-const conn = new WebSocket(protocol + "//127.0.0.1:4001?history=no");
+const conn = new WebSocket(protocol + "//3.15.33.186:4001?history=no");
 
 async function getUTxO() {
-  const res = await fetch("http://127.0.0.1:4001/snapshot/utxo");
+  const res = await fetch("http://3.15.33.186:4001/snapshot/utxo");
   return res.json();
 }
 

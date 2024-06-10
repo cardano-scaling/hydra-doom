@@ -7,19 +7,9 @@ declare function callMain(args: string[]): void;
 
 const startButton: HTMLButtonElement | null = document.querySelector("#start");
 
-// TODO: this is flaky and not always happens (in time?)
-Module.onRuntimeInitialized = () => {
-    console.log("WASM module loaded");
-
+startButton?.addEventListener("click", () => {
     Module.hydraSend = hydraSend;
     Module.hydraRecv = hydraRecv;
-
-    if (startButton) {
-        startButton.disabled = false;
-    }
-};
-
-startButton?.addEventListener("click", () => {
     var args = [
         "-iwad",
         "doom1.wad",
