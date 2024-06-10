@@ -12,7 +12,7 @@ import {
 import { HydraProvider } from "./lucid-provider-hydra";
 import {
   GameData,
-  PlayerState,
+  Player,
   buildDatum,
   initialGameData,
 } from "./contract/datum";
@@ -123,9 +123,25 @@ type Cmd = { forwardMove: number };
 
 let latestUTxO: UTxO | null = null;
 
-export async function hydraSend(cmd: Cmd) {
+export enum GameState {
+  GS_LEVEL,
+  GS_INTERMISSION,
+  GS_FINALE,
+  GS_DEMOSCREEN,
+}
+
+export async function hydraSend(
+  cmd: Cmd,
+  player: Player,
+  gameState: GameState,
+) {
   console.log("hydraSend", cmd);
 
+  if (gameState != GameState.GS_LEVEL) {
+    return;
+  }
+
+  gameData.player = player;
   const utxos = await getUTxOsAtAddress(address);
   if (latestUTxO == null) {
     const utxo = utxos[0];
