@@ -6,7 +6,7 @@ import { HydraProvider } from "./lucid-provider-hydra";
 
 console.log("Setting up a lucid instance against hydra");
 const lucid = await Lucid.new(
-  new HydraProvider("http://3.15.33.186:4001"),
+  new HydraProvider("http://127.0.0.1:4001"),
   "Preprod",
 );
 console.log(lucid);
@@ -27,13 +27,13 @@ console.info(
 
 // Makeshift hydra client
 
-console.log("connecting to hydra head at ws://3.15.33.186:4001");
+console.log("connecting to hydra head at ws://127.0.0.1:4001");
 
 const protocol = window.location.protocol == "https:" ? "wss:" : "ws:";
-const conn = new WebSocket(protocol + "//3.15.33.186:4001?history=no");
+const conn = new WebSocket(protocol + "//127.0.0.1:4001?history=no");
 
 async function getUTxO() {
-  const res = await fetch("http://3.15.33.186:4001/snapshot/utxo");
+  const res = await fetch("http://127.0.0.1:4001/snapshot/utxo");
   return res.json();
 }
 
