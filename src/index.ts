@@ -10,6 +10,8 @@ const startButton: HTMLButtonElement | null = document.querySelector("#start");
 startButton?.addEventListener("click", () => {
     Module.hydraSend = hydraSend;
     Module.hydraRecv = hydraRecv;
+    (window as any).hydraSend = hydraSend;
+    (window as any).hydraRecv = hydraRecv;
     var args = [
         "-iwad",
         "doom1.wad",
