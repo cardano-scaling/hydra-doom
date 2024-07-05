@@ -44,7 +44,7 @@ async function fetchData() {
       throw new Error("Network response was not ok " + response.statusText);
     }
     const data = await response.json();
-    console.log(data);
+    console.log({ data });
     updateUI(data);
   } catch (error) {
     console.error("Fetch error: ", error);
@@ -53,16 +53,18 @@ async function fetchData() {
 
 // Function to update UI with fetched data
 function updateUI(data: any) {
-  if (txPerSecond && data.txPerSecond !== undefined) {
-    txPerSecond.innerText = data.txPerSecond;
+  if (txPerSecond && data.transactions !== undefined) {
+    txPerSecond.innerText = new Intl.NumberFormat("en").format(
+      data.transactions
+    );
   }
-  if (bytesPerSecond && data.bytesPerSecond !== undefined) {
-    bytesPerSecond.innerText = data.bytesPerSecond;
+  if (bytesPerSecond && data.bytes !== undefined) {
+    bytesPerSecond.innerText = new Intl.NumberFormat("en").format(data.bytes);
   }
 }
 
 // Function to start querying the API at intervals
 function startQueryingAPI() {
   fetchData(); // Initial fetch
-  setInterval(fetchData, 5000); // Fetch data every 5 seconds
+  setInterval(fetchData, 1000); // Fetch data every 5 seconds
 }
