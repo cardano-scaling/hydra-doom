@@ -6,8 +6,28 @@
   <meta name="viewport" content="minimal-ui, width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 </html>
 <body>
-  <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
-  <button id="start"> Give em hell</button>
+  <div id="background" style="background-image:url(./background.jpg);" />
+  <img id="logo" src="./logo.png" />
+  <div id="canvas-container">
+    <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1" ></canvas>
+    <button id="start" class="pushable">
+      <span class="shadow"></span>
+      <span class="edge"></span>
+      <span class="front">
+        Give em hell
+      </span>
+    </button>
+  </div>
+  <div id="stats">
+    <dl class="stats-item">
+      <dt>tx/s</dt>
+      <dd id="txps">-</dd>
+    </dl>
+    <dl class="stats-item" >
+      <dt>bytes/s</dt>
+      <dd id="bps">-</dd>
+    </dl>
+  </div>
   <script type="text/javascript">
     // Setup configuration for doom-wasm
     var Module = {
@@ -38,7 +58,7 @@
       setStatus: (text) => {
         console.log("setStatus", text);
       },
-    };
+    }
   </script>
   <script defer type="text/javascript" src="websockets-doom.js"></script>
 </body>
