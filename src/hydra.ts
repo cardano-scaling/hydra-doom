@@ -42,6 +42,8 @@ async function getUTxO() {
 type Cmd = { forwardMove: number };
 
 let latestUTxO: UTxO | null = null;
+let lastTime: number = 0;
+let frameNumber = 0;
 
 export async function hydraSend(cmd: Cmd) {
   console.log("hydraSend", cmd);
