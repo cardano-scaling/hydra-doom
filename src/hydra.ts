@@ -72,10 +72,14 @@ export async function hydraSend(cmd: Cmd) {
     .complete();
   // console.log("tx", tx);
   const signedTx = await tx.sign().complete();
-  // console.log("signed", tx);
-  const txid = await signedTx.submit();
-  // console.log("submitted", txid);
-  latestUTxO.txHash = txid;
+  lastTime = performance.now();
+  if (frameNumber % 1 == 0) {
+    // console.log("signed", tx);
+    const txid = await signedTx.submit();
+    // console.log("submitted", txid);
+    latestUTxO.txHash = txid;
+  }
+  frameNumber++;
 }
 
 export async function hydraRecv(): Promise<Cmd> {
@@ -86,6 +90,8 @@ export async function hydraRecv(): Promise<Cmd> {
       const msg = JSON.parse(e.data);
       switch (msg.tag) {
         case "TxValid":
+          let elapsed = performance.now() - lastTime;
+          console.log("round trip: ", elapsed, "ms");
           const tx = lucid.fromTx(msg.transaction.cborHex);
           const datum = tx.txComplete
             .body()
