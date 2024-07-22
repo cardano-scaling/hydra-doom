@@ -150,7 +150,6 @@ table {
 }
 
 html {
-  overflow-y: scroll;
   font-size: 16px;
   height: 100%;
 }
@@ -297,7 +296,7 @@ a:hover {
 main {
   padding: 54px;
   margin: 0 auto;
-  max-width: 1200px;
+  max-width: 1920px;
 }
 
 @media (max-width: 1200px) {
@@ -361,16 +360,78 @@ main {
     0 0 12px rgba(255, 255, 255, 0.3);
 }
 
+.card--small {
+  padding: 14px 20px;
+}
+
+.card--stats {
+  text-transform: none;
+  font-size: 0.75rem;
+  text-align: left;
+}
+
+.card--stats table {
+  width: 100%;
+}
+
+.card--stats table tr:not(:last-child) td {
+  padding-bottom: 0.3rem;
+}
+
+.card--stats table td:last-of-type {
+  width: 40%;
+  color: #fffb24;
+}
+
+.card--console table {
+  font-size: 0.5rem;
+}
+
+.card--console table td:last-of-type {
+  text-align: right;
+}
+
+.card--console table tr:not(:last-child) td {
+  padding-bottom: 0.5rem;
+}
+
+.card--leaderboard {
+  padding-right: 10px;
+  max-height: 140px;
+  overflow: auto;
+}
+
+.card--leaderboard table {
+  font-size: 0.73rem;
+  color: #fffb24;
+}
+
+.card--leaderboard table td:last-of-type {
+  width: 80%;
+  color: #fff;
+}
+
+.card--leaderboard table button {
+  background: none;
+  color: inherit;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}
+
 /* Play Doom Button */
 
 .play-doom-button {
+  border: none;
+  cursor: pointer;
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 359px;
   height: 67px;
-  margin: auto;
+  margin: 0.625rem auto;
   background: url("assets/images/play-doom-button.png");
   text-decoration: none;
 }
@@ -390,6 +451,7 @@ main {
 .play-doom-button > span {
   margin-top: -0.4rem;
   font-family: "Pixelify Sans", monospace;
+  text-transform: uppercase;
   color: yellow;
   font-size: 1.85rem;
   text-shadow:
@@ -411,7 +473,7 @@ main {
   height: 100%;
   overflow: auto;
   background-color: rgba(13, 13, 13, 0.5);
-  padding: 2rem;
+  padding: 3.125rem 5rem;
 }
 
 .modal__close-btn {
@@ -537,4 +599,157 @@ main {
   background-color: #040404;
   transform: rotate(-45deg);
   box-shadow: 0px 2.41px 6.03px 3.62px #ff4a4a40 inset;
+}
+
+/* Game View Wrapper */
+
+.game-view-wrapper {
+  width: 100%;
+}
+
+/* Header */
+
+.header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header .hydra-logo {
+  top: 0;
+  left: 0;
+}
+
+.header__nav ul {
+  display: flex;
+  gap: 4.25rem;
+}
+
+.header__nav button {
+  border: none;
+  cursor: pointer;
+  font-family: "Pixelify Sans", monospace;
+  text-transform: uppercase;
+  color: #fff;
+  background-color: transparent;
+  background: linear-gradient(180deg, #ffffff 0%, #999999 100%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1rem;
+}
+
+.header__nav button::after {
+  content: "";
+  display: block;
+  width: 103px;
+  height: 1px;
+  margin: 0.3rem auto 0;
+  background-color: #ff3030;
+}
+
+.header__wallet {
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 177px;
+  height: 61px;
+  background: url("assets/images/connect-wallet-button.png");
+}
+
+.header__wallet > span {
+  margin-top: -0.5rem;
+  font-family: "Pixelify Sans", monospace;
+  text-transform: uppercase;
+  color: yellow;
+  font-size: 0.875rem;
+  text-shadow:
+    0 0 10px #db1102,
+    0 0 20px #f2581f,
+    0 0 50px #f2581f,
+    0 0 50px rgba(255, 50, 50, 0.25);
+}
+
+/* Three columns */
+
+.three-columns {
+  display: flex;
+  gap: 5rem;
+  margin-top: 4rem;
+}
+
+.three-columns > div {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.three-columns > div:nth-child(1),
+.three-columns > div:nth-child(3) {
+  width: 289px;
+}
+
+.three-columns > div:nth-child(2) {
+  flex: 1;
+}
+
+/* Block */
+
+.block__heading {
+  margin-bottom: 0.625rem;
+  color: #fff;
+  background-color: transparent;
+  background: linear-gradient(180deg, #ffffff 0%, #999999 100%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1rem;
+}
+
+/* Game Slot */
+
+.game-slot {
+  aspect-ratio: 1028/805;
+  background: linear-gradient(11.57deg, #000000 5.67%, #ff2f2f 68.21%);
+  padding: 5px;
+}
+
+.game-slot__container {
+  background-color: #000;
+  width: 100%;
+  height: 100%;
+}
+
+/* Speedometer */
+
+.speedometer-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  max-width: 190px;
+  margin: 1.5rem auto 0;
+  font-size: 0.9rem;
+  text-transform: none;
+}
+
+.speedometer-labels .red::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 0.5rem;
+  background-color: #b9201b;
+}
+
+.speedometer-labels .yellow::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 0.5rem;
+  background-color: #ccac25;
 }

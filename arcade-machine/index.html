@@ -24,9 +24,9 @@
           />
         </h1>
         <div>
-          <a class="play-doom-button" href="#">
+          <button class="play-doom-button" data-modal-target="modal-game">
             <span>Play Doom On Hydra</span>
-          </a>
+          </button>
         </div>
         <!-- <div class="card">
           <h2 class="card__title">Coming Soon</h2>
@@ -53,7 +53,7 @@
         <div class="bg--guy"></div>
       </div>
     </div>
-    <div id="modal-intro" class="modal" role="dialog" data-modal-auto-open>
+    <div id="modal-intro" class="modal" role="dialog">
       <div class="modal__container">
         <div class="modal__outer-border">
           <div class="modal__top-left-bar"></div>
@@ -82,7 +82,325 @@
         </div>
       </div>
     </div>
-
+    <div id="modal-game" class="modal" role="dialog">
+      <div class="game-view-wrapper">
+        <header class="header">
+          <a target="_blank" class="hydra-logo" href="https://hydra.family">
+            <img src="assets/images/hydra-logo-2-0x.png" alt="Hydra Logo" />
+          </a>
+          <nav class="header__nav">
+            <ul>
+              <li>
+                <button data-modal-target="modal-why-cardano">
+                  Why Cardano?
+                </button>
+              </li>
+              <li>
+                <button data-modal-target="modal-what-is-hydra">
+                  What is Hydra?
+                </button>
+              </li>
+              <li>
+                <button data-modal-target="modal-why-doom">Why Doom?</button>
+              </li>
+            </ul>
+          </nav>
+          <button class="header__wallet"><span>Conntect Wallet</span></button>
+        </header>
+        <div class="three-columns">
+          <div>
+            <article class="block">
+              <h4 class="block__heading">Global Totals</h4>
+              <div class="card card--stats">
+                <table>
+                  <tr>
+                    <td>transactions:</td>
+                    <td>1747</td>
+                  </tr>
+                  <tr>
+                    <td>bytes:</td>
+                    <td>343044</td>
+                  </tr>
+                  <tr>
+                    <td>kills:</td>
+                    <td>0</td>
+                  </tr>
+                  <tr>
+                    <td>items:</td>
+                    <td>0</td>
+                  </tr>
+                  <tr>
+                    <td>secrets:</td>
+                    <td>0</td>
+                  </tr>
+                  <tr>
+                    <td>play_time:</td>
+                    <td>0</td>
+                  </tr>
+                </table>
+              </div>
+            </article>
+            <article class="block">
+              <h4 class="block__heading">Session Totals</h4>
+              <div class="card card--stats">
+                <table>
+                  <tr>
+                    <td>transactions:</td>
+                    <td>1747</td>
+                  </tr>
+                  <tr>
+                    <td>bytes:</td>
+                    <td>343044</td>
+                  </tr>
+                  <tr>
+                    <td>kills:</td>
+                    <td>0</td>
+                  </tr>
+                  <tr>
+                    <td>items:</td>
+                    <td>0</td>
+                  </tr>
+                  <tr>
+                    <td>secrets:</td>
+                    <td>0</td>
+                  </tr>
+                  <tr>
+                    <td>play_time:</td>
+                    <td>0</td>
+                  </tr>
+                </table>
+              </div>
+            </article>
+            <article class="block">
+              <h4 class="block__heading">Hydra Head Live Stats</h4>
+              <div class="card card--stats card--console">
+                <table>
+                  <tr>
+                    <td>hydraSend • {forwardMove: 255}</td>
+                    <td>hydra.ts: 47</td>
+                  </tr>
+                  <tr>
+                    <td>received • {forwardMove: '255'}</td>
+                    <td>hydra.ts: 98</td>
+                  </tr>
+                  <tr>
+                    <td>hydraRecv</td>
+                    <td>hydra.ts: 82</td>
+                  </tr>
+                  <tr>
+                    <td>glue in • Promise {&lt;pending&gt;}</td>
+                    <td>websockets-doom. js: 803</td>
+                  </tr>
+                  <tr>
+                    <td>stdout hydra recv: forwardmove=0</td>
+                    <td>(index): 36</td>
+                  </tr>
+                  <tr>
+                    <td>stdout hydra send: forwardmove=-2 buttons=1</td>
+                    <td>(index) : 36</td>
+                  </tr>
+                </table>
+              </div>
+            </article>
+          </div>
+          <div>
+            <div class="game-slot">
+              <div class="game-slot__container"></div>
+            </div>
+          </div>
+          <div>
+            <article class="block">
+              <h4 class="block__heading">Leaderboard</h4>
+              <div class="card card--stats card--leaderboard">
+                <table>
+                  <tr>
+                    <td>01</td>
+                    <td>
+                      <button
+                        data-copy-clipboard="addr1v83kxv68wsfw12345678912345679j5pwkhjkr7txgrcrj0e"
+                      >
+                        addr1v83kxv68wsfw...j5pwkhjkr7txgrcrj0e
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>02</td>
+                    <td>
+                      <button
+                        data-copy-clipboard="addr1v83kxv68wsfw12345678912345679j5pwkhjkr7txgrcrj0e"
+                      >
+                        addr1v83kxv68wsfw...j5pwkhjkr7txgrcrj0e
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>03</td>
+                    <td>
+                      <button
+                        data-copy-clipboard="addr1v83kxv68wsfw12345678912345679j5pwkhjkr7txgrcrj0e"
+                      >
+                        addr1v83kxv68wsfw...j5pwkhjkr7txgrcrj0e
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>04</td>
+                    <td>
+                      <button
+                        data-copy-clipboard="addr1v83kxv68wsfw12345678912345679j5pwkhjkr7txgrcrj0e"
+                      >
+                        addr1v83kxv68wsfw...j5pwkhjkr7txgrcrj0e
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>05</td>
+                    <td>
+                      <button
+                        data-copy-clipboard="addr1v83kxv68wsfw12345678912345679j5pwkhjkr7txgrcrj0e"
+                      >
+                        addr1v83kxv68wsfw...j5pwkhjkr7txgrcrj0e
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>06</td>
+                    <td>
+                      <button
+                        data-copy-clipboard="addr1v83kxv68wsfw12345678912345679j5pwkhjkr7txgrcrj0e"
+                      >
+                        addr1v83kxv68wsfw...j5pwkhjkr7txgrcrj0e
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>07</td>
+                    <td>
+                      <button
+                        data-copy-clipboard="addr1v83kxv68wsfw12345678912345679j5pwkhjkr7txgrcrj0e"
+                      >
+                        addr1v83kxv68wsfw...j5pwkhjkr7txgrcrj0e
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>08</td>
+                    <td>
+                      <button
+                        data-copy-clipboard="addr1v83kxv68wsfw12345678912345679j5pwkhjkr7txgrcrj0e"
+                      >
+                        addr1v83kxv68wsfw...j5pwkhjkr7txgrcrj0e
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>09</td>
+                    <td>
+                      <button
+                        data-copy-clipboard="addr1v83kxv68wsfw12345678912345679j5pwkhjkr7txgrcrj0e"
+                      >
+                        addr1v83kxv68wsfw...j5pwkhjkr7txgrcrj0e
+                      </button>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </article>
+            <article class="block">
+              <h4 class="block__heading">TPS</h4>
+              <img src="assets/images/speedometer.png" alt="Speedometer" />
+              <ul class="speedometer-labels">
+                <li class="red">Main net max throughput</li>
+                <li class="yellow">Session max throughput</li>
+              </ul>
+            </article>
+            <article class="block">
+              <div class="card card--small card--stats">
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                  do eiusmod tempor incididunt ut labore et dolore aliqua.
+                </p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="modal-why-cardano" class="modal" role="dialog">
+      <div class="modal__container">
+        <div class="modal__outer-border">
+          <div class="modal__top-left-bar"></div>
+          <div class="modal__top-right-bar"></div>
+          <div class="modal__bottom-left-bar"></div>
+          <div class="modal__bottom-right-bar"></div>
+          <div class="modal__mid-gradient">
+            <div class="modal__inner-border">
+              <div class="modal__content">
+                <button
+                  type="button"
+                  class="modal__close-btn"
+                  data-modal-close
+                  aria-label="Close modal"
+                >
+                  X
+                </button>
+                <p>Why Cardano?</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="modal-what-is-hydra" class="modal" role="dialog">
+      <div class="modal__container">
+        <div class="modal__outer-border">
+          <div class="modal__top-left-bar"></div>
+          <div class="modal__top-right-bar"></div>
+          <div class="modal__bottom-left-bar"></div>
+          <div class="modal__bottom-right-bar"></div>
+          <div class="modal__mid-gradient">
+            <div class="modal__inner-border">
+              <div class="modal__content">
+                <button
+                  type="button"
+                  class="modal__close-btn"
+                  data-modal-close
+                  aria-label="Close modal"
+                >
+                  X
+                </button>
+                <p>What is Hydra?</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="modal-why-doom" class="modal" role="dialog">
+      <div class="modal__container">
+        <div class="modal__outer-border">
+          <div class="modal__top-left-bar"></div>
+          <div class="modal__top-right-bar"></div>
+          <div class="modal__bottom-left-bar"></div>
+          <div class="modal__bottom-right-bar"></div>
+          <div class="modal__mid-gradient">
+            <div class="modal__inner-border">
+              <div class="modal__content">
+                <button
+                  type="button"
+                  class="modal__close-btn"
+                  data-modal-close
+                  aria-label="Close modal"
+                >
+                  X
+                </button>
+                <p>Why Doom?</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <script defer type="text/javascript" src="index.js"></script>
   </body>
 </html>

@@ -38,4 +38,16 @@ document.addEventListener("DOMContentLoaded", (event) => {
   document.querySelectorAll("[data-modal-auto-open]").forEach((modal) => {
     openModal(modal);
   });
+
+  /**
+   * Copy to clipboard
+   */
+  document.querySelectorAll("[data-copy-clipboard]").forEach((element) => {
+    element.addEventListener("click", (event) => {
+      const data = event.target.getAttribute("data-copy-clipboard");
+      navigator.clipboard.writeText(data).then(function () {
+        alert("Copied to clipboard: " + data);
+      });
+    });
+  });
 });
