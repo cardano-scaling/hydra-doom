@@ -388,8 +388,10 @@ main {
 }
 
 .play-doom-button > span {
+  margin-top: -0.4rem;
+  font-family: "Pixelify Sans", monospace;
   color: yellow;
-  font-size: 2.1rem;
+  font-size: 1.85rem;
   text-shadow:
     0 0 10px #db1102,
     0 0 20px #f2581f,
