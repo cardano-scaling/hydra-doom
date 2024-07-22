@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hydra Doom</title>
+    <link rel="stylesheet" href="styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <div class="layer--wrapper">
+      <main class="layer--base">
+        <a target="_blank" class="hydra-logo" href="https://hydra.family">
+          <img src="assets/images/hydra-logo-2-0x.png" alt="Hydra Logo" />
+        </a>
+        <h1 class="doom-logo">
+          <img
+            srcset="
+              assets/images/hydra-text-1-0x.png 1200w,
+              assets/images/hydra-text-1-5x.png 1920w
+            "
+            sizes="(max-width: 1200px) 1200px, 1920px"
+            src="assets/images/hydra-text-1-0x.png"
+            alt="Hydra Doom"
+          />
+        </h1>
+        <div class="card">
+          <h2 class="card__title">Coming Soon</h2>
+          <p class="card__description">
+            Learn more about hydra here:
+            <a target="_blank" href="https://hydra.family">hydra.family</a>
+          </p>
+        </div>
+      </main>
+      <div class="layer--bg">
+        <img
+          class="bg--main"
+          srcset="
+            assets/images/bg-0-5x.jpg  768w,
+            assets/images/bg-1-0x.jpg 1200w,
+            assets/images/bg-1-5x.jpg 1920w
+          "
+          sizes="(max-width: 768px) 768px, (max-width: 1200px) 1200px, 1920px"
+          src="assets/images/bg-1-0x.jpg"
+          alt=""
+        />
+      </div>
+      <div class="layer--foreground">
+        <div class="bg--guy"></div>
+      </div>
+    </div>
+  </body>
+</html>
