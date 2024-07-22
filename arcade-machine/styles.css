@@ -353,3 +353,39 @@ main {
     0 0 2px rgba(255, 255, 255, 0.5),
     0 0 12px rgba(255, 255, 255, 0.3);
 }
+
+/* Play Doom Button */
+
+.play-doom-button {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 359px;
+  height: 67px;
+  margin: auto;
+  background: url("assets/images/play-doom-button.png");
+  text-decoration: none;
+}
+
+.play-doom-button:before {
+  content: "";
+  z-index: -1;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 436px;
+  height: 228px;
+  background: url("assets/images/play-doom-button-bg.png");
+  pointer-events: none;
+}
+
+.play-doom-button > span {
+  color: yellow;
+  font-size: 2.1rem;
+  text-shadow:
+    0 0 10px #db1102,
+    0 0 20px #f2581f,
+    0 0 50px #f2581f,
+    0 0 50px rgba(255, 50, 50, 0.25);
+}
