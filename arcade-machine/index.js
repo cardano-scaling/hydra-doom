@@ -1,28 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
   /**
-   * Helpers
-   */
-  function matchBreakpoint(breakpoint, callback) {
-    const mediaQuery = window.matchMedia(breakpoint);
-    if (mediaQuery.matches) callback();
-
-    mediaQuery.addEventListener("change", (event) => {
-      if (event.matches) callback();
-    });
-  }
-
-  /**
    * Modal
    */
   const openModal = (modal) => {
     if (modal) {
       modal.style.display = "flex";
 
-      if (
-        modal.id === "modal-game" ||
-        modal.id === "modal-intro" ||
-        modal.id === "modal-fallback"
-      ) {
+      if (modal.id === "modal-game" || modal.id === "modal-intro") {
         document
           .querySelectorAll(".js-hide-when-modal-opens")
           .forEach((element) => {
@@ -61,23 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // window.addEventListener('click', (event) => {
-  //   if (event.target.classList.contains('modal')) {
-  //     closeModal(event.target);
-  //   }
-  // });
-
   document.querySelectorAll("[data-modal-auto-open]").forEach((modal) => {
     openModal(modal);
-  });
-
-  // Prevents game from being played on mobile devices
-  matchBreakpoint("(max-width: 768px)", () => {
-    document.querySelectorAll(".modal").forEach((modal) => {
-      closeModal(modal);
-      const fallback = document.getElementById("modal-fallback");
-      openModal(fallback);
-    });
   });
 
   /**
