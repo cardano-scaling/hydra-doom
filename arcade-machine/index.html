@@ -10,13 +10,13 @@
     <div class="layer--wrapper">
       <a
         target="_blank"
-        class="hydra-logo js-hide-when-game-opens"
+        class="hydra-logo js-hide-when-modal-opens"
         href="https://hydra.family"
       >
         <img src="assets/images/hydra-logo-2-0x.png" alt="Hydra Logo" />
       </a>
       <main class="layer--base">
-        <h1 class="doom-logo js-hide-when-game-opens">
+        <h1 class="doom-logo js-hide-when-modal-opens">
           <img
             srcset="
               assets/images/hydra-text-1-0x.png 1200w,
@@ -27,7 +27,7 @@
             alt="Hydra Doom"
           />
         </h1>
-        <div class="js-hide-when-game-opens">
+        <div class="js-hide-when-modal-opens">
           <button class="play-doom-button" data-modal-target="modal-game">
             <span>Play Doom On Hydra</span>
           </button>
@@ -50,41 +50,73 @@
         <div class="bg--guy"></div>
       </div>
     </div>
-    <div id="modal-intro" class="modal" role="dialog" data-modal-auto-open>
-      <div class="modal__container">
-        <div class="modal__outer-border">
-          <div class="modal__top-left-bar"></div>
-          <div class="modal__top-right-bar"></div>
-          <div class="modal__bottom-left-bar"></div>
-          <div class="modal__bottom-right-bar"></div>
-          <div class="modal__mid-gradient">
-            <div class="modal__inner-border">
-              <div class="modal__content">
-                <button
-                  type="button"
-                  class="modal__close-btn"
-                  data-modal-close
-                  aria-label="Close modal"
-                >
-                  X
-                </button>
-                <p>
-                  Dicta consectetur exercitationem fugit libero, nisi
-                  accusantium. Perferendis, dolores sit. Dolor ad nostrum
-                  quibusdam exercitationem vel dignissimos voluptatibus.
-                </p>
+    <div id="modal-fallback" class="modal" role="dialog">
+      <div class="modal__outer-container">
+        <div class="modal__container">
+          <div class="modal__outer-border">
+            <div class="modal__top-left-bar"></div>
+            <div class="modal__top-right-bar"></div>
+            <div class="modal__bottom-left-bar"></div>
+            <div class="modal__bottom-right-bar"></div>
+            <div class="modal__mid-gradient">
+              <div class="modal__inner-border">
+                <div class="modal__content">
+                  <p>To experience DOOM on Hydra, please visit on desktop.</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        <a target="_blank" class="hydra-logo" href="https://hydra.family">
+          <img src="assets/images/hydra-logo-2-0x.png" alt="Hydra Logo" />
+        </a>
       </div>
     </div>
-    <div id="modal-game" class="modal" role="dialog">
+    <div
+      id="modal-intro"
+      class="modal modal"
+      role="dialog"
+      data-modal-auto-open
+    >
+      <div class="modal__outer-container">
+        <div class="modal__container">
+          <div class="modal__outer-border">
+            <div class="modal__top-left-bar"></div>
+            <div class="modal__top-right-bar"></div>
+            <div class="modal__bottom-left-bar"></div>
+            <div class="modal__bottom-right-bar"></div>
+            <div class="modal__mid-gradient">
+              <div class="modal__inner-border">
+                <div class="modal__content">
+                  <button
+                    type="button"
+                    class="modal__close-btn"
+                    data-modal-close
+                    aria-label="Close modal"
+                  >
+                    X
+                  </button>
+                  <p>
+                    Dicta consectetur exercitationem fugit libero, nisi
+                    accusantium. Perferendis, dolores sit. Dolor ad nostrum
+                    quibusdam exercitationem vel dignissimos voluptatibus.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <a target="_blank" class="hydra-logo" href="https://hydra.family">
+          <img src="assets/images/hydra-logo-2-0x.png" alt="Hydra Logo" />
+        </a>
+      </div>
+    </div>
+    <div id="modal-game" class="modal modal--game" role="dialog">
+      <a target="_blank" class="hydra-logo" href="https://hydra.family">
+        <img src="assets/images/hydra-logo-2-0x.png" alt="Hydra Logo" />
+      </a>
       <div class="game-view-wrapper">
         <header class="header">
-          <a target="_blank" class="hydra-logo" href="https://hydra.family">
-            <img src="assets/images/hydra-logo-2-0x.png" alt="Hydra Logo" />
-          </a>
           <nav class="header__nav">
             <ul>
               <li>
@@ -329,78 +361,93 @@
       </div>
     </div>
     <div id="modal-why-cardano" class="modal" role="dialog">
-      <div class="modal__container">
-        <div class="modal__outer-border">
-          <div class="modal__top-left-bar"></div>
-          <div class="modal__top-right-bar"></div>
-          <div class="modal__bottom-left-bar"></div>
-          <div class="modal__bottom-right-bar"></div>
-          <div class="modal__mid-gradient">
-            <div class="modal__inner-border">
-              <div class="modal__content">
-                <button
-                  type="button"
-                  class="modal__close-btn"
-                  data-modal-close
-                  aria-label="Close modal"
-                >
-                  X
-                </button>
-                <p>Why Cardano?</p>
+      <div class="modal__outer-container">
+        <div class="modal__container">
+          <div class="modal__outer-border">
+            <div class="modal__top-left-bar"></div>
+            <div class="modal__top-right-bar"></div>
+            <div class="modal__bottom-left-bar"></div>
+            <div class="modal__bottom-right-bar"></div>
+            <div class="modal__mid-gradient">
+              <div class="modal__inner-border">
+                <div class="modal__content">
+                  <button
+                    type="button"
+                    class="modal__close-btn"
+                    data-modal-close
+                    aria-label="Close modal"
+                  >
+                    X
+                  </button>
+                  <p>Why Cardano?</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        <a target="_blank" class="hydra-logo" href="https://hydra.family">
+          <img src="assets/images/hydra-logo-2-0x.png" alt="Hydra Logo" />
+        </a>
       </div>
     </div>
     <div id="modal-what-is-hydra" class="modal" role="dialog">
-      <div class="modal__container">
-        <div class="modal__outer-border">
-          <div class="modal__top-left-bar"></div>
-          <div class="modal__top-right-bar"></div>
-          <div class="modal__bottom-left-bar"></div>
-          <div class="modal__bottom-right-bar"></div>
-          <div class="modal__mid-gradient">
-            <div class="modal__inner-border">
-              <div class="modal__content">
-                <button
-                  type="button"
-                  class="modal__close-btn"
-                  data-modal-close
-                  aria-label="Close modal"
-                >
-                  X
-                </button>
-                <p>What is Hydra?</p>
+      <div class="modal__outer-container">
+        <div class="modal__container">
+          <div class="modal__outer-border">
+            <div class="modal__top-left-bar"></div>
+            <div class="modal__top-right-bar"></div>
+            <div class="modal__bottom-left-bar"></div>
+            <div class="modal__bottom-right-bar"></div>
+            <div class="modal__mid-gradient">
+              <div class="modal__inner-border">
+                <div class="modal__content">
+                  <button
+                    type="button"
+                    class="modal__close-btn"
+                    data-modal-close
+                    aria-label="Close modal"
+                  >
+                    X
+                  </button>
+                  <p>What is Hydra?</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        <a target="_blank" class="hydra-logo" href="https://hydra.family">
+          <img src="assets/images/hydra-logo-2-0x.png" alt="Hydra Logo" />
+        </a>
       </div>
     </div>
     <div id="modal-why-doom" class="modal" role="dialog">
-      <div class="modal__container">
-        <div class="modal__outer-border">
-          <div class="modal__top-left-bar"></div>
-          <div class="modal__top-right-bar"></div>
-          <div class="modal__bottom-left-bar"></div>
-          <div class="modal__bottom-right-bar"></div>
-          <div class="modal__mid-gradient">
-            <div class="modal__inner-border">
-              <div class="modal__content">
-                <button
-                  type="button"
-                  class="modal__close-btn"
-                  data-modal-close
-                  aria-label="Close modal"
-                >
-                  X
-                </button>
-                <p>Why Doom?</p>
+      <div class="modal__outer-container">
+        <div class="modal__container">
+          <div class="modal__outer-border">
+            <div class="modal__top-left-bar"></div>
+            <div class="modal__top-right-bar"></div>
+            <div class="modal__bottom-left-bar"></div>
+            <div class="modal__bottom-right-bar"></div>
+            <div class="modal__mid-gradient">
+              <div class="modal__inner-border">
+                <div class="modal__content">
+                  <button
+                    type="button"
+                    class="modal__close-btn"
+                    data-modal-close
+                    aria-label="Close modal"
+                  >
+                    X
+                  </button>
+                  <p>Why Doom?</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        <a target="_blank" class="hydra-logo" href="https://hydra.family">
+          <img src="assets/images/hydra-logo-2-0x.png" alt="Hydra Logo" />
+        </a>
       </div>
     </div>
     <script defer type="text/javascript" src="index.js"></script>

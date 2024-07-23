@@ -296,12 +296,14 @@ main {
   top: 65px;
   left: 60px;
   width: 53px;
-  z-index: 5000;
+  z-index: 2;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1600px) {
   .hydra-logo {
-    width: 32px;
+    top: 40px;
+    left: 45px;
+    width: 49px;
   }
 }
 
@@ -453,6 +455,7 @@ main {
 
 .modal {
   display: none;
+  flex-direction: column;
   position: fixed;
   z-index: 4000;
   left: 0;
@@ -461,7 +464,7 @@ main {
   height: 100%;
   overflow: auto;
   background-color: rgba(13, 13, 13, 0.5);
-  padding: 1.25rem;
+  padding: 1.25rem 6.25rem;
 }
 
 .modal__close-btn {
@@ -481,6 +484,11 @@ main {
     0 0 20px #f2581f,
     0 0 50px #f2581f,
     0 0 50px rgba(255, 50, 50, 0.25);
+}
+
+.modal__outer-container {
+  width: 100%;
+  margin: auto;
 }
 
 .modal__container {
@@ -520,7 +528,7 @@ main {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 15% 20%;
+  padding: 12% 20%;
   position: relative;
   background-color: #1d1515;
   box-shadow: 0px 2.41px 6.03px 3.62px rgba(255, 74, 74, 0.25) inset;
@@ -589,6 +597,41 @@ main {
   box-shadow: 0px 2.41px 6.03px 3.62px #ff4a4a40 inset;
 }
 
+.modal--game {
+  padding: 1.25rem;
+}
+
+@media (max-width: 1900px) {
+  .modal__container {
+    max-width: 1240px;
+  }
+}
+
+@media (max-width: 1600px) {
+  .modal__content {
+    padding: 10% 15%;
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal {
+    padding-inline: 5rem;
+  }
+
+  .modal__content {
+    min-height: 60vh;
+  }
+
+  .hydra-logo {
+    position: relative;
+    top: auto;
+    left: 0;
+    right: 0;
+    margin: 46px auto auto;
+  }
+}
+
 /* Game View Wrapper */
 
 .game-view-wrapper {
@@ -606,14 +649,15 @@ main {
   justify-content: center;
 }
 
-.header .hydra-logo {
-  top: 0.4rem;
-  left: 0;
-}
-
 .header__nav ul {
   display: flex;
   gap: 4.25rem;
+}
+
+@media (max-width: 1024px) {
+  .header__nav ul {
+    gap: 1rem;
+  }
 }
 
 .header__nav button {
@@ -666,13 +710,22 @@ main {
     0 0 50px rgba(255, 50, 50, 0.25);
 }
 
+@media (max-width: 1024px) {
+  .header__wallet {
+    width: 150px;
+    height: 52px;
+    background-size: cover;
+  }
+}
+
 /* Three columns */
 
 .three-columns {
   display: flex;
-  gap: 4.7rem;
+  gap: 1.25rem 4.7rem;
   padding: 4rem 1rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .three-columns > div {
@@ -688,6 +741,7 @@ main {
 
 .three-columns > div:nth-child(2) {
   flex: 1;
+  min-width: 300px;
 }
 
 /* Block */
