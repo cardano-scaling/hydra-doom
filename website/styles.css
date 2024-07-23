@@ -299,6 +299,14 @@ main {
   z-index: 2;
 }
 
+@media (max-width: 1600px) {
+  .hydra-logo {
+    top: 40px;
+    left: 45px;
+    width: 49px;
+  }
+}
+
 .doom-logo img {
   display: block;
   margin: -3.5% auto -4.5%;
@@ -640,14 +648,15 @@ main {
   justify-content: center;
 }
 
-.header .hydra-logo {
-  top: 0.4rem;
-  left: 0;
-}
-
 .header__nav ul {
   display: flex;
   gap: 4.25rem;
+}
+
+@media (max-width: 1024px) {
+  .header__nav ul {
+    gap: 1rem;
+  }
 }
 
 .header__nav button {
@@ -698,6 +707,14 @@ main {
     0 0 20px #f2581f,
     0 0 50px #f2581f,
     0 0 50px rgba(255, 50, 50, 0.25);
+}
+
+@media (max-width: 1024px) {
+  .header__wallet {
+    width: 150px;
+    height: 52px;
+    background-size: cover;
+  }
 }
 
 /* Three columns */
