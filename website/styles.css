@@ -296,13 +296,7 @@ main {
   top: 65px;
   left: 60px;
   width: 53px;
-  z-index: 5000;
-}
-
-@media (max-width: 1200px) {
-  .hydra-logo {
-    width: 32px;
-  }
+  z-index: 2;
 }
 
 .doom-logo img {
@@ -453,6 +447,7 @@ main {
 
 .modal {
   display: none;
+  flex-direction: column;
   position: fixed;
   z-index: 4000;
   left: 0;
@@ -520,7 +515,7 @@ main {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 15% 20%;
+  padding: 12% 20%;
   position: relative;
   background-color: #1d1515;
   box-shadow: 0px 2.41px 6.03px 3.62px rgba(255, 74, 74, 0.25) inset;
@@ -587,6 +582,45 @@ main {
   background-color: #040404;
   transform: rotate(-45deg);
   box-shadow: 0px 2.41px 6.03px 3.62px #ff4a4a40 inset;
+}
+
+.modal--responsive {
+  padding-inline: 6.25rem;
+}
+
+.modal--responsive .modal__outer-container {
+  margin: auto;
+}
+
+@media (max-width: 1900px) {
+  .modal--responsive .modal__container {
+    max-width: 1240px;
+  }
+}
+
+@media (max-width: 1600px) {
+  .modal--responsive .modal__content {
+    padding: 10% 15%;
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal--responsive {
+    padding-inline: 5rem;
+  }
+
+  .modal--responsive .modal__content {
+    min-height: 60vh;
+  }
+
+  .modal--responsive .hydra-logo {
+    position: relative;
+    top: auto;
+    left: 0;
+    right: 0;
+    margin: 46px auto auto;
+  }
 }
 
 /* Game View Wrapper */

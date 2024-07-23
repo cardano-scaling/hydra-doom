@@ -1,4 +1,16 @@
-document.addEventListener("DOMContentLoaded", (event) => {
+document.addEventListener("DOMContentLoaded", () => {
+  /**
+   * Helpers
+   */
+  function matchBreakpoint(breakpoint, callback) {
+    const mediaQuery = window.matchMedia(breakpoint);
+    if (mediaQuery.matches) callback();
+
+    mediaQuery.addEventListener("change", (event) => {
+      if (event.matches) callback();
+    });
+  }
+
   /**
    * Modal
    */
@@ -6,9 +18,13 @@ document.addEventListener("DOMContentLoaded", (event) => {
     if (modal) {
       modal.style.display = "flex";
 
-      if (modal.id === "modal-game") {
+      if (
+        modal.id === "modal-game" ||
+        modal.id === "modal-intro" ||
+        modal.id === "modal-fallback"
+      ) {
         document
-          .querySelectorAll(".js-hide-when-game-opens")
+          .querySelectorAll(".js-hide-when-modal-opens")
           .forEach((element) => {
             element.style.display = "none";
           });
@@ -19,6 +35,12 @@ document.addEventListener("DOMContentLoaded", (event) => {
   const closeModal = (modal) => {
     if (modal) {
       modal.style.display = "none";
+
+      document
+        .querySelectorAll(".js-hide-when-modal-opens")
+        .forEach((element) => {
+          element.style.display = "flex";
+        });
     }
   };
 
@@ -45,6 +67,15 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
   document.querySelectorAll("[data-modal-auto-open]").forEach((modal) => {
     openModal(modal);
+  });
+
+  // Prevents game from being played on mobile devices
+  matchBreakpoint("(max-width: 768px)", () => {
+    document.querySelectorAll(".modal").forEach((modal) => {
+      closeModal(modal);
+      const fallback = document.getElementById("modal-fallback");
+      openModal(fallback);
+    });
   });
 
   /**
