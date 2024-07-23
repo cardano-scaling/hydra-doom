@@ -136,6 +136,13 @@ table {
   font-style: normal;
 }
 
+@font-face {
+  font-family: "Pixelify Sans";
+  src: url("assets/fonts/pixelifysans-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
 /* Global */
 
 * {
@@ -231,7 +238,7 @@ a:hover {
   position: relative;
   z-index: 2;
   overflow: hidden;
-  margin-top: -120px;
+  margin-top: -100px;
   max-height: 50vh;
   min-height: 500px;
   height: 900px;
@@ -301,21 +308,47 @@ main {
 
 .hydra-logo {
   position: absolute;
+  top: 65px;
+  left: 55px;
   display: block;
   width: 53px;
+  z-index: 2;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1440px) {
   .hydra-logo {
-    width: 32px;
+    top: 40px;
+    left: 45px;
+    width: 49px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hydra-logo {
+    top: 25px;
+    left: 30px;
+    width: 30px;
   }
 }
 
 .doom-logo img {
   display: block;
-  margin: -3% auto -4.5%;
+  margin: -4.5% auto -6.5%;
   width: 970px;
   max-width: 70vw;
+}
+
+@media (max-width: 1440px) {
+  .doom-logo img {
+    margin-top: -7.5%;
+    margin-bottom: -4.5%;
+  }
+}
+
+@media (max-width: 1200px) {
+  .doom-logo img {
+    margin-top: -4%;
+  }
 }
 
 @media (max-width: 768px) {
@@ -331,15 +364,17 @@ main {
   box-shadow: 0px 4px 10px 6px rgba(0, 0, 0, 0.25);
   max-width: 535px;
   text-align: center;
-  padding: 24px 14px;
+  padding: 15px 15px 20px;
   margin: 0 auto;
   font-size: 1.45rem;
 }
 
 .card__title {
+  font-family: "Pixelify Sans";
+  font-weight: 700;
   font-size: 2.5rem;
   letter-spacing: -0.01em;
-  padding: 0 0 0.25em;
+  padding: 0 0 0.3em;
   color: yellow;
   text-shadow:
     0 0 10px #db1102,
