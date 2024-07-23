@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hydra Doom</title>
+    <link rel="stylesheet" href="styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <div class="card">
+      <h2 class="card__title">Coming Soon</h2>
+      <p class="card__description">
+        Learn more about hydra here:
+        <a target="_blank" href="https://hydra.family">hydra.family</a>
+      </p>
+    </div>
+
+    <div style="margin-top: 100px; margin-bottom: 100px">
+      <button class="play-doom-button">
+        <span>Play Doom On Hydra</span>
+      </button>
+    </div>
+
+    <button data-modal-target="modal-example-1">Open Modal Example 1</button>
+    <div id="modal-example-1" class="modal" role="dialog">
+      <div class="modal__container">
+        <div class="modal__outer-border">
+          <div class="modal__top-left-bar"></div>
+          <div class="modal__top-right-bar"></div>
+          <div class="modal__bottom-left-bar"></div>
+          <div class="modal__bottom-right-bar"></div>
+          <div class="modal__mid-gradient">
+            <div class="modal__inner-border">
+              <div class="modal__content">
+                <button
+                  type="button"
+                  class="modal__close-btn"
+                  data-modal-close
+                  aria-label="Close modal"
+                >
+                  X
+                </button>
+                <p>
+                  Example 1, dicta consectetur exercitationem fugit libero, nisi
+                  accusantium. Perferendis, dolores sit. Dolor ad nostrum
+                  quibusdam exercitationem vel dignissimos voluptatibus.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button data-modal-target="modal-example-2">Open Modal Example 2</button>
+    <div id="modal-example-2" class="modal" role="dialog">
+      <div class="modal__container">
+        <div class="modal__outer-border">
+          <div class="modal__top-left-bar"></div>
+          <div class="modal__top-right-bar"></div>
+          <div class="modal__bottom-left-bar"></div>
+          <div class="modal__bottom-right-bar"></div>
+          <div class="modal__mid-gradient">
+            <div class="modal__inner-border">
+              <div class="modal__content">
+                <button
+                  type="button"
+                  class="modal__close-btn"
+                  data-modal-close
+                  aria-label="Close modal"
+                >
+                  X
+                </button>
+                <p>
+                  Example 2, dicta consectetur exercitationem fugit libero, nisi
+                  accusantium.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="speedometer">
+      <div class="speedometer__tick" data-speedometer-value=""></div>
+    </div>
+
+    <script defer type="text/javascript" src="index.js"></script>
+  </body>
+</html>
