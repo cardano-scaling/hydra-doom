@@ -594,7 +594,7 @@ main {
 .game-view-wrapper {
   width: 100%;
   max-width: 1800px;
-  margin: 2.4rem auto;
+  margin: 2.4rem auto 0;
 }
 
 /* Header */

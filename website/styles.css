@@ -628,7 +628,7 @@ main {
 .game-view-wrapper {
   width: 100%;
   max-width: 1800px;
-  margin: 2.4rem auto;
+  margin: 2.4rem auto 0;
 }
 
 /* Header */
@@ -704,9 +704,10 @@ main {
 
 .three-columns {
   display: flex;
-  gap: 4.7rem;
+  gap: 1.25rem 4.7rem;
   padding: 4rem 1rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .three-columns > div {
@@ -722,6 +723,7 @@ main {
 
 .three-columns > div:nth-child(2) {
   flex: 1;
+  min-width: 300px;
 }
 
 /* Block */
