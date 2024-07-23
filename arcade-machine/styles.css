@@ -473,7 +473,7 @@ main {
   height: 100%;
   overflow: auto;
   background-color: rgba(13, 13, 13, 0.5);
-  padding: 3.125rem 5rem;
+  padding: 1.25rem;
 }
 
 .modal__close-btn {
@@ -605,6 +605,8 @@ main {
 
 .game-view-wrapper {
   width: 100%;
+  max-width: 1800px;
+  margin: 2.4rem auto;
 }
 
 /* Header */
@@ -617,7 +619,7 @@ main {
 }
 
 .header .hydra-logo {
-  top: 0;
+  top: 0.4rem;
   left: 0;
 }
 
@@ -655,10 +657,11 @@ main {
   justify-content: center;
   align-items: center;
   position: absolute;
-  top: 0;
-  right: 0;
+  top: -0.7rem;
+  right: 10px;
   width: 177px;
   height: 61px;
+  padding: 0;
   background: url("assets/images/connect-wallet-button.png");
 }
 
@@ -679,8 +682,9 @@ main {
 
 .three-columns {
   display: flex;
-  gap: 5rem;
-  margin-top: 4rem;
+  gap: 4.7rem;
+  padding: 4rem 1rem;
+  align-items: center;
 }
 
 .three-columns > div {
@@ -716,6 +720,7 @@ main {
   aspect-ratio: 1028/805;
   background: linear-gradient(11.57deg, #000000 5.67%, #ff2f2f 68.21%);
   padding: 5px;
+  box-shadow: 0px 4px 10px 6px rgba(0, 0, 0, 0.25);
 }
 
 .game-slot__container {
