@@ -293,7 +293,10 @@ main {
 .hydra-logo {
   position: absolute;
   display: block;
+  top: 65px;
+  left: 60px;
   width: 53px;
+  z-index: 5000;
 }
 
 @media (max-width: 1200px) {
@@ -304,7 +307,7 @@ main {
 
 .doom-logo img {
   display: block;
-  margin: -3.3% auto -4.5%;
+  margin: -3.5% auto -4.5%;
   width: 970px;
   max-width: 70vw;
 }
