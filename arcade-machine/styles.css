@@ -719,12 +719,55 @@ main {
 
 /* Speedometer */
 
+.speedometer {
+  width: 30px;
+  height: 15px;
+  border-top-left-radius: 360px;
+  border-top-right-radius: 360px;
+  border: 145px solid transparent;
+  border-bottom: 0;
+  position: relative;
+}
+
+.speedometer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 289px;
+  height: 153px;
+  background: url("assets/images/speedometer.png");
+  background-size: cover;
+  transform: translate(-50%, -94%);
+}
+
+.speedometer__tick {
+  position: absolute;
+  bottom: -10px;
+  left: -115px;
+  width: 113px;
+  height: 19px;
+  transform-origin: right center;
+  transform: rotate(0deg); /* updated via js */
+}
+
+.speedometer__tick::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 23px;
+  width: 113px;
+  height: 19px;
+  background: url("assets/images/speedometer-tick.png");
+  background-size: cover;
+}
+
 .speedometer-labels {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
   max-width: 190px;
-  margin: 1.5rem auto 0;
+  margin: 2.5rem auto 0;
   font-size: 0.9rem;
   text-transform: none;
 }
