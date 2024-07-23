@@ -12,7 +12,7 @@
         <a target="_blank" class="hydra-logo" href="https://hydra.family">
           <img src="assets/images/hydra-logo-2-0x.png" alt="Hydra Logo" />
         </a>
-        <h1 class="doom-logo">
+        <h1 class="doom-logo js-hide-when-game-opens">
           <img
             srcset="
               assets/images/hydra-text-1-0x.png 1200w,
@@ -23,7 +23,7 @@
             alt="Hydra Doom"
           />
         </h1>
-        <div>
+        <div class="js-hide-when-game-opens">
           <button class="play-doom-button" data-modal-target="modal-game">
             <span>Play Doom On Hydra</span>
           </button>
@@ -53,7 +53,7 @@
         <div class="bg--guy"></div>
       </div>
     </div>
-    <div id="modal-intro" class="modal" role="dialog">
+    <div id="modal-intro" class="modal" role="dialog" data-modal-auto-open>
       <div class="modal__container">
         <div class="modal__outer-border">
           <div class="modal__top-left-bar"></div>

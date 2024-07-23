@@ -5,6 +5,14 @@ document.addEventListener("DOMContentLoaded", (event) => {
   const openModal = (modal) => {
     if (modal) {
       modal.style.display = "flex";
+
+      if (modal.id === "modal-game") {
+        document
+          .querySelectorAll(".js-hide-when-game-opens")
+          .forEach((element) => {
+            element.style.display = "none";
+          });
+      }
     }
   };
 
