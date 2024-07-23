@@ -36,11 +36,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (modal) {
       modal.style.display = "none";
 
-      document
-        .querySelectorAll(".js-hide-when-modal-opens")
-        .forEach((element) => {
-          element.style.display = "flex";
-        });
+      if (modal.id === "modal-intro") {
+        document
+          .querySelectorAll(".js-hide-when-modal-opens")
+          .forEach((element) => {
+            element.style.display = "flex";
+          });
+      }
     }
   };
 

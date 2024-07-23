@@ -464,7 +464,7 @@ main {
   height: 100%;
   overflow: auto;
   background-color: rgba(13, 13, 13, 0.5);
-  padding: 1.25rem;
+  padding: 1.25rem 6.25rem;
 }
 
 .modal__close-btn {
@@ -484,6 +484,11 @@ main {
     0 0 20px #f2581f,
     0 0 50px #f2581f,
     0 0 50px rgba(255, 50, 50, 0.25);
+}
+
+.modal__outer-container {
+  width: 100%;
+  margin: auto;
 }
 
 .modal__container {
@@ -592,37 +597,33 @@ main {
   box-shadow: 0px 2.41px 6.03px 3.62px #ff4a4a40 inset;
 }
 
-.modal--responsive {
-  padding-inline: 6.25rem;
-}
-
-.modal--responsive .modal__outer-container {
-  margin: auto;
+.modal--game {
+  padding: 1.25rem;
 }
 
 @media (max-width: 1900px) {
-  .modal--responsive .modal__container {
+  .modal__container {
     max-width: 1240px;
   }
 }
 
 @media (max-width: 1600px) {
-  .modal--responsive .modal__content {
+  .modal__content {
     padding: 10% 15%;
     font-size: 2.5rem;
   }
 }
 
 @media (max-width: 768px) {
-  .modal--responsive {
+  .modal {
     padding-inline: 5rem;
   }
 
-  .modal--responsive .modal__content {
+  .modal__content {
     min-height: 60vh;
   }
 
-  .modal--responsive .hydra-logo {
+  .hydra-logo {
     position: relative;
     top: auto;
     left: 0;
