@@ -239,7 +239,7 @@ a:hover {
   overflow: hidden;
   margin-top: -120px;
   max-height: 50vh;
-  min-height: 500px;
+  min-height: 560px;
   height: 900px;
 }
 
@@ -264,37 +264,22 @@ a:hover {
 }
 
 .bg--guy {
-  max-width: 1600px;
+  max-width: 1920px;
   position: absolute;
   bottom: 0;
   right: 0;
   width: 100%;
   height: 100%;
-  background-image: image-set(
-    url("assets/images/doom-guy-1-0x.png") 1x,
-    url("assets/images/doom-guy-1-5x.png") 2x
-  );
+  background-image: url("assets/images/doom-guy-1920.png");
   background-size: cover;
   background-repeat: no-repeat;
-  background-position: right 85% bottom;
-}
-
-@media (max-width: 1200px) {
-  .bg--guy {
-    background-position: right 72% bottom;
-  }
-}
-
-@media (max-width: 768px) {
-  .bg--guy {
-    background-position: right 60% bottom;
-  }
+  background-position: center bottom;
 }
 
 /* Body */
 
 main {
-  padding: 54px;
+  padding: 65px 60px;
   margin: 0 auto;
   max-width: 1920px;
 }
@@ -319,7 +304,7 @@ main {
 
 .doom-logo img {
   display: block;
-  margin: -3% auto -4.5%;
+  margin: -3.3% auto -4.5%;
   width: 970px;
   max-width: 70vw;
 }
