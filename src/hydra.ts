@@ -19,87 +19,52 @@ import {
 import { CBOR } from "./contract/cbor";
 import { UTxOResponse, recordValueToAssets } from "./types";
 
-// Setup a lucid instance running against hydra
+if (!process.env.SERVER_URL) {
+  throw new Error("SERVER_URL not set in environment");
+}
 
-console.log("Setting up a lucid instance against hydra");
-const lucid = await Lucid.new(
-  new HydraProvider("http://3.15.33.186:4001"),
-  "Preprod",
+console.log("Generating ephemeral keypair");
+const setupLucid = await Lucid.new(undefined, "Preprod");
+const privateKey = setupLucid.utils.generatePrivateKey();
+const address = await setupLucid
+  .selectWalletFromPrivateKey(privateKey)
+  .wallet.address();
+const pkh =
+  setupLucid.utils.getAddressDetails(address).paymentCredential?.hash!;
+console.log(`Generated ephemeral keypair: ${address}`);
+// This is temporary, the initial game state is stored in a UTxO created by the control plane.
+// We need to add the ability to parse game state from the datum here.
+const gameData = initialGameData(pkh);
+const response = await fetch(
+  `${process.env.SERVER_URL}/new_game?address=${address}`,
 );
-console.log(lucid);
+const newGameResponse = await response.json();
+const node = newGameResponse.ip as string;
+const scriptRef = newGameResponse.script_ref as string;
 
-// Private key of the wallet used in hydra devnet:
-//
-// Using a cardano-cli envelope file with a PaymentSigningKeyShelley_ed25519 type:
-// cat /tmp/hydra-cluster-Nothing-2bf845ef1b4b44aa/wallet.sk | jq -r .cborHex | cut -c 5- | bech32 ed25519_sk
-const privateKey =
-  process.env.SIGNING_KEY ||
-  "ed25519_sk1l3r62rzyrk7le5pyplyysthagqkm4wgwks86rfvzwl67vg0ectuqqvv9kw";
-lucid.selectWalletFromPrivateKey(privateKey);
-
-console.info(
-  "Using ad-hoc wallet",
-  privateKey,
-  "with address: ",
-  await lucid.wallet.address(),
-);
-const address = await lucid.wallet.address();
-const pkh = lucid.utils.getAddressDetails(address).paymentCredential?.hash;
-const scriptAddress = lucid.utils.validatorToAddress({
+const scriptAddress = setupLucid.utils.validatorToAddress({
   script: CBOR,
   type: "PlutusV2",
 });
 
+// Setup a lucid instance running against hydra
+
+const hydraHttp = `http://${node}`;
+console.log("Setting up a lucid instance against hydra");
+const lucid = await Lucid.new(new HydraProvider(hydraHttp), "Preprod");
+lucid.selectWalletFromPrivateKey(privateKey);
+console.log(lucid);
+
 // Makeshift hydra client
 
-console.log("connecting to hydra head at ws://3.15.33.186:4001");
+console.log(`connecting to hydra head at ws://${node}`);
 
-const protocol = window.location.protocol == "https:" ? "wss:" : "ws:";
-const conn = new WebSocket(protocol + "//3.15.33.186:4001?history=no");
+const protocol = window.location.protocol == "https:" ? "wss://" : "ws://";
+const conn = new WebSocket(protocol + `${node}?history=no`);
 
-async function getUTxO() {
-  const res = await fetch("http://3.15.33.186:4001/snapshot/utxo");
+async function getUTxO(): Promise<UTxOResponse> {
+  const res = await fetch(`${hydraHttp}/snapshot/utxo`);
   return res.json();
-}
-
-// Game initialization
-let gameData: GameData = initialGameData(pkh!);
-const scriptRef = await createScriptRef();
-// if we don't wait for a second, the transaction is not confirmed yet, and thus the next transaction will fail
-await new Promise((resolve) => setTimeout(resolve, 500));
-
-// we need to create a new UTxO to use as collateral for the first script execution
-const tx = await lucid
-  .newTx()
-  .collectFrom(await getUTxOsAtAddress(address))
-  .payToAddress(address, { lovelace: BigInt(5e6) })
-  .complete();
-const collateralTx = await tx.sign().complete();
-await collateralTx.submit();
-await new Promise((resolve) => setTimeout(resolve, 500));
-
-console.log("Created collateral UTxO");
-console.log(await getUTxOsAtAddress(address));
-async function createScriptRef() {
-  const utxos = await getUTxOsAtAddress(address);
-  const tx = await lucid
-    .newTx()
-    .collectFrom(utxos)
-    .payToAddressWithData(
-      scriptAddress,
-      {
-        scriptRef: { type: "PlutusV2", script: CBOR },
-      },
-      { lovelace: BigInt(2e6) },
-    )
-    .complete();
-  const signedTx = await tx.sign().complete();
-  await signedTx.submit();
-  console.log("ScriptRef created", signedTx.toHash());
-  return {
-    hash: signedTx.toHash(),
-    index: 0,
-  };
 }
 
 async function getUTxOsAtAddress(address: string): Promise<UTxO[]> {
@@ -144,12 +109,14 @@ export async function hydraSend(
   }
 
   gameData.player = player;
+  // TODO: the latestUTxO should be fetched from the script address, filtering by admin in datum.
   const utxos = await getUTxOsAtAddress(address);
-  console.log("Current UTxOs owned by gamer", utxos);
+  console.log("Current UTxOs owned by gamer", JSON.stringify(utxos));
   if (latestUTxO == null) {
     const utxo = utxos[0];
     latestUTxO = utxo;
   }
+
   console.log("spending from", latestUTxO);
   const tx = await buildTx(latestUTxO!, buildDatum(gameData), utxos[0]);
 
@@ -223,13 +190,13 @@ const buildTx = async (
   const tx = await lucid
     .newTx()
     .collectFrom([inputUtxo], Data.to(new Constr(0, [])))
-    .payToContract(scriptAddress, { inline: datum }, { lovelace: BigInt(1e6) })
+    .payToContract(scriptAddress, { inline: datum }, { lovelace: BigInt(0) })
     .readFrom([
       {
-        txHash: scriptRef.hash,
-        outputIndex: scriptRef.index,
+        txHash: scriptRef.split("#")[0],
+        outputIndex: Number(scriptRef.split("#")[1]),
         address: scriptAddress,
-        assets: { lovelace: BigInt(2e6) },
+        assets: { lovelace: BigInt(0) },
         scriptRef: {
           type: "PlutusV2",
           script: CBOR,
