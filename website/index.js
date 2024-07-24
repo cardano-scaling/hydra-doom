@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Prevents game from being played on mobile devices
-  matchBreakpoint("(max-width: 768px)", () => {
+  matchBreakpoint("(max-width: 1024px)", () => {
     document.querySelectorAll(".modal").forEach((modal) => {
       closeModal(modal);
       const fallback = document.getElementById("modal-fallback");

@@ -726,7 +726,6 @@ main {
   gap: 1.25rem 4.7rem;
   padding: 4rem 1rem;
   align-items: center;
-  flex-wrap: wrap;
 }
 
 .three-columns > div {
@@ -742,7 +741,6 @@ main {
 
 .three-columns > div:nth-child(2) {
   flex: 1;
-  min-width: 300px;
 }
 
 /* Block */
