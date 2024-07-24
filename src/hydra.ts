@@ -127,9 +127,6 @@ export async function hydraSend(
     latestUTxO.txHash = txid;
   }
   frameNumber++;
-
-  // if we don't wait for a second, the transaction is not confirmed yet, and thus the next transaction will fail
-  await new Promise((resolve) => setTimeout(resolve, 500));
 }
 
 export async function hydraRecv(): Promise<Cmd> {
