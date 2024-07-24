@@ -270,10 +270,27 @@ a:hover {
   right: 0;
   width: 100%;
   height: 100%;
-  background-image: url("assets/images/doom-guy-1920.png");
+  background-image: image-set(
+    url("assets/images/doom-guy-1-0x.png") 1x,
+    url("assets/images/doom-guy-1-5x.png") 2x
+  );
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center bottom;
+}
+
+@media (min-width: 1921px) {
+  .layer--foreground {
+    max-height: none;
+    min-height: auto;
+    height: auto;
+    margin-top: -135px;
+    padding: 15%;
+  }
+
+  .bg--guy {
+    max-width: none;
+  }
 }
 
 /* Body */
