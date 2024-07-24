@@ -391,8 +391,19 @@ main {
 }
 
 .card--console {
+  position: relative;
   height: 150px;
   overflow: hidden;
+}
+
+.card--console::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%);
 }
 
 .card--console table td:last-of-type {
