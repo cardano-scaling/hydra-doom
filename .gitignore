@@ -8,3 +8,5 @@ state-hydra
 Rocket.toml
 # nix
 result*
+*.sk
+*.vk
