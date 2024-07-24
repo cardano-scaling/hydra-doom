@@ -1,3 +1,5 @@
 /node_modules/
 /dist/
+/assets/doom1.wad
+/assets/websockets-doom*
 .env
