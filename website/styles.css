@@ -276,6 +276,19 @@ a:hover {
   background-position: center bottom;
 }
 
+@media (min-width: 1921px) {
+  .layer--foreground {
+    max-height: none;
+    min-height: auto;
+    height: auto;
+    padding: 15%;
+  }
+
+  .bg--guy {
+    max-width: none;
+  }
+}
+
 /* Body */
 
 main {
