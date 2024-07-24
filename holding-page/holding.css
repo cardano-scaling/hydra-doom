@@ -238,9 +238,9 @@ a:hover {
   position: relative;
   z-index: 2;
   overflow: hidden;
-  margin-top: -100px;
+  margin-top: -85px;
   max-height: 50vh;
-  min-height: 500px;
+  min-height: 560px;
   height: 900px;
 }
 
@@ -265,7 +265,7 @@ a:hover {
 }
 
 .bg--guy {
-  max-width: 1600px;
+  max-width: 1920px;
   position: absolute;
   bottom: 0;
   right: 0;
@@ -277,18 +277,20 @@ a:hover {
   );
   background-size: cover;
   background-repeat: no-repeat;
-  background-position: right 85% bottom;
+  background-position: center bottom;
 }
 
-@media (max-width: 1200px) {
-  .bg--guy {
-    background-position: right 72% bottom;
+@media (min-width: 1921px) {
+  .layer--foreground {
+    max-height: none;
+    min-height: auto;
+    height: auto;
+    margin-top: -100px;
+    padding: 15%;
   }
-}
 
-@media (max-width: 768px) {
   .bg--guy {
-    background-position: right 60% bottom;
+    max-width: none;
   }
 }
 
