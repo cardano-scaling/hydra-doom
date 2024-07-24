@@ -61,12 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // window.addEventListener('click', (event) => {
-  //   if (event.target.classList.contains('modal')) {
-  //     closeModal(event.target);
-  //   }
-  // });
-
   document.querySelectorAll("[data-modal-auto-open]").forEach((modal) => {
     openModal(modal);
   });
