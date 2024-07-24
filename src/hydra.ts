@@ -23,15 +23,21 @@ if (!process.env.SERVER_URL) {
   throw new Error("SERVER_URL not set in environment");
 }
 
-console.log("Generating ephemeral keypair");
-const setupLucid = await Lucid.new(undefined, "Preprod");
-const privateKey = setupLucid.utils.generatePrivateKey();
-const address = await setupLucid
+let lucid = await Lucid.new(undefined, "Preprod");
+
+// Only generate a new session key if none is in local storage
+let privateKey = window.localStorage.getItem("hydra-doom-session-key");
+if (privateKey == null) {
+  console.log("Generating new session key");
+  privateKey = lucid.utils.generatePrivateKey();
+  window.localStorage.setItem("hydra-doom-session-key", privateKey);
+}
+const address = await lucid
   .selectWalletFromPrivateKey(privateKey)
   .wallet.address();
-const pkh =
-  setupLucid.utils.getAddressDetails(address).paymentCredential?.hash!;
-console.log(`Generated ephemeral keypair: ${address}`);
+const pkh = lucid.utils.getAddressDetails(address).paymentCredential?.hash!;
+console.log(`Using session key with address: ${address}`);
+
 // This is temporary, the initial game state is stored in a UTxO created by the control plane.
 // We need to add the ability to parse game state from the datum here.
 const gameData = initialGameData(pkh);
@@ -42,7 +48,7 @@ const newGameResponse = await response.json();
 const node = newGameResponse.ip as string;
 const scriptRef = newGameResponse.script_ref as string;
 
-const scriptAddress = setupLucid.utils.validatorToAddress({
+const scriptAddress = lucid.utils.validatorToAddress({
   script: CBOR,
   type: "PlutusV2",
 });
@@ -51,7 +57,7 @@ const scriptAddress = setupLucid.utils.validatorToAddress({
 
 const hydraHttp = `http://${node}`;
 console.log("Setting up a lucid instance against hydra");
-const lucid = await Lucid.new(new HydraProvider(hydraHttp), "Preprod");
+lucid = await Lucid.new(new HydraProvider(hydraHttp), "Preprod");
 lucid.selectWalletFromPrivateKey(privateKey);
 console.log(lucid);
 
