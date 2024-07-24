@@ -373,8 +373,9 @@ main {
   color: #fffb24;
 }
 
-.card--console table {
-  font-size: 0.5rem;
+.card--console {
+  height: 150px;
+  overflow: hidden;
 }
 
 .card--console table td:last-of-type {
