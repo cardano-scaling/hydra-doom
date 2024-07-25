@@ -19,8 +19,12 @@ import {
 import { CBOR } from "./contract/cbor";
 import { UTxOResponse, recordValueToAssets } from "./types";
 
-if (!process.env.SERVER_URL) {
-  throw new Error("SERVER_URL not set in environment");
+let gameServerUrl = process.env.SERVER_URL;
+if (!gameServerUrl) {
+  gameServerUrl = "http://localhost:8000";
+  console.warn(
+    `Defaulting SERVER_URL to ${gameServerUrl}, use .env to configure`,
+  );
 }
 
 let lucid = await Lucid.new(undefined, "Preprod");
@@ -53,9 +57,7 @@ let node = window.localStorage.getItem("hydra-doom-session-node");
 let scriptRef = window.localStorage.getItem("hydra-doom-session-ref");
 if (!process.env.PERSISTENT_SESSION || node == null || scriptRef == null) {
   console.warn(`Starting new game for ${address}`);
-  const response = await fetch(
-    `${process.env.SERVER_URL}/new_game?address=${address}`,
-  );
+  const response = await fetch(`${gameServerUrl}/new_game?address=${address}`);
   const newGameResponse = await response.json();
   node = newGameResponse.ip as string;
   window.localStorage.setItem("hydra-doom-session-node", node);

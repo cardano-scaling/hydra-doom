@@ -39,7 +39,7 @@
               runtimeInputs = [ config.packages.cardano-node config.packages.cardano-cli ];
               text = ''
                 rm -rf "${hydraDataDir}"
-                ${lib.getExe config.packages.hydra-cluster} --devnet --publish-hydra-scripts --state-directory ${hydraDataDir}
+                ${lib.getExe' config.packages.hydra-cluster "hydra-cluster"} --devnet --publish-hydra-scripts --state-directory ${hydraDataDir}
               '';
             };
             hydra-offline-wrapper = pkgs.writeShellApplication {
@@ -50,7 +50,7 @@
                 mkdir -p "${hydraDataDir}"
                 cardano-cli address key-gen --normal-key --verification-key-file admin.vk --signing-key-file admin.sk
                 pushd ${hydraDataDir}
-                ${lib.getExe config.packages.hydra-node} gen-hydra-key --output-file hydra
+                ${lib.getExe' config.packages.hydra-node "hydra-node"} gen-hydra-key --output-file hydra
                 curl https://raw.githubusercontent.com/cardano-scaling/hydra/0.17.0/hydra-cluster/config/protocol-parameters.json | jq '.utxoCostPerByte = 0' > protocol-parameters.json
                 cat > utxo.json << EOF
                 {
@@ -62,7 +62,7 @@
                   }
                 }
                 EOF
-                ${lib.getExe config.packages.hydra-node} offline \
+                ${lib.getExe' config.packages.hydra-node "hydra-node"} offline \
                   --hydra-signing-key hydra.sk \
                   --ledger-protocol-parameters protocol-parameters.json \
                   --initial-utxo utxo.json
@@ -77,7 +77,7 @@
                 ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
                 ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm assets/websockets-doom.wasm
                 ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
-                sleep 5
+                sleep 1
                 npm install
                 npm start
               '';
@@ -104,7 +104,7 @@
                 admin_key_file = "admin.sk"
                 persisted = false
                 EOF
-                ${lib.getExe config.packages.hydra-control-plane}
+                ${lib.getExe' config.packages.hydra-control-plane "hydra_control_plane"}
               '';
             };
           };
