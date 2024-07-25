@@ -27,8 +27,9 @@ let lucid = await Lucid.new(undefined, "Preprod");
 
 // Load or generate a session key
 
+let persistentSession = true;
 let privateKey = window.localStorage.getItem("hydra-doom-session-key");
-if (privateKey == null) {
+if (persistentSession && privateKey == null) {
   console.warn("Generating new session key");
   privateKey = lucid.utils.generatePrivateKey();
   window.localStorage.setItem("hydra-doom-session-key", privateKey);
