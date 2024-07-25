@@ -2,6 +2,8 @@
 
 Experiment of running Doom using a [Cardano Hydra head](https://github.com/cardano-scaling/hydra).
 
+## Manual startup
+
 This is using a forked version of [doom-wasm](https://github.com/cardano-scaling/doom-wasm), make sure to build it first and copy or symlink the build results:
 
 ``` shell
@@ -23,6 +25,14 @@ Then to build & run:
 ```shell
 npm install
 npm start
+```
+
+## Integrated startup
+
+There is a way to start all required processes using `nix` and `process-compose`:
+
+``` shell
+nix run
 ```
 
 ## Persistent sessions
