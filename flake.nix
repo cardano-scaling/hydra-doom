@@ -73,7 +73,6 @@
               name = "hydra-doom-wrapper";
               runtimeInputs = [ config.packages.bech32 pkgs.jq pkgs.git pkgs.nodejs ];
               text = ''
-                ln -sf ${config.packages.doom-wasm}/websockets-doom.html assets/websockets-doom.html
                 ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
                 ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm assets/websockets-doom.wasm
                 ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
