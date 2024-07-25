@@ -44,7 +44,7 @@
             };
             hydra-offline-wrapper = pkgs.writeShellApplication {
               name = "hydra-offline-wrapper";
-              runtimeInputs = [ config.packages.cardano-node config.packages.cardano-cli ];
+              runtimeInputs = [ config.packages.cardano-node config.packages.cardano-cli pkgs.jq ];
               text = ''
                 rm -rf "${hydraDataDir}"
                 mkdir -p "${hydraDataDir}"
