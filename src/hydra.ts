@@ -10,12 +10,7 @@ import {
 } from "lucid-cardano";
 
 import { HydraProvider } from "./lucid-provider-hydra";
-import {
-  GameData,
-  Player,
-  buildDatum,
-  initialGameData,
-} from "./contract/datum";
+import { Player, buildDatum, initialGameData } from "./contract/datum";
 import { CBOR } from "./contract/cbor";
 import { UTxOResponse, recordValueToAssets } from "./types";
 
@@ -103,7 +98,7 @@ async function getUTxOsAtAddress(address: string): Promise<UTxO[]> {
 }
 // Callbacks from forked doom-wasm
 
-type Cmd = { forwardMove: number };
+type Cmd = { forwardMove: number; sideMove: number };
 
 let latestUTxO: UTxO | null = null;
 let lastTime: number = 0;
@@ -206,12 +201,14 @@ const buildCollateralInput = (txHash: string, txIx: number) => {
 };
 
 const encodeRedeemer = (cmd: Cmd): string => {
-  return Data.to(new Constr(0, [BigInt(cmd.forwardMove)]));
+  return Data.to(
+    new Constr(0, [BigInt(cmd.forwardMove), BigInt(cmd.sideMove)]),
+  );
 };
 
 const decodeRedeemer = (redeemer: string): Cmd => {
   const d = Data.from(redeemer) as Constr<Data>;
-  return { forwardMove: Number(d.fields[0]) };
+  return { forwardMove: Number(d.fields[0]), sideMove: Number(d.fields[1]) };
 };
 
 const buildTx = async (
