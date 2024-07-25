@@ -73,6 +73,7 @@
               name = "hydra-doom-wrapper";
               runtimeInputs = [ config.packages.bech32 pkgs.jq pkgs.git pkgs.nodejs ];
               text = ''
+                [ -f assets/doom1.wad ] || curl https://distro.ibiblio.org/slitaz/sources/packages/d/doom1.wad -o assets/doom1.wad
                 ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
                 ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm assets/websockets-doom.wasm
                 ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
