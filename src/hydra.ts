@@ -23,42 +23,60 @@ if (!process.env.SERVER_URL) {
   throw new Error("SERVER_URL not set in environment");
 }
 
-console.log("Generating ephemeral keypair");
-const setupLucid = await Lucid.new(undefined, "Preprod");
-const privateKey = setupLucid.utils.generatePrivateKey();
-const address = await setupLucid
+let lucid = await Lucid.new(undefined, "Preprod");
+
+// Load or generate a session key
+
+let persistentSession = true;
+let privateKey = window.localStorage.getItem("hydra-doom-session-key");
+if (persistentSession && privateKey == null) {
+  console.warn("Generating new session key");
+  privateKey = lucid.utils.generatePrivateKey();
+  window.localStorage.setItem("hydra-doom-session-key", privateKey);
+}
+const address = await lucid
   .selectWalletFromPrivateKey(privateKey)
   .wallet.address();
-const pkh =
-  setupLucid.utils.getAddressDetails(address).paymentCredential?.hash!;
-console.log(`Generated ephemeral keypair: ${address}`);
+const pkh = lucid.utils.getAddressDetails(address).paymentCredential?.hash!;
+console.log(`Using session key with address: ${address}`);
+
 // This is temporary, the initial game state is stored in a UTxO created by the control plane.
 // We need to add the ability to parse game state from the datum here.
 const gameData = initialGameData(pkh);
-const response = await fetch(
-  `${process.env.SERVER_URL}/new_game?address=${address}`,
-);
-const newGameResponse = await response.json();
-const node = newGameResponse.ip as string;
-const scriptRef = newGameResponse.script_ref as string;
-
-const scriptAddress = setupLucid.utils.validatorToAddress({
+const scriptAddress = lucid.utils.validatorToAddress({
   script: CBOR,
   type: "PlutusV2",
 });
 
+// Continue or fetch a game session
+
+let node = window.localStorage.getItem("hydra-doom-session-node");
+let scriptRef = window.localStorage.getItem("hydra-doom-session-ref");
+if (node == null || scriptRef == null) {
+  console.warn(`Starting new game for ${address}`);
+  const response = await fetch(
+    `${process.env.SERVER_URL}/new_game?address=${address}`,
+  );
+  const newGameResponse = await response.json();
+  node = newGameResponse.ip as string;
+  window.localStorage.setItem("hydra-doom-session-node", node);
+  scriptRef = newGameResponse.script_ref as string;
+  window.localStorage.setItem("hydra-doom-session-ref", scriptRef);
+}
+console.log(
+  `Using hydra node ${node} and game validator script at reference: ${scriptRef}`,
+);
+
 // Setup a lucid instance running against hydra
 
 const hydraHttp = `http://${node}`;
-console.log("Setting up a lucid instance against hydra");
-const lucid = await Lucid.new(new HydraProvider(hydraHttp), "Preprod");
+console.log("Connecting lucid");
+lucid = await Lucid.new(new HydraProvider(hydraHttp), "Preprod");
 lucid.selectWalletFromPrivateKey(privateKey);
-console.log(lucid);
 
 // Makeshift hydra client
 
-console.log(`connecting to hydra head at ws://${node}`);
-
+console.log(`Connecting websocket ws://${node}`);
 const protocol = window.location.protocol == "https:" ? "wss://" : "ws://";
 const conn = new WebSocket(protocol + `${node}?history=no`);
 
