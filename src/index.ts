@@ -23,6 +23,8 @@ startButton?.addEventListener("click", () => {
     "-nomusic",
     "-config",
     "default.cfg",
+    "-hydra-send",
+    // "-hydra-recv",
   ];
   callMain(args);
 });
