@@ -16,7 +16,7 @@ Also, you need to copy the shareware version of [doom1.wad](https://doomwiki.org
 curl https://distro.ibiblio.org/slitaz/sources/packages/d/doom1.wad -o assets/doom1.wad
 ```
 
-The application requires connection to a [hydra-control-plane](https://github.com/cardano-scaling/hydra-control-plane) which provides managed Hydra head instances provided as SERVER_URL in the `.envrc` file.
+The application requires connection to a [hydra-control-plane](https://github.com/cardano-scaling/hydra-control-plane) which provides managed Hydra head instances provided as `SERVER_URL` in the `.env` file.
 
 Then to build & run:
 
@@ -24,3 +24,7 @@ Then to build & run:
 npm install
 npm start
 ```
+
+## Persistent sessions
+
+If we want to keep using the same key and remote node configuration between runs, set the `PERSISTENT_SESSION=true` variable in the `.env` file before starting the dev web server.

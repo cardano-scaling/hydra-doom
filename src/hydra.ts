@@ -27,9 +27,8 @@ let lucid = await Lucid.new(undefined, "Preprod");
 
 // Load or generate a session key
 
-let persistentSession = true;
 let privateKey = window.localStorage.getItem("hydra-doom-session-key");
-if (persistentSession && privateKey == null) {
+if (!process.env.PERSISTENT_SESSION || privateKey == null) {
   console.warn("Generating new session key");
   privateKey = lucid.utils.generatePrivateKey();
   window.localStorage.setItem("hydra-doom-session-key", privateKey);
@@ -52,7 +51,7 @@ const scriptAddress = lucid.utils.validatorToAddress({
 
 let node = window.localStorage.getItem("hydra-doom-session-node");
 let scriptRef = window.localStorage.getItem("hydra-doom-session-ref");
-if (node == null || scriptRef == null) {
+if (!process.env.PERSISTENT_SESSION || node == null || scriptRef == null) {
   console.warn(`Starting new game for ${address}`);
   const response = await fetch(
     `${process.env.SERVER_URL}/new_game?address=${address}`,
