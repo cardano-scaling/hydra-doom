@@ -166,8 +166,8 @@ export async function hydraRecv(): Promise<Cmd> {
             .datum()
             ?.as_data()
             ?.to_js_value().datum;
+          console.log("received", datum);
           const cmd = { forwardMove: datum.Integer };
-          console.log("received", cmd);
           conn.removeEventListener("message", onMessage);
           res(cmd);
           break;

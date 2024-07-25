@@ -8,6 +8,16 @@ declare function callMain(args: string[]): void;
 (window as any).hydraSend = hydraSend;
 (window as any).hydraRecv = hydraRecv;
 
+const commonArgs = [
+  "-iwad",
+  "doom1.wad",
+  "-window",
+  "-nogui",
+  "-nomusic",
+  "-config",
+  "default.cfg",
+];
+
 // Start a new game
 const startButton: HTMLButtonElement | null = document.querySelector("#start");
 startButton?.addEventListener("click", () => {
@@ -15,18 +25,20 @@ startButton?.addEventListener("click", () => {
   if (startButton) {
     startButton.style.display = "none";
   }
-  var args = [
-    "-iwad",
-    "doom1.wad",
-    "-window",
-    "-nogui",
-    "-nomusic",
-    "-config",
-    "default.cfg",
-    "-hydra-send",
-    // "-hydra-recv",
-  ];
-  callMain(args);
+  callMain(commonArgs.concat(["-hydra-send"]));
 });
+
+// Watch game
+// FIXME: prevent /new_game in hydra.ts
+const params = new URLSearchParams(window.location.search);
+if (params.get("watch") != null) {
+  // Hide the button
+  if (startButton) {
+    startButton.style.display = "none";
+  }
+  setTimeout(() => {
+    callMain(commonArgs.concat("-hydra-recv"));
+  }, 1000);
+}
 
 startQueryingAPI();
