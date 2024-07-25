@@ -1876,16 +1876,15 @@
         "nixpkgs": "nixpkgs_10"
       },
       "locked": {
-        "lastModified": 1721833241,
-        "narHash": "sha256-/Ni32z/2aF9RxO97CPUD5ZadPgJtYpFIzVYnf2ohKY8=",
+        "lastModified": 1721890306,
+        "narHash": "sha256-x+1IlJPC8HqPNqwIyfSh3ubU8Ij+IuJWcFakUy4epnQ=",
         "owner": "cardano-scaling",
         "repo": "doom-wasm",
-        "rev": "b0d387c789f15cbebe091dda4074b31409d93b69",
+        "rev": "3cde753fb2eb2ba3339a90ccc39920b4c7a6d6d8",
         "type": "github"
       },
       "original": {
         "owner": "cardano-scaling",
-        "ref": "sl/build-wasm",
         "repo": "doom-wasm",
         "type": "github"
       }

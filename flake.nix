@@ -8,7 +8,7 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
     hydra-control-plane.url = "github:cardano-scaling/hydra-control-plane";
-    doom-wasm.url = "github:cardano-scaling/doom-wasm/sl/build-wasm";
+    doom-wasm.url = "github:cardano-scaling/doom-wasm";
   };
 
   outputs = inputs@{ flake-parts, ... }:
