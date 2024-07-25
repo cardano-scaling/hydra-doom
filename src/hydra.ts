@@ -137,7 +137,12 @@ export async function hydraSend(
   }
 
   console.log("spending from", latestUTxO);
-  const tx = await buildTx(latestUTxO!, buildDatum(gameData), utxos[0]);
+  const tx = await buildTx(
+    latestUTxO!,
+    encodeRedeemer(cmd),
+    buildDatum(gameData),
+    utxos[0],
+  );
 
   lastTime = performance.now();
   if (frameNumber % 1 == 0) {
@@ -159,15 +164,17 @@ export async function hydraRecv(): Promise<Cmd> {
           let elapsed = performance.now() - lastTime;
           console.log("round trip: ", elapsed, "ms");
           const tx = lucid.fromTx(msg.transaction.cborHex);
-          const datum = tx.txComplete
-            .body()
-            .outputs()
-            .get(0)
-            .datum()
-            ?.as_data()
-            ?.to_js_value().datum;
-          console.log("received", datum);
-          const cmd = { forwardMove: datum.Integer };
+          const redeemer: Uint8Array | undefined = tx.txComplete
+            .witness_set()
+            .redeemers()
+            ?.get(0)
+            ?.data()
+            .to_bytes();
+          if (!redeemer) {
+            throw new Error("Redeemer not found");
+          }
+          const cmd = decodeRedeemer(toHex(redeemer));
+          console.log("received", cmd);
           conn.removeEventListener("message", onMessage);
           res(cmd);
           break;
@@ -198,14 +205,24 @@ const buildCollateralInput = (txHash: string, txIx: number) => {
   return inputs;
 };
 
+const encodeRedeemer = (cmd: Cmd): string => {
+  return Data.to(new Constr(0, [BigInt(cmd.forwardMove)]));
+};
+
+const decodeRedeemer = (redeemer: string): Cmd => {
+  const d = Data.from(redeemer) as Constr<Data>;
+  return { forwardMove: Number(d.fields[0]) };
+};
+
 const buildTx = async (
   inputUtxo: UTxO,
+  redeemer: string,
   datum: string,
   collateralUtxo: UTxO,
 ): Promise<TxSigned> => {
   const tx = await lucid
     .newTx()
-    .collectFrom([inputUtxo], Data.to(new Constr(0, [])))
+    .collectFrom([inputUtxo], redeemer)
     .payToContract(scriptAddress, { inline: datum }, { lovelace: BigInt(0) })
     .readFrom([
       {
