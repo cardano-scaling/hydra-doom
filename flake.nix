@@ -92,6 +92,18 @@
             hydra-control-plane-wrapper = pkgs.writeShellApplication {
               name = "hydra-control-plane-wrapper";
               text = ''
+                cat > Rocket.toml << EOF
+                [default]
+                ttl_minutes = 5
+                max_players = 100
+                port = 8000
+                address = "0.0.0.0"
+
+                [[default.nodes]]
+                connection_url = "ws://127.0.0.1:4001"
+                admin_key_file = "admin.sk"
+                persisted = false
+                EOF
                 ${lib.getExe config.packages.hydra-control-plane}
               '';
             };
