@@ -11,7 +11,7 @@
     doom-wasm.url = "github:cardano-scaling/doom-wasm";
   };
 
-  outputs = inputs@{ flake-parts, ... }:
+  outputs = { self, flake-parts, nixpkgs, ... }@ inputs:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
         inputs.process-compose-flake.flakeModule
@@ -107,6 +107,29 @@
                 ${lib.getExe' config.packages.hydra-control-plane "hydra_control_plane"}
               '';
             };
+            qemu-run-iso = pkgs.writeShellApplication {
+              name = "qemu-run-iso";
+              runtimeInputs = with pkgs; [fd qemu_kvm];
+
+              text = ''
+                if fd --type file --has-results 'nixos-.*\.iso' result/iso 2> /dev/null; then
+                  echo "Symlinking the existing iso image for qemu:"
+                  ln -sfv result/iso/nixos-*.iso result-iso
+                  echo
+                else
+                  echo "No iso file exists to run, please build one first, example:"
+                  echo "  nix build -L .#nixosConfigurations.kiosk-boot.config.system.build.isoImage"
+                  exit
+                fi
+
+                qemu-kvm \
+                  -smp 2 \
+                  -m 4G \
+                  -drive file=result-iso,format=raw,if=none,media=cdrom,id=drive-cd1,readonly=on \
+                  -device ahci,id=achi0 \
+                  -device ide-cd,bus=achi0.0,drive=drive-cd1,id=cd1,bootindex=1 \
+              '';
+            };
           };
           devShells.default = pkgs.mkShell
             {
@@ -173,5 +196,13 @@
             };
 
         };
+      flake.nixosConfigurations.kiosk-boot = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [./kiosk-boot.nix];
+        specialArgs = {
+          inherit self;
+          system = "x86_64-linux";
+        };
+      };
     };
 }
