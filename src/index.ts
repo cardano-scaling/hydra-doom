@@ -25,7 +25,7 @@ startButton?.addEventListener("click", () => {
   if (startButton) {
     startButton.style.display = "none";
   }
-  callMain(commonArgs.concat(["-hydra-send", "-hydra-recv"]));
+  callMain(commonArgs.concat(["-hydra-send"]));
 });
 
 // Watch game

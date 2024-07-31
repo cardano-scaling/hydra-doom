@@ -10,7 +10,7 @@ import {
 } from "lucid-cardano";
 
 import { HydraProvider } from "./lucid-provider-hydra";
-import { Player, buildDatum, initialGameData } from "./contract/datum";
+import { Player, buildDatum, decodeDatum, hydraDatumToPlutus, initialGameData } from "./contract/datum";
 import { CBOR } from "./contract/cbor";
 import { UTxOResponse, recordValueToAssets } from "./types";
 
@@ -90,6 +90,7 @@ async function getUTxOsAtAddress(address: string): Promise<UTxO[]> {
       const [txHash, ixStr] = txIn.split("#");
       return {
         txHash,
+        datum: output.inlineDatum ?? output.datum,
         outputIndex: Number.parseInt(ixStr),
         address: output.address,
         assets: recordValueToAssets(output.value),
@@ -101,6 +102,7 @@ async function getUTxOsAtAddress(address: string): Promise<UTxO[]> {
 type Cmd = { forwardMove: number; sideMove: number };
 
 let latestUTxO: UTxO | null = null;
+let collateralUTxO: UTxO | null = null;
 let lastTime: number = 0;
 let frameNumber = 0;
 
@@ -124,26 +126,43 @@ export async function hydraSend(
 
   gameData.player = player;
   // TODO: the latestUTxO should be fetched from the script address, filtering by admin in datum.
-  const utxos = await getUTxOsAtAddress(address);
-  console.log("Current UTxOs owned by gamer", JSON.stringify(utxos));
   if (latestUTxO == null) {
-    const utxo = utxos[0];
-    latestUTxO = utxo;
+    const utxos = await getUTxOsAtAddress(scriptAddress);
+    console.log(utxos);
+    for(const utxo of utxos) {
+      if (!utxo.datum) {
+        continue;
+      }
+      console.log(utxo);
+      const data = decodeDatum(utxo.datum);
+      if (!!data && data.admin == pkh) {
+        latestUTxO = utxo;
+        break;
+      }
+    }
+    if (!latestUTxO) {
+      throw new Error("No UTxO found for admin");
+    }
+    console.log("Current UTxO owned by gamer", JSON.stringify(latestUTxO));
+  }
+  if (!collateralUTxO) {
+    const utxos = await getUTxOsAtAddress(address);
+    collateralUTxO = utxos[0];
   }
 
   console.log("spending from", latestUTxO);
-  const tx = await buildTx(
+  const [newUtxo, tx] = await buildTx(
     latestUTxO!,
     encodeRedeemer(cmd),
     buildDatum(gameData),
-    utxos[0],
+    collateralUTxO!,
   );
 
   lastTime = performance.now();
   if (frameNumber % 1 == 0) {
     const txid = await tx.submit();
     console.log("submitted", txid);
-    latestUTxO.txHash = txid;
+    latestUTxO = newUtxo;
   }
   frameNumber++;
 }
@@ -202,7 +221,7 @@ const buildCollateralInput = (txHash: string, txIx: number) => {
 
 const encodeRedeemer = (cmd: Cmd): string => {
   return Data.to(
-    new Constr(0, [BigInt(cmd.forwardMove), BigInt(cmd.sideMove)]),
+    new Constr(0, [BigInt(cmd.forwardMove), BigInt(cmd.sideMove), BigInt(0), []]),
   );
 };
 
@@ -216,10 +235,20 @@ const buildTx = async (
   redeemer: string,
   datum: string,
   collateralUtxo: UTxO,
-): Promise<TxSigned> => {
+): Promise<[UTxO, TxSigned]> => {
+  // HACK: hydra returns a decoded/json format of the datum, so we coerce it back here
+  let lucidUtxo = {
+    txHash: inputUtxo.txHash,
+    outputIndex: inputUtxo.outputIndex,
+    address: inputUtxo.address,
+    assets: inputUtxo.assets,
+    datum: !!inputUtxo.datum && (typeof inputUtxo.datum !== "string") ? Data.to(hydraDatumToPlutus(inputUtxo.datum)) : inputUtxo.datum,
+    datumHash: inputUtxo.datumHash,
+    scriptRef: inputUtxo.scriptRef,
+  }
   const tx = await lucid
     .newTx()
-    .collectFrom([inputUtxo], redeemer)
+    .collectFrom([lucidUtxo], redeemer)
     .payToContract(scriptAddress, { inline: datum }, { lovelace: BigInt(0) })
     .readFrom([
       {
@@ -258,6 +287,7 @@ const buildTx = async (
   const body = signedTx.txSigned.body();
   const outputs = body.outputs();
   body.free();
+  let newUtxo: UTxO | null = null;
   for (let i = 0; i < outputs.len(); i++) {
     const output = outputs.get(i);
     const address = output.address();
@@ -266,7 +296,7 @@ const buildTx = async (
       const datum = output.datum()!;
       const data = datum.as_data()!;
 
-      latestUTxO = {
+      newUtxo = {
         txHash: signedTx.toHash(),
         outputIndex: i,
         address: address.to_bech32("addr_test"),
@@ -279,12 +309,11 @@ const buildTx = async (
       output.free();
       data.free();
       address.free();
-      console.log("New UTxO", latestUTxO);
       break;
     }
     outputs.free();
     body.free();
   }
 
-  return signedTx;
+  return [newUtxo!, signedTx];
 };

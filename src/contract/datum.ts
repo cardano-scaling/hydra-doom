@@ -51,6 +51,8 @@ export const initialGameData = (adminKey: string) => ({
   monsters: [],
 });
 
+
+
 export const buildDatum = (state: GameData): string => {
   return Data.to(
     new Constr(0, [
@@ -61,6 +63,26 @@ export const buildDatum = (state: GameData): string => {
     ]),
   );
 };
+
+export const decodeDatum = (datum: any): GameData | undefined => {
+  try {
+    return {
+      isOver: datum.fields[0].constructor == 0, // TODO
+      admin: datum.fields[1].fields[0].bytes,
+      // TODO: rest of fields
+    } as any as GameData;
+  } catch(e) {
+    return undefined;
+  }
+}
+
+function fromHex(h: string) {
+    var s = ''
+    for (var i = 0; i < h.length; i+=2) {
+        s += String.fromCharCode(parseInt(h.substr(i, 2), 16))
+    }
+    return decodeURIComponent(escape(s))
+}
 
 const encodePlayer = (player: Player) => {
   return new Constr(0, [
@@ -106,3 +128,20 @@ const encodeBoolean = (b: boolean) => {
 const encodeByteString = (s: string) => {
   return new Constr(0, [s]);
 };
+const decodeByteString = (d: Constr<Data>) => {
+  return d.fields[0];
+}
+
+export const hydraDatumToPlutus = (d: any) => {
+  console.log(d);
+  if ("fields" in d) {
+    console.log(d);
+    return new Constr(d.constructor, d.fields.map(hydraDatumToPlutus));
+  } else if ("bytes" in d) {
+    return d.bytes;
+  } else if ("int" in d) {
+    return BigInt(d.int);
+  } else if ("list" in d) {
+    return d.list.map(hydraDatumToPlutus);
+  }
+}
