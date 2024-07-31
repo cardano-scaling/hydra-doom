@@ -1,4 +1,5 @@
-import { hydraRecv, hydraSend } from "./hydra";
+import { hydraSend } from "./hydra";
+import { hydraRecv } from "./hydraRecv";
 import { startQueryingAPI } from "./stats";
 import "./styles.css";
 
@@ -25,7 +26,7 @@ startButton?.addEventListener("click", () => {
   if (startButton) {
     startButton.style.display = "none";
   }
-  callMain(commonArgs.concat(["-hydra-send"]));
+  callMain(commonArgs.concat(["-hydra-send", "-hydra-recv"]));
 });
 
 // Watch game
