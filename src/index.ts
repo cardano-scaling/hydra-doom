@@ -1,5 +1,4 @@
-import { hydraSend } from "./hydra";
-import { hydraRecv } from "./hydraRecv";
+import { hydraSend, hydraRecv } from "./hydra";
 import { startQueryingAPI } from "./stats";
 import "./styles.css";
 
