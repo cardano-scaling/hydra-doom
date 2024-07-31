@@ -9,6 +9,7 @@
     process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
     hydra-control-plane.url = "github:cardano-scaling/hydra-control-plane";
     doom-wasm.url = "github:cardano-scaling/doom-wasm";
+    nix-inclusive.url = "github:input-output-hk/nix-inclusive";
   };
 
   outputs = { self, flake-parts, nixpkgs, ... }@ inputs:
@@ -27,6 +28,70 @@
       perSystem = { config, system, pkgs, lib, ... }:
         let
           hydraDataDir = "state-hydra";
+          # edit these to override defaults for serverUrl and doom wad file
+          controlPlaneUrl = "http://localhost:8000";
+          doomWad = pkgs.fetchurl {
+            url = "https://distro.ibiblio.org/slitaz/sources/packages/d/doom1.wad";
+            sha256 = "sha256-HX1DvlAeZ9kn5BXguPPinDvzMHXoWXIYFvZSpSbKx3E=";
+          };
+          mkHydraDoomStatic = {
+            serverUrl ? controlPlaneUrl
+          , wadFile ? doomWad
+          }: let
+            src = inputs.nix-inclusive.lib.inclusive ./. [
+              ./src
+              ./assets
+              ./fonts
+              ./package.json
+              ./package-lock.json
+              ./tsconfig.json
+              ./webpack.config.js
+            ];
+            packageLock = builtins.fromJSON (builtins.readFile (src + "/package-lock.json"));
+            deps = builtins.attrValues (removeAttrs packageLock.packages [ "" ]);
+
+            nodeModules = pkgs.writeTextFile {
+              name = "tarballs";
+              text = ''
+                ${builtins.concatStringsSep "\n" (map (p: pkgs.fetchurl { url = p.resolved; hash = p.integrity; }) deps)}
+              '';
+            };
+          in pkgs.stdenv.mkDerivation {
+            name = "hydra-doom-static";
+            phases = [ "unpackPhase" "buildPhase" "installPhase" ];
+            inherit src;
+            buildInputs = [
+              pkgs.nodejs
+              pkgs.curl
+              pkgs.coreutils
+            ];
+            buildPhase = ''
+              export HOME="$PWD/.home"
+              mkdir -p "$HOME"
+              export npm_config_cache=$HOME/.npm
+              while read package
+              do
+                echo "caching $package"
+                npm cache add "$package"
+              done <${nodeModules} > /dev/null
+
+              ln -sf ${wadFile} assets/doom1.wad
+              ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
+              ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm assets/websockets-doom.wasm
+              ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
+
+              echo "SERVER_URL=${serverUrl}" > .env;
+
+              npm install
+              head -n 1 node_modules/.bin/webpack
+              patchShebangs --build node_modules/webpack/bin/webpack.js
+              head -n 1 node_modules/.bin/webpack
+              npm run build
+            '';
+            installPhase = ''
+              cp -a dist $out
+            '';
+          };
         in
         {
           packages = {
@@ -69,11 +134,13 @@
                 popd
               '';
             };
+            hydra-doom-static-local = mkHydraDoomStatic {};
+            hydra-doom-static-remote = mkHydraDoomStatic { serverUrl = "http://3.15.33.186:8000"; };
             hydra-doom-wrapper = pkgs.writeShellApplication {
               name = "hydra-doom-wrapper";
               runtimeInputs = [ config.packages.bech32 pkgs.jq pkgs.git pkgs.nodejs ];
               text = ''
-                [ -f assets/doom1.wad ] || curl https://distro.ibiblio.org/slitaz/sources/packages/d/doom1.wad -o assets/doom1.wad
+                [ -f assets/doom1.wad ] || ln -s ${doomWad} assets/doom1.wad
                 ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
                 ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm assets/websockets-doom.wasm
                 ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
