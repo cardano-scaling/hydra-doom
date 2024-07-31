@@ -9,9 +9,10 @@
     process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
     hydra-control-plane.url = "github:cardano-scaling/hydra-control-plane";
     doom-wasm.url = "github:cardano-scaling/doom-wasm";
+    nix-inclusive.url = "github:input-output-hk/nix-inclusive";
   };
 
-  outputs = inputs@{ flake-parts, ... }:
+  outputs = { self, flake-parts, nixpkgs, ... }@ inputs:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
         inputs.process-compose-flake.flakeModule
@@ -27,6 +28,70 @@
       perSystem = { config, system, pkgs, lib, ... }:
         let
           hydraDataDir = "state-hydra";
+          # edit these to override defaults for serverUrl and doom wad file
+          controlPlaneUrl = "http://localhost:8000";
+          doomWad = pkgs.fetchurl {
+            url = "https://distro.ibiblio.org/slitaz/sources/packages/d/doom1.wad";
+            sha256 = "sha256-HX1DvlAeZ9kn5BXguPPinDvzMHXoWXIYFvZSpSbKx3E=";
+          };
+          mkHydraDoomStatic = {
+            serverUrl ? controlPlaneUrl
+          , wadFile ? doomWad
+          }: let
+            src = inputs.nix-inclusive.lib.inclusive ./. [
+              ./src
+              ./assets
+              ./fonts
+              ./package.json
+              ./package-lock.json
+              ./tsconfig.json
+              ./webpack.config.js
+            ];
+            packageLock = builtins.fromJSON (builtins.readFile (src + "/package-lock.json"));
+            deps = builtins.attrValues (removeAttrs packageLock.packages [ "" ]);
+
+            nodeModules = pkgs.writeTextFile {
+              name = "tarballs";
+              text = ''
+                ${builtins.concatStringsSep "\n" (map (p: pkgs.fetchurl { url = p.resolved; hash = p.integrity; }) deps)}
+              '';
+            };
+          in pkgs.stdenv.mkDerivation {
+            name = "hydra-doom-static";
+            phases = [ "unpackPhase" "buildPhase" "installPhase" ];
+            inherit src;
+            buildInputs = [
+              pkgs.nodejs
+              pkgs.curl
+              pkgs.coreutils
+            ];
+            buildPhase = ''
+              export HOME="$PWD/.home"
+              mkdir -p "$HOME"
+              export npm_config_cache=$HOME/.npm
+              while read package
+              do
+                echo "caching $package"
+                npm cache add "$package"
+              done <${nodeModules} > /dev/null
+
+              ln -sf ${wadFile} assets/doom1.wad
+              ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
+              ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm assets/websockets-doom.wasm
+              ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
+
+              echo "SERVER_URL=${serverUrl}" > .env;
+
+              npm install
+              head -n 1 node_modules/.bin/webpack
+              patchShebangs --build node_modules/webpack/bin/webpack.js
+              head -n 1 node_modules/.bin/webpack
+              npm run build
+            '';
+            installPhase = ''
+              cp -a dist $out
+            '';
+          };
         in
         {
           packages = {
@@ -69,11 +134,13 @@
                 popd
               '';
             };
+            hydra-doom-static-local = mkHydraDoomStatic {};
+            hydra-doom-static-remote = mkHydraDoomStatic { serverUrl = "http://3.15.33.186:8000"; };
             hydra-doom-wrapper = pkgs.writeShellApplication {
               name = "hydra-doom-wrapper";
               runtimeInputs = [ config.packages.bech32 pkgs.jq pkgs.git pkgs.nodejs ];
               text = ''
-                [ -f assets/doom1.wad ] || curl https://distro.ibiblio.org/slitaz/sources/packages/d/doom1.wad -o assets/doom1.wad
+                [ -f assets/doom1.wad ] || ln -s ${doomWad} assets/doom1.wad
                 ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
                 ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm assets/websockets-doom.wasm
                 ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
@@ -105,6 +172,29 @@
                 persisted = false
                 EOF
                 ${lib.getExe' config.packages.hydra-control-plane "hydra_control_plane"}
+              '';
+            };
+            qemu-run-iso = pkgs.writeShellApplication {
+              name = "qemu-run-iso";
+              runtimeInputs = with pkgs; [fd qemu_kvm];
+
+              text = ''
+                if fd --type file --has-results 'nixos-.*\.iso' result/iso 2> /dev/null; then
+                  echo "Symlinking the existing iso image for qemu:"
+                  ln -sfv result/iso/nixos-*.iso result-iso
+                  echo
+                else
+                  echo "No iso file exists to run, please build one first, example:"
+                  echo "  nix build -L .#nixosConfigurations.kiosk-boot.config.system.build.isoImage"
+                  exit
+                fi
+
+                qemu-kvm \
+                  -smp 2 \
+                  -m 4G \
+                  -drive file=result-iso,format=raw,if=none,media=cdrom,id=drive-cd1,readonly=on \
+                  -device ahci,id=achi0 \
+                  -device ide-cd,bus=achi0.0,drive=drive-cd1,id=cd1,bootindex=1 \
               '';
             };
           };
@@ -173,5 +263,13 @@
             };
 
         };
+      flake.nixosConfigurations.kiosk-boot = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [./kiosk-boot.nix];
+        specialArgs = {
+          inherit self;
+          system = "x86_64-linux";
+        };
+      };
     };
 }

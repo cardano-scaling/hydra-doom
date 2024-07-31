@@ -1876,11 +1876,11 @@
         "nixpkgs": "nixpkgs_10"
       },
       "locked": {
-        "lastModified": 1721890306,
-        "narHash": "sha256-x+1IlJPC8HqPNqwIyfSh3ubU8Ij+IuJWcFakUy4epnQ=",
+        "lastModified": 1722440640,
+        "narHash": "sha256-HmR66f2NeKeJ5O5EdofaIMhc9iH9MUbTJHdehttTBRA=",
         "owner": "cardano-scaling",
         "repo": "doom-wasm",
-        "rev": "3cde753fb2eb2ba3339a90ccc39920b4c7a6d6d8",
+        "rev": "73ad7cac4a55fb87e1808d23ac4218ca99c0f9c4",
         "type": "github"
       },
       "original": {
@@ -4680,11 +4680,11 @@
         "utils": "utils_9"
       },
       "locked": {
-        "lastModified": 1721887343,
-        "narHash": "sha256-H0HeolFRTO2PcikcgzP0zJSQA8ax6gGJe/foQfnZMy0=",
+        "lastModified": 1722447969,
+        "narHash": "sha256-EbOMm5oJ2+oUKPmk27q9J213pBfvnSWrNjMhWINQpVY=",
         "owner": "cardano-scaling",
         "repo": "hydra-control-plane",
-        "rev": "1eae4ee049c045241766fe1806afbf960430d67f",
+        "rev": "1eef5a82a52ccf5ea8d7de2f56ce73e343b3c575",
         "type": "github"
       },
       "original": {
@@ -5764,6 +5764,24 @@
         "owner": "NixOS",
         "ref": "2.11.0",
         "repo": "nix",
+        "type": "github"
+      }
+    },
+    "nix-inclusive": {
+      "inputs": {
+        "stdlib": "stdlib"
+      },
+      "locked": {
+        "lastModified": 1628098927,
+        "narHash": "sha256-Ft4sdf7VPL8MQtu18AAPiN2s5pUsbv+3RxqzJSa/yzg=",
+        "owner": "input-output-hk",
+        "repo": "nix-inclusive",
+        "rev": "13123eb7a8c3359738a4756b8d645729e8655b27",
+        "type": "github"
+      },
+      "original": {
+        "owner": "input-output-hk",
+        "repo": "nix-inclusive",
         "type": "github"
       }
     },
@@ -9123,6 +9141,7 @@
         "flake-utils": "flake-utils_8",
         "hydra": "hydra_2",
         "hydra-control-plane": "hydra-control-plane",
+        "nix-inclusive": "nix-inclusive",
         "nixpkgs": "nixpkgs_46",
         "process-compose-flake": "process-compose-flake"
       }
@@ -9984,6 +10003,21 @@
       "original": {
         "owner": "divnix",
         "repo": "std",
+        "type": "github"
+      }
+    },
+    "stdlib": {
+      "locked": {
+        "lastModified": 1590026685,
+        "narHash": "sha256-E5INrVvYX/P/UpcoUFDAsuHem+lsqT+/teBs9O7oc9Q=",
+        "owner": "manveru",
+        "repo": "nix-lib",
+        "rev": "99088cf7febcdb21afd375a335dcafa959bef3ed",
+        "type": "github"
+      },
+      "original": {
+        "owner": "manveru",
+        "repo": "nix-lib",
         "type": "github"
       }
     },
