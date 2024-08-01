@@ -29,69 +29,73 @@
         let
           hydraDataDir = "state-hydra";
           # edit these to override defaults for serverUrl and doom wad file
-          controlPlaneUrl = "http://localhost:8000";
+          controlPlaneHost = "0.0.0.0";
+          controlPlanePort = "8000";
+          controlPlaneUrl = "http://${controlPlaneHost}:${controlPlanePort}";
           doomWad = pkgs.fetchurl {
             url = "https://distro.ibiblio.org/slitaz/sources/packages/d/doom1.wad";
             sha256 = "sha256-HX1DvlAeZ9kn5BXguPPinDvzMHXoWXIYFvZSpSbKx3E=";
           };
-          mkHydraDoomStatic = {
-            serverUrl ? controlPlaneUrl
-          , wadFile ? doomWad
-          }: let
-            src = inputs.nix-inclusive.lib.inclusive ./. [
-              ./src
-              ./assets
-              ./fonts
-              ./package.json
-              ./package-lock.json
-              ./tsconfig.json
-              ./webpack.config.js
-            ];
-            packageLock = builtins.fromJSON (builtins.readFile (src + "/package-lock.json"));
-            deps = builtins.attrValues (removeAttrs packageLock.packages [ "" ]);
+          mkHydraDoomStatic =
+            { serverUrl ? controlPlaneUrl
+            , wadFile ? doomWad
+            }:
+            let
+              src = inputs.nix-inclusive.lib.inclusive ./. [
+                ./src
+                ./assets
+                ./fonts
+                ./package.json
+                ./package-lock.json
+                ./tsconfig.json
+                ./webpack.config.js
+              ];
+              packageLock = builtins.fromJSON (builtins.readFile (src + "/package-lock.json"));
+              deps = builtins.attrValues (removeAttrs packageLock.packages [ "" ]);
 
-            nodeModules = pkgs.writeTextFile {
-              name = "tarballs";
-              text = ''
-                ${builtins.concatStringsSep "\n" (map (p: pkgs.fetchurl { url = p.resolved; hash = p.integrity; }) deps)}
+              nodeModules = pkgs.writeTextFile {
+                name = "tarballs";
+                text = ''
+                  ${builtins.concatStringsSep "\n" (map (p: pkgs.fetchurl { url = p.resolved; hash = p.integrity; }) deps)}
+                '';
+              };
+            in
+            pkgs.stdenv.mkDerivation {
+              name = "hydra-doom-static";
+              phases = [ "unpackPhase" "buildPhase" "installPhase" ];
+              inherit src;
+              buildInputs = [
+                pkgs.nodejs
+                pkgs.curl
+                pkgs.coreutils
+              ];
+              buildPhase = ''
+                export HOME="$PWD/.home"
+                mkdir -p "$HOME"
+                export npm_config_cache=$HOME/.npm
+                while read package
+                do
+                  echo "caching $package"
+                  npm cache add "$package"
+                done <${nodeModules} > /dev/null
+
+                ln -sf ${wadFile} assets/doom1.wad
+                ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
+                ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm assets/websockets-doom.wasm
+                ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
+
+                echo "SERVER_URL=${serverUrl}" > .env;
+
+                npm install
+                head -n 1 node_modules/.bin/webpack
+                patchShebangs --build node_modules/webpack/bin/webpack.js
+                head -n 1 node_modules/.bin/webpack
+                npm run build
+              '';
+              installPhase = ''
+                cp -a dist $out
               '';
             };
-          in pkgs.stdenv.mkDerivation {
-            name = "hydra-doom-static";
-            phases = [ "unpackPhase" "buildPhase" "installPhase" ];
-            inherit src;
-            buildInputs = [
-              pkgs.nodejs
-              pkgs.curl
-              pkgs.coreutils
-            ];
-            buildPhase = ''
-              export HOME="$PWD/.home"
-              mkdir -p "$HOME"
-              export npm_config_cache=$HOME/.npm
-              while read package
-              do
-                echo "caching $package"
-                npm cache add "$package"
-              done <${nodeModules} > /dev/null
-
-              ln -sf ${wadFile} assets/doom1.wad
-              ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
-              ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm assets/websockets-doom.wasm
-              ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
-
-              echo "SERVER_URL=${serverUrl}" > .env;
-
-              npm install
-              head -n 1 node_modules/.bin/webpack
-              patchShebangs --build node_modules/webpack/bin/webpack.js
-              head -n 1 node_modules/.bin/webpack
-              npm run build
-            '';
-            installPhase = ''
-              cp -a dist $out
-            '';
-          };
         in
         {
           packages = {
@@ -134,7 +138,7 @@
                 popd
               '';
             };
-            hydra-doom-static-local = mkHydraDoomStatic {};
+            hydra-doom-static-local = mkHydraDoomStatic { };
             hydra-doom-static-remote = mkHydraDoomStatic { serverUrl = "http://3.15.33.186:8000"; };
             hydra-doom-wrapper = pkgs.writeShellApplication {
               name = "hydra-doom-wrapper";
@@ -153,7 +157,7 @@
               name = "hydra-tui-wrapper";
               runtimeInputs = [ config.packages.hydra-tui ];
               text = ''
-                hydra-tui -k admin.sk
+                ${lib.getExe' config.packages.hydra-tui "hydra-tui"} -k admin.sk
               '';
             };
             hydra-control-plane-wrapper = pkgs.writeShellApplication {
@@ -163,8 +167,8 @@
                 [default]
                 ttl_minutes = 5
                 max_players = 100
-                port = 8000
-                address = "0.0.0.0"
+                port = ${controlPlanePort}
+                address = "${controlPlaneHost}"
 
                 [[default.nodes]]
                 connection_url = "ws://127.0.0.1:4001"
@@ -176,7 +180,7 @@
             };
             qemu-run-iso = pkgs.writeShellApplication {
               name = "qemu-run-iso";
-              runtimeInputs = with pkgs; [fd qemu_kvm];
+              runtimeInputs = with pkgs; [ fd qemu_kvm ];
 
               text = ''
                 if fd --type file --has-results 'nixos-.*\.iso' result/iso 2> /dev/null; then
@@ -244,6 +248,12 @@
                       backoff_seconds = 2;
                     };
                   };
+                  hydra-tui = {
+                    command = config.packages.hydra-tui-wrapper;
+                    depends_on."hydra-offline".condition = "process_started";
+                    is_foreground = true;
+                    disabled = true;
+                  };
 
                   # If a process is named 'test', it will be ignored. But a new
                   # flake check will be created that runs it so as to test the
@@ -265,7 +275,7 @@
         };
       flake.nixosConfigurations.kiosk-boot = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        modules = [./kiosk-boot.nix];
+        modules = [ ./kiosk-boot.nix ];
         specialArgs = {
           inherit self;
           system = "x86_64-linux";
