@@ -173,6 +173,7 @@ body {
   text-transform: uppercase;
   color: white;
   height: 100%;
+  overflow: hidden; /* Do not scroll if content too big */
 }
 
 img {
