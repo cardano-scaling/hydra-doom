@@ -1,0 +1,392 @@
+/* Reset */
+
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+body {
+  line-height: 1;
+}
+ol,
+ul {
+  list-style: none;
+}
+blockquote,
+q {
+  quotes: none;
+}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: "";
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* Fonts */
+
+@font-face {
+  font-family: "less_perfect_dos_vgaregular";
+  src:
+    url("assets/fonts/lessperfectdosvga-webfont.woff2") format("woff2"),
+    url("assets/fonts/lessperfectdosvga-webfont.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Pixelify Sans";
+  src: url("assets/fonts/pixelifysans-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* Global */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-y: scroll;
+  font-size: 16px;
+  height: 100%;
+}
+
+@media (max-width: 1200px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 12px;
+  }
+}
+
+body {
+  background: red;
+  font-family: "less_perfect_dos_vgaregular", monospace;
+  text-transform: uppercase;
+  color: white;
+  height: 100%;
+}
+
+img {
+  max-width: 100%;
+}
+
+a {
+  color: white;
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Background */
+
+.layer--wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  min-height: 100%;
+}
+
+.layer--wrapper > * {
+  width: 100%;
+}
+
+.layer--base {
+  position: relative;
+  z-index: 3;
+}
+
+.layer--bg {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.layer--bg::before {
+  mix-blend-mode: color-dodge;
+}
+
+.bg--main {
+  position: absolute;
+  object-fit: cover;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+.layer--foreground {
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  margin-top: -85px;
+  max-height: 50vh;
+  min-height: 560px;
+  height: 900px;
+}
+
+@media (max-width: 1200px) {
+  .layer--foreground {
+    margin-top: -40px;
+    min-height: 300px;
+    height: 600px;
+  }
+}
+
+.layer--foreground::after,
+.layer--foreground::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 0, 0, 0) 40%,
+    rgba(255, 0, 0, 0.75) 100%
+  );
+}
+
+.bg--guy {
+  max-width: 1920px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background-image: image-set(
+    url("assets/images/doom-guy-1-0x.png") 1x,
+    url("assets/images/doom-guy-1-5x.png") 2x
+  );
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+}
+
+@media (min-width: 1921px) {
+  .layer--foreground {
+    max-height: none;
+    min-height: auto;
+    height: auto;
+    margin-top: -100px;
+    padding: 15%;
+  }
+
+  .bg--guy {
+    max-width: none;
+  }
+}
+
+/* Body */
+
+main {
+  padding: 54px;
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+@media (max-width: 1200px) {
+  main {
+    padding: 20px;
+  }
+}
+
+.hydra-logo {
+  position: absolute;
+  top: 65px;
+  left: 60px;
+  display: block;
+  width: 53px;
+  z-index: 2;
+}
+
+@media (max-width: 1440px) {
+  .hydra-logo {
+    top: 40px;
+    left: 45px;
+    width: 49px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hydra-logo {
+    top: 25px;
+    left: 30px;
+    width: 30px;
+  }
+}
+
+.doom-logo img {
+  display: block;
+  margin: -4.5% auto -6.5%;
+  width: 970px;
+  max-width: 70vw;
+}
+
+@media (max-width: 1440px) {
+  .doom-logo img {
+    margin-top: -7.5%;
+    margin-bottom: -4.5%;
+  }
+}
+
+@media (max-width: 1200px) {
+  .doom-logo img {
+    margin-top: -4%;
+  }
+}
+
+@media (max-width: 768px) {
+  .doom-logo {
+    padding-top: 45px;
+    padding-bottom: 20px;
+  }
+}
+
+.card {
+  background: #18181a;
+  border: 1px solid #ff3030;
+  box-shadow: 0px 4px 10px 6px rgba(0, 0, 0, 0.25);
+  max-width: 535px;
+  text-align: center;
+  padding: 15px 15px 20px;
+  margin: 0 auto;
+  font-size: 1.45rem;
+}
+
+.card__title {
+  font-family: "Pixelify Sans";
+  font-weight: 700;
+  font-size: 2.5rem;
+  letter-spacing: -0.01em;
+  padding: 0 0 0.3em;
+  color: yellow;
+  text-shadow:
+    0 0 10px #db1102,
+    0 0 20px #f2581f,
+    0 0 50px #f2581f,
+    0 0 50px rgba(255, 50, 50, 0.25);
+}
+
+.card__description {
+  text-shadow:
+    0 0 2px rgba(255, 255, 255, 0.5),
+    0 0 12px rgba(255, 255, 255, 0.3);
+}
