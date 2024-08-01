@@ -9,11 +9,13 @@
   <div id="background" style="background-image:url(./background.jpg);" />
   <img id="logo" src="./logo.png" />
   <div id="canvas-container">
+      <div id="qr-container" class="qr-code">
+      </div>
     <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1" ></canvas>
     <button id="start" class="pushable">
       <span class="shadow"></span>
       <span class="edge"></span>
-      <span class="front">
+      <span id="button-text" class="front">
         Give em hell
       </span>
     </button>

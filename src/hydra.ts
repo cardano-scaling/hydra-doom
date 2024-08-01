@@ -13,6 +13,7 @@ import { HydraProvider } from "./lucid-provider-hydra";
 import { Player, buildDatum, decodeDatum, hydraDatumToPlutus, initialGameData } from "./contract/datum";
 import { CBOR } from "./contract/cbor";
 import { UTxOResponse, recordValueToAssets } from "./types";
+import { keys } from "./keys";
 
 let gameServerUrl = process.env.SERVER_URL;
 if (!gameServerUrl) {
@@ -21,17 +22,8 @@ if (!gameServerUrl) {
     `Defaulting SERVER_URL to ${gameServerUrl}, use .env to configure`,
   );
 }
-
 let lucid = await Lucid.new(undefined, "Preprod");
-
-// Load or generate a session key
-
-let privateKey = window.localStorage.getItem("hydra-doom-session-key");
-if (!process.env.PERSISTENT_SESSION || privateKey == null) {
-  console.warn("Generating new session key");
-  privateKey = lucid.utils.generatePrivateKey();
-  window.localStorage.setItem("hydra-doom-session-key", privateKey);
-}
+let { sessionKey: privateKey } = keys;
 const address = await lucid
   .selectWalletFromPrivateKey(privateKey)
   .wallet.address();
