@@ -10,7 +10,13 @@ import {
 } from "lucid-cardano";
 
 import { HydraProvider } from "./lucid-provider-hydra";
-import { Player, buildDatum, decodeDatum, hydraDatumToPlutus, initialGameData } from "./contract/datum";
+import {
+  Player,
+  buildDatum,
+  decodeDatum,
+  hydraDatumToPlutus,
+  initialGameData,
+} from "./contract/datum";
 import { CBOR } from "./contract/cbor";
 import { UTxOResponse, recordValueToAssets } from "./types";
 import { keys } from "./keys";
@@ -30,16 +36,8 @@ const address = await lucid
 const pkh = lucid.utils.getAddressDetails(address).paymentCredential?.hash!;
 console.log(`Using session key with address: ${address}`);
 
-// This is temporary, the initial game state is stored in a UTxO created by the control plane.
-// We need to add the ability to parse game state from the datum here.
-const gameData = initialGameData(pkh);
-const scriptAddress = lucid.utils.validatorToAddress({
-  script: CBOR,
-  type: "PlutusV2",
-});
-
 // Continue or fetch a game session
-
+let admin_pkh: string;
 let node = window.localStorage.getItem("hydra-doom-session-node");
 let scriptRef = window.localStorage.getItem("hydra-doom-session-ref");
 if (!process.env.PERSISTENT_SESSION || node == null || scriptRef == null) {
@@ -47,6 +45,7 @@ if (!process.env.PERSISTENT_SESSION || node == null || scriptRef == null) {
   const response = await fetch(`${gameServerUrl}/new_game?address=${address}`);
   const newGameResponse = await response.json();
   node = newGameResponse.ip as string;
+  admin_pkh = newGameResponse.admin_pkh as string;
   window.localStorage.setItem("hydra-doom-session-node", node);
   scriptRef = newGameResponse.script_ref as string;
   window.localStorage.setItem("hydra-doom-session-ref", scriptRef);
@@ -54,6 +53,14 @@ if (!process.env.PERSISTENT_SESSION || node == null || scriptRef == null) {
 console.log(
   `Using hydra node ${node} and game validator script at reference: ${scriptRef}`,
 );
+
+// This is temporary, the initial game state is stored in a UTxO created by the control plane.
+// We need to add the ability to parse game state from the datum here.
+const gameData = initialGameData(pkh, admin_pkh!);
+const scriptAddress = lucid.utils.validatorToAddress({
+  script: CBOR,
+  type: "PlutusV2",
+});
 
 // Setup a lucid instance running against hydra
 
@@ -121,13 +128,13 @@ export async function hydraSend(
   if (latestUTxO == null) {
     const utxos = await getUTxOsAtAddress(scriptAddress);
     console.log(utxos);
-    for(const utxo of utxos) {
+    for (const utxo of utxos) {
       if (!utxo.datum) {
         continue;
       }
       console.log(utxo);
       const data = decodeDatum(utxo.datum);
-      if (!!data && data.admin == pkh) {
+      if (!!data && data.owner == pkh) {
         latestUTxO = utxo;
         break;
       }
@@ -213,12 +220,20 @@ const buildCollateralInput = (txHash: string, txIx: number) => {
 
 const encodeRedeemer = (cmd: Cmd): string => {
   return Data.to(
-    new Constr(0, [BigInt(cmd.forwardMove), BigInt(cmd.sideMove), BigInt(0), []]),
+    new Constr(1, [
+      new Constr(0, [
+        BigInt(cmd.forwardMove),
+        BigInt(cmd.sideMove),
+        BigInt(0),
+        [],
+      ]),
+    ]),
   );
 };
 
 const decodeRedeemer = (redeemer: string): Cmd => {
-  const d = Data.from(redeemer) as Constr<Data>;
+  const d = (Data.from(redeemer) as Constr<Data>).fields[0] as Constr<Data>;
+
   return { forwardMove: Number(d.fields[0]), sideMove: Number(d.fields[1]) };
 };
 
@@ -234,10 +249,13 @@ const buildTx = async (
     outputIndex: inputUtxo.outputIndex,
     address: inputUtxo.address,
     assets: inputUtxo.assets,
-    datum: !!inputUtxo.datum && (typeof inputUtxo.datum !== "string") ? Data.to(hydraDatumToPlutus(inputUtxo.datum)) : inputUtxo.datum,
+    datum:
+      !!inputUtxo.datum && typeof inputUtxo.datum !== "string"
+        ? Data.to(hydraDatumToPlutus(inputUtxo.datum))
+        : inputUtxo.datum,
     datumHash: inputUtxo.datumHash,
     scriptRef: inputUtxo.scriptRef,
-  }
+  };
   const tx = await lucid
     .newTx()
     .collectFrom([lucidUtxo], redeemer)
