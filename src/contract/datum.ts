@@ -2,6 +2,7 @@ import { Constr, Data } from "lucid-cardano";
 
 export interface GameData {
   isOver: boolean;
+  owner: string;
   admin: string;
   player: Player;
   monsters: MabObject[];
@@ -30,8 +31,9 @@ export enum PlayerState {
   REBORN,
 }
 
-export const initialGameData = (adminKey: string) => ({
+export const initialGameData = (ownerKey: string, adminKey: string) => ({
   isOver: false,
+  owner: ownerKey,
   admin: adminKey,
   player: {
     playerState: PlayerState.LIVE,
@@ -51,12 +53,11 @@ export const initialGameData = (adminKey: string) => ({
   monsters: [],
 });
 
-
-
 export const buildDatum = (state: GameData): string => {
   return Data.to(
     new Constr(0, [
       encodeBoolean(state.isOver),
+      encodeByteString(state.owner),
       encodeByteString(state.admin),
       encodePlayer(state.player),
       state.monsters.map((monster) => encodeMapObject(monster)),
@@ -68,21 +69,14 @@ export const decodeDatum = (datum: any): GameData | undefined => {
   try {
     return {
       isOver: datum.fields[0].constructor == 0, // TODO
-      admin: datum.fields[1].fields[0].bytes,
+      owner: datum.fields[1].fields[0].bytes,
+      admin: datum.fields[2].fields[0].bytes,
       // TODO: rest of fields
     } as any as GameData;
-  } catch(e) {
+  } catch (e) {
     return undefined;
   }
-}
-
-function fromHex(h: string) {
-    var s = ''
-    for (var i = 0; i < h.length; i+=2) {
-        s += String.fromCharCode(parseInt(h.substr(i, 2), 16))
-    }
-    return decodeURIComponent(escape(s))
-}
+};
 
 const encodePlayer = (player: Player) => {
   return new Constr(0, [
@@ -128,9 +122,6 @@ const encodeBoolean = (b: boolean) => {
 const encodeByteString = (s: string) => {
   return new Constr(0, [s]);
 };
-const decodeByteString = (d: Constr<Data>) => {
-  return d.fields[0];
-}
 
 export const hydraDatumToPlutus = (d: any) => {
   console.log(d);
@@ -144,4 +135,4 @@ export const hydraDatumToPlutus = (d: any) => {
   } else if ("list" in d) {
     return d.list.map(hydraDatumToPlutus);
   }
-}
+};
