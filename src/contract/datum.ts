@@ -124,9 +124,7 @@ const encodeByteString = (s: string) => {
 };
 
 export const hydraDatumToPlutus = (d: any) => {
-  console.log(d);
   if ("fields" in d) {
-    console.log(d);
     return new Constr(d.constructor, d.fields.map(hydraDatumToPlutus));
   } else if ("bytes" in d) {
     return d.bytes;

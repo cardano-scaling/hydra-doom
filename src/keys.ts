@@ -1,4 +1,5 @@
 import * as ed25519 from "@noble/ed25519";
+import * as bech32 from "bech32-buffer";
 import { encode } from "cbor-x";
 import { Lucid } from "lucid-cardano";
 import * as QRCode from "qrcode";
@@ -24,7 +25,18 @@ if (!process.env.PERSISTENT_SESSION || sessionKey == null) {
   window.localStorage.setItem("hydra-doom-session-key", sessionKey);
 }
 
-export const keys = { sessionKey, cabinetKey };
+const decodedSessionKey = Array.from(bech32.decode(sessionKey).data)
+  .map(toHex)
+  .join("");
+const sessionPk = Array.from(await ed25519.getPublicKeyAsync(decodedSessionKey))
+  .map(toHex)
+  .join("");
+
+function toHex(i: number) {
+  return ("0" + i.toString(16)).slice(-2);
+}
+
+export const keys = { sessionKey, sessionPk, cabinetKey };
 
 export async function generatePooQrUri() {
   if (!sessionKey || !cabinetKey) {
@@ -32,11 +44,6 @@ export async function generatePooQrUri() {
   }
 
   const cabinetPk = await ed25519.getPublicKeyAsync(cabinetKey);
-  const address = await (await Lucid.new(undefined, "Preprod"))
-    .selectWalletFromPrivateKey(sessionKey)
-    .wallet.address();
-  const sessionPk =
-    lucid.utils.getAddressDetails(address).paymentCredential?.hash!;
   const signature = await ed25519.signAsync(sessionPk, cabinetKey);
   const code = ed25519.etc.bytesToHex(
     encode([sessionPk, [cabinetPk, signature]]),
