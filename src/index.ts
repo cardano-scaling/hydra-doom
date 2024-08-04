@@ -3,19 +3,31 @@ import { generatePooQrUri } from "./keys";
 import "./osano.js";
 import { startQueryingAPI } from "./stats";
 import "./styles.css";
+import { generatePooQrUri, keys } from "./keys";
 
 declare function callMain(args: string[]): void;
 
 const startButton: HTMLButtonElement | null = document.querySelector("#start");
 const qrContainer: HTMLElement | null = document.querySelector("#qr-container");
-const buttonText: HTMLDataListElement | null =
-  document.querySelector("#button-text");
 
 // Stuff for POO
+const { sessionPk } = keys;
 let qrCode = await generatePooQrUri();
-console.log(qrCode);
 let qrShown = false;
+async function pollForPoo(ephemeralKey: string) {
+  console.log(ephemeralKey);
+  const request = await fetch(`https://auth.hydradoom.fun/v1/${ephemeralKey}`);
+  const status = request.status;
+  if (status === 401) {
+    throw new Error("Invalid Key");
+  }
+  if (status === 200) {
+    startGame();
+    return;
+  }
 
+  setTimeout(() => pollForPoo(ephemeralKey), 5000);
+}
 // Glue together callbacks available from doom-wasm
 (window as any).hydraSend = hydraSend;
 (window as any).hydraRecv = hydraRecv;
@@ -31,21 +43,18 @@ const commonArgs = [
 ];
 
 // Start a new game
-startButton?.addEventListener("click", () => {
-  startGame();
+startButton?.addEventListener("click", async () => {
+  !!qrCode && !qrShown ? await showQrCode() : startGame();
 });
 
-function showQrCode() {
+async function showQrCode() {
   qrShown = true;
 
   const img = document.createElement("img");
   img.src = qrCode!;
   qrContainer?.appendChild(img);
-
-  // We can add polling here and hide the button, but for now we'll just let the user click the button again
-  if (buttonText) {
-    buttonText.innerText = "Start Game";
-  }
+  if (startButton) startButton.style.display = "none";
+  await pollForPoo(sessionPk);
 }
 
 function startGame() {

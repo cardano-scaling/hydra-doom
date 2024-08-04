@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@noble/ed25519": "^2.1.0",
+    "bech32-buffer": "^0.2.1",
     "cbor-x": "^1.5.9",
     "lucid-cardano": "^0.10.7",
     "qrcode": "^1.5.3"
