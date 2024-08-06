@@ -1,0 +1,12 @@
+/node_modules/
+/dist/
+/assets/doom1.wad
+/assets/websockets-doom*
+.env
+state-hydra
+.direnv
+Rocket.toml
+# nix
+result*
+*.sk
+*.vk
