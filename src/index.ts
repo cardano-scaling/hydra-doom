@@ -1,6 +1,5 @@
-import { hydraRecv, hydraSend } from "./hydra";
-import { generatePooQrUri } from "./keys";
 import "./osano.js";
+import { hydraSend, hydraRecv, fetchNewGame } from "./hydra";
 import { startQueryingAPI } from "./stats";
 import "./styles.css";
 import { generatePooQrUri, keys } from "./keys";
@@ -44,7 +43,7 @@ const commonArgs = [
 
 // Start a new game
 startButton?.addEventListener("click", async () => {
-  !!qrCode && !qrShown ? await showQrCode() : startGame();
+  !!qrCode && !qrShown ? await showQrCode() : await startGame();
 });
 
 async function showQrCode() {
@@ -57,20 +56,27 @@ async function showQrCode() {
   await pollForPoo(sessionPk);
 }
 
-function startGame() {
-  callMain(commonArgs.concat(["-hydra-send"]));
-
-  // Watch game
-  // FIXME: prevent /new_game in hydra.ts
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("watch") != null) {
-    // Hide the button
-    if (startButton) {
-      startButton.style.display = "none";
-    }
-    setTimeout(() => {
-      callMain(commonArgs.concat("-hydra-recv"));
-    }, 1000);
+async function startGame() {
+  await fetchNewGame();
+  if (startButton) {
+    startButton.style.display = "none";
   }
+  if (qrContainer) {
+    qrContainer.style.display = "none";
+  }
+  callMain(commonArgs.concat(["-hydra-send"]));
+}
+
+// Watch game
+// FIXME: prevent /new_game in hydra.ts
+const params = new URLSearchParams(window.location.search);
+if (params.get("watch") != null) {
+  // Hide the button
+  if (startButton) {
+    startButton.style.display = "none";
+  }
+  setTimeout(() => {
+    callMain(commonArgs.concat("-hydra-recv"));
+  }, 1000);
 }
 startQueryingAPI();
