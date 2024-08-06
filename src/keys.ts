@@ -28,15 +28,17 @@ if (!process.env.PERSISTENT_SESSION || sessionKey == null) {
 const decodedSessionKey = Array.from(bech32.decode(sessionKey).data)
   .map(toHex)
   .join("");
-const sessionPk = Array.from(await ed25519.getPublicKeyAsync(decodedSessionKey))
-  .map(toHex)
-  .join("");
+const sessionPk = await ed25519.getPublicKeyAsync(decodedSessionKey);
 
 function toHex(i: number) {
   return ("0" + i.toString(16)).slice(-2);
 }
 
-export const keys = { sessionKey, sessionPk, cabinetKey };
+export const keys = {
+  sessionKey,
+  sessionPk: ed25519.etc.bytesToHex(sessionPk),
+  cabinetKey,
+};
 
 export async function generatePooQrUri() {
   if (!sessionKey || !cabinetKey) {
