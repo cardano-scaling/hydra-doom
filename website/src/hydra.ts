@@ -1,15 +1,15 @@
 import {
   C,
+  Constr,
   Data,
   Lucid,
-  UTxO,
-  valueToAssets,
-  toHex,
-  Constr,
   TxSigned,
+  UTxO,
+  toHex,
+  valueToAssets,
 } from "lucid-cardano";
 
-import { HydraProvider } from "./lucid-provider-hydra";
+import { CBOR } from "./contract/cbor";
 import {
   Player,
   buildDatum,
@@ -17,13 +17,13 @@ import {
   hydraDatumToPlutus,
   initialGameData,
 } from "./contract/datum";
-import { CBOR } from "./contract/cbor";
-import { UTxOResponse, recordValueToAssets } from "./types";
 import { keys } from "./keys";
+import { HydraProvider } from "./lucid-provider-hydra";
+import { UTxOResponse, recordValueToAssets } from "./types";
 
 let gameServerUrl = process.env.SERVER_URL;
 if (!gameServerUrl) {
-  gameServerUrl = "http://3.15.33.186:8000";
+  gameServerUrl = "http://localhost:8000";
   console.warn(
     `Defaulting SERVER_URL to ${gameServerUrl}, use .env to configure`
   );

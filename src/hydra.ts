@@ -23,9 +23,9 @@ import { keys } from "./keys";
 
 let gameServerUrl = process.env.SERVER_URL;
 if (!gameServerUrl) {
-  gameServerUrl = "http://3.15.33.186:8000";
+  gameServerUrl = "http://localhost:8000";
   console.warn(
-    `Defaulting SERVER_URL to ${gameServerUrl}, use .env to configure`
+    `Defaulting SERVER_URL to ${gameServerUrl}, use .env to configure`,
   );
 }
 let lucid = await Lucid.new(undefined, "Preprod");
@@ -51,7 +51,7 @@ if (!process.env.PERSISTENT_SESSION || node == null || scriptRef == null) {
   window.localStorage.setItem("hydra-doom-session-ref", scriptRef);
 }
 console.log(
-  `Using hydra node ${node} and game validator script at reference: ${scriptRef}`
+  `Using hydra node ${node} and game validator script at reference: ${scriptRef}`,
 );
 
 // This is temporary, the initial game state is stored in a UTxO created by the control plane.
@@ -115,7 +115,7 @@ export enum GameState {
 export async function hydraSend(
   cmd: Cmd,
   player: Player,
-  gameState: GameState
+  gameState: GameState,
 ) {
   console.log("hydraSend", cmd);
 
@@ -154,7 +154,7 @@ export async function hydraSend(
     latestUTxO!,
     encodeRedeemer(cmd),
     buildDatum(gameData),
-    collateralUTxO!
+    collateralUTxO!,
   );
 
   lastTime = performance.now();
@@ -208,7 +208,7 @@ const buildCollateralInput = (txHash: string, txIx: number) => {
   const transactionHash = C.TransactionHash.from_hex(txHash);
   const input = C.TransactionInput.new(
     transactionHash,
-    C.BigNum.from_str(txIx.toString())
+    C.BigNum.from_str(txIx.toString()),
   );
   const inputs = C.TransactionInputs.new();
   inputs.add(input);
@@ -227,7 +227,7 @@ const encodeRedeemer = (cmd: Cmd): string => {
         BigInt(0),
         [],
       ]),
-    ])
+    ]),
   );
 };
 
@@ -241,7 +241,7 @@ const buildTx = async (
   inputUtxo: UTxO,
   redeemer: string,
   datum: string,
-  collateralUtxo: UTxO
+  collateralUtxo: UTxO,
 ): Promise<[UTxO, TxSigned]> => {
   // HACK: hydra returns a decoded/json format of the datum, so we coerce it back here
   let lucidUtxo = {
@@ -277,7 +277,7 @@ const buildTx = async (
 
   const collateral = buildCollateralInput(
     collateralUtxo.txHash,
-    collateralUtxo.outputIndex
+    collateralUtxo.outputIndex,
   );
   const txBody = tx.txComplete.body();
   const witnessSet = tx.txComplete.witness_set();
