@@ -1,6 +1,5 @@
 import {
   Address,
-  Assets,
   Credential,
   Datum,
   DatumHash,
@@ -8,11 +7,10 @@ import {
   OutRef,
   ProtocolParameters,
   Provider,
-  RewardAddress,
   Transaction,
   TxHash,
   Unit,
-  UTxO,
+  UTxO
 } from "lucid-cardano";
 
 export class HydraProvider implements Provider {

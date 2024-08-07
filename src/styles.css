@@ -306,20 +306,39 @@ main {
   }
 }
 
-.hydra-logo {
-  position: absolute;
-  display: block;
-  top: 65px;
+.logos {
+  display: flex;
+  flex-direction: column;
+  font-size: 0;
+  gap: 24px;
   left: 60px;
+  position: absolute;
+  top: 65px;
+  width: max-content;
+  z-index: 4;
+}
+
+.logos img {
   width: 53px;
-  z-index: 2;
+}
+
+.iog-logo img {
+  width: 160px;
 }
 
 @media (max-width: 1600px) {
-  .hydra-logo {
+  .logos {
     top: 40px;
     left: 45px;
+  }
+
+  .logos img {
     width: 49px;
+  }
+
+  .iog-logo img {
+    width: 130px;
+    max-width: initial;
   }
 }
 
@@ -525,6 +544,8 @@ main {
   width: 100%;
   max-width: 1465px;
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  z-index: 5;
+  position: relative;
 }
 
 .modal__outer-border {
@@ -556,7 +577,7 @@ main {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 12% 20%;
+  padding: 6rem 7rem;
   position: relative;
   background-color: #1d1515;
   box-shadow: 0px 2.41px 6.03px 3.62px rgba(255, 74, 74, 0.25) inset;
@@ -570,7 +591,16 @@ main {
   text-transform: none;
   line-height: 1.15;
   text-align: center;
+}
+
+.modal__content h1 {
   font-size: 3.5rem;
+  margin-bottom: 2rem;
+}
+
+.modal__content p {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
 }
 
 /** QR Code */
@@ -668,12 +698,13 @@ main {
     min-height: 60vh;
   }
 
-  .hydra-logo {
-    position: relative;
-    top: auto;
+  .logos {
+    align-items: center;
     left: 0;
-    right: 0;
     margin: 46px auto auto;
+    position: relative;
+    right: 0;
+    top: auto;
   }
 }
 
@@ -768,7 +799,7 @@ main {
 .three-columns {
   display: flex;
   gap: 1.25rem 4.7rem;
-  padding: 4rem 1rem;
+  padding: 9.5rem 1rem 4rem;
   align-items: center;
 }
 
