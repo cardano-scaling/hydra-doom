@@ -609,12 +609,16 @@ main {
   color: yellow;
   display: flex;
   flex-direction: column;
-  font-size: 2.5rem;
+  font-size: 2rem;
   gap: 2rem;
   height: 100%;
   justify-content: center;
   padding: 1rem;
   text-align: center;
+}
+
+.qr-code p {
+  max-width: 810px;
 }
 
 .qr-code img {
