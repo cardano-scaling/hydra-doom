@@ -6,6 +6,13 @@ const items: HTMLDataListElement | null = document.querySelector("#items");
 const secrets: HTMLDataListElement | null = document.querySelector("#secrets");
 const playTime: HTMLDataListElement | null =
   document.querySelector("#playTime");
+let gameServerUrl = process.env.SERVER_URL;
+if (!gameServerUrl) {
+  gameServerUrl = "http://localhost:8000";
+  console.warn(
+    `Defaulting SERVER_URL to ${gameServerUrl}, use .env to configure`,
+  );
+}
 
 // Function to update UI with fetched data
 function updateUI(data: any) {
@@ -35,7 +42,9 @@ function updateUI(data: any) {
 async function fetchData() {
   try {
     // FIXME: should use SERVER_URL (see hydra.ts)
-    const response = await fetch("http://3.15.33.186:8000/global");
+    const response = await fetch(
+      `${gameServerUrl}/global`,
+    );
     if (!response.ok) {
       throw new Error("Network response was not ok " + response.statusText);
     }
