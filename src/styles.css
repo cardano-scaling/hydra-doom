@@ -605,19 +605,63 @@ main {
 
 /** QR Code */
 .qr-code {
+  align-items: center;
+  color: yellow;
+  display: flex;
+  flex-direction: column;
+  font-size: 2.5rem;
+  gap: 2rem;
+  height: 100%;
+  justify-content: center;
+  padding: 1rem;
   text-align: center;
-  background-color: black;
-  border: 2px solid red;
-  margin: 8px auto;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 }
 
 .qr-code img {
-    background-color: white;
-    padding: 8px;
+  background-color: white;
+  padding: 8px;
+}
+
+.qr-skip-button {
+  align-items: center;
+  background-color: transparent;
+  background-image: url("../assets/images/play-doom-button.png");
+  background-position: center;
+  background-size: cover;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  height: 67px;
+  justify-content: center;
+  margin: 0 auto;
+  position: relative;
+  text-decoration: none;
+  width: 359px;
+}
+
+.qr-skip-button::before {
+  content: "";
+  z-index: -1;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 436px;
+  height: 228px;
+  background: url("../assets/images/play-doom-button-bg.png");
+  pointer-events: none;
+}
+
+.qr-skip-button > span {
+  margin-top: -0.4rem;
+  font-family: "Pixelify Sans", monospace;
+  text-transform: uppercase;
+  color: yellow;
+  font-size: 1.85rem;
+  text-shadow:
+    0 0 10px #db1102,
+    0 0 20px #f2581f,
+    0 0 50px #f2581f,
+    0 0 50px rgba(255, 50, 50, 0.25);
 }
 
 .modal__content::before {
@@ -684,8 +728,34 @@ main {
 
 @media (max-width: 1600px) {
   .modal__content {
-    padding: 10% 15%;
+    padding: 4rem 5rem;
+  }
+
+  .modal__content h1 {
     font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .modal__content p {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .qr-code {
+    font-size: 1.8rem;
+    gap: 1.5rem;
+  }
+  .qr-code img {
+    max-width: 350px;
+  }
+
+  .qr-skip-button {
+    width: 287px;
+    height: 55px;
+  }
+
+  .qr-skip-button span {
+    font-size: 1.5rem;
   }
 }
 
@@ -799,7 +869,7 @@ main {
 .three-columns {
   display: flex;
   gap: 1.25rem 4.7rem;
-  padding: 9.5rem 1rem 4rem;
+  padding: 9rem 1rem 4rem;
   align-items: center;
 }
 
@@ -847,8 +917,9 @@ main {
 
 .game-slot__container canvas {
   aspect-ratio: 1028/805;
-  width: 100%;
-  height: 100%;
+  width: 0;
+  height: 0;
+  position: absolute;
 }
 
 /* Speedometer */

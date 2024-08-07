@@ -3,7 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <title>Hydra Doom</title>
-    <link rel="stylesheet" href="./styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
@@ -325,6 +324,12 @@
           <div>
             <div class="game-slot">
               <div class="game-slot__container">
+                <div class="qr-code" id="qr-code">
+                  <p>Scan with Begin, Vespr, or Yoroi</p>
+                  <div id="qr-container"></div>
+                  <p>Or get right to the action</p>
+                  <button class="qr-skip-button" id="skip-button"><span>Skip</span></button>
+                </div>
                 <canvas
                   id="canvas"
                   oncontextmenu="event.preventDefault()"

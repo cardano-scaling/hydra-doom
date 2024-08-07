@@ -1,26 +1,41 @@
+import { fetchNewGame, hydraRecv, hydraSend } from "./hydra";
+import { generatePooQrUri, keys } from "./keys";
 import "./osano.js";
-import { hydraSend, hydraRecv, fetchNewGame } from "./hydra";
 import { startQueryingAPI } from "./stats";
 import "./styles.css";
-import { generatePooQrUri, keys } from "./keys";
 
 declare function callMain(args: string[]): void;
 
 const startButton: HTMLButtonElement | null = document.querySelector("#start");
 const qrContainer: HTMLElement | null = document.querySelector("#qr-container");
+const skipButton: HTMLElement | null = document.querySelector("#skip-button");
+const qrCodeWrapper: HTMLElement | null = document.querySelector("#qr-code");
+const canvas: HTMLElement | null = document.querySelector("#canvas");
 
 // Stuff for POO
 const { sessionPk } = keys;
 let qrCode = await generatePooQrUri();
 let qrShown = false;
+
+function hideQrAndShowCanvas() {
+  if (qrCodeWrapper) {
+    qrCodeWrapper.style.display = "none";
+  }
+  if (canvas) {
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+    canvas.style.position = "static";
+  }
+}
+
 async function pollForPoo(ephemeralKey: string) {
-  console.log(ephemeralKey);
   const request = await fetch(`https://auth.hydradoom.fun/v1/${ephemeralKey}`);
   const status = request.status;
   if (status === 401) {
     throw new Error("Invalid Key");
   }
   if (status === 200) {
+    hideQrAndShowCanvas();
     startGame();
     return;
   }
@@ -46,6 +61,12 @@ startButton?.addEventListener("click", async () => {
   !!qrCode && !qrShown ? await showQrCode() : await startGame();
 });
 
+// Skip QR code
+skipButton?.addEventListener("click", () => {
+  hideQrAndShowCanvas();
+  startGame();
+});
+
 async function showQrCode() {
   qrShown = true;
 
@@ -60,9 +81,6 @@ async function startGame() {
   await fetchNewGame();
   if (startButton) {
     startButton.style.display = "none";
-  }
-  if (qrContainer) {
-    qrContainer.style.display = "none";
   }
   callMain(commonArgs.concat(["-hydra-send"]));
 }

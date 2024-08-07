@@ -4,13 +4,13 @@ import { encode } from "cbor-x";
 import { Lucid } from "lucid-cardano";
 
 import QRCodeStyling, {
-    DrawType,
-    TypeNumber,
-    Mode,
-    ErrorCorrectionLevel,
-    DotType,
-    CornerSquareType,
-    CornerDotType,
+  CornerDotType,
+  CornerSquareType,
+  DotType,
+  DrawType,
+  ErrorCorrectionLevel,
+  Mode,
+  TypeNumber,
 } from "styled-qr-code";
 
 const cabinetKey =
@@ -52,35 +52,35 @@ export const keys = {
 const qr_code_options = {
   width: 512,
   height: 512,
-  type: 'svg' as DrawType,
-  image: './hydra_outline_small.png',
+  type: "png" as DrawType,
+  image: "assets/images/hydra_outline_small.png",
   margin: 0,
   qrOptions: {
-      typeNumber: 0 as TypeNumber,
-      mode: "Byte" as Mode,
-      errorCorrectionLevel: "Q" as ErrorCorrectionLevel
+    typeNumber: 0 as TypeNumber,
+    mode: "Byte" as Mode,
+    errorCorrectionLevel: "Q" as ErrorCorrectionLevel,
   },
   imageOptions: {
-      hideBackgroundDots: false,
-      imageSize: 1,
-      margin: 0,
-      crossOrigin: 'anonymous'
+    hideBackgroundDots: false,
+    imageSize: 1,
+    margin: 0,
+    crossOrigin: "anonymous",
   },
   dotsOptions: {
-      type: "square" as DotType,
-      color: "#000000",
+    type: "square" as DotType,
+    color: "#000000",
   },
   backgroundOptions: {
-      color: "#ffffff"
+    color: "#ffffff",
   },
   cornersSquareOptions: {
-      type: "extra-rounded" as CornerSquareType,
-      color: "#000000"
+    type: "extra-rounded" as CornerSquareType,
+    color: "#000000",
   },
   cornersDotOptions: {
-      type: "dot" as CornerDotType,
-      color: "#000000"
-  }
+    type: "dot" as CornerDotType,
+    color: "#000000",
+  },
 };
 
 export async function generatePooQrUri() {
@@ -91,11 +91,10 @@ export async function generatePooQrUri() {
   const cabinetPk = await ed25519.getPublicKeyAsync(cabinetKey);
   const signature = await ed25519.signAsync(sessionPk, cabinetKey);
   const code = ed25519.etc.bytesToHex(
-    encode([sessionPk, [cabinetPk, signature]]),
+    encode([sessionPk, [cabinetPk, signature]])
   );
 
   const qr_code_url = `web+cardano://claim/v1?faucet_url=https%3A%2F%2Fauth.hydradoom.fun/v1&code=${code}`;
-
-  const qrcode = new QRCodeStyling({...qr_code_options, data: qr_code_url});
-  return qrcode.toDataUrl('.svg');
+  const qrcode = new QRCodeStyling({ ...qr_code_options, data: qr_code_url });
+  return qrcode.toDataUrl("png");
 }
