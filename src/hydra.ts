@@ -11,6 +11,7 @@ import {
 
 import { HydraProvider } from "./lucid-provider-hydra";
 import {
+  GameData,
   Player,
   buildDatum,
   decodeDatum,
@@ -40,23 +41,41 @@ console.log(`Using session key with address: ${address}`);
 let admin_pkh: string;
 let node = window.localStorage.getItem("hydra-doom-session-node");
 let scriptRef = window.localStorage.getItem("hydra-doom-session-ref");
-if (!process.env.PERSISTENT_SESSION || node == null || scriptRef == null) {
-  console.warn(`Starting new game for ${address}`);
-  const response = await fetch(`${gameServerUrl}/new_game?address=${address}`);
-  const newGameResponse = await response.json();
-  node = newGameResponse.ip as string;
-  admin_pkh = newGameResponse.admin_pkh as string;
-  window.localStorage.setItem("hydra-doom-session-node", node);
-  scriptRef = newGameResponse.script_ref as string;
-  window.localStorage.setItem("hydra-doom-session-ref", scriptRef);
-}
-console.log(
-  `Using hydra node ${node} and game validator script at reference: ${scriptRef}`,
-);
+let hydraHttp: string;
+let conn: WebSocket;
+let gameData: GameData;
 
-// This is temporary, the initial game state is stored in a UTxO created by the control plane.
-// We need to add the ability to parse game state from the datum here.
-const gameData = initialGameData(pkh, admin_pkh!);
+export async function fetchNewGame() {
+  if (!process.env.PERSISTENT_SESSION || node == null || scriptRef == null) {
+    console.warn(`Starting new game for ${address}`);
+    const response = await fetch(
+      `${gameServerUrl}/new_game?address=${address}`,
+    );
+    const newGameResponse = await response.json();
+    node = newGameResponse.ip as string;
+    admin_pkh = newGameResponse.admin_pkh as string;
+    window.localStorage.setItem("hydra-doom-session-node", node);
+    scriptRef = newGameResponse.script_ref as string;
+    window.localStorage.setItem("hydra-doom-session-ref", scriptRef);
+  }
+  console.log(
+    `Using hydra node ${node} and game validator script at reference: ${scriptRef}`,
+  );
+
+  hydraHttp = `http://${node}`;
+  console.log("Connecting lucid");
+  lucid = await Lucid.new(new HydraProvider(hydraHttp), "Preprod");
+  lucid.selectWalletFromPrivateKey(privateKey);
+
+  console.log(`Connecting websocket ws://${node}`);
+  const protocol = window.location.protocol == "https:" ? "wss://" : "ws://";
+  conn = new WebSocket(protocol + `${node}?history=no`);
+
+  // This is temporary, the initial game state is stored in a UTxO created by the control plane.
+  // We need to add the ability to parse game state from the datum here.
+  gameData = initialGameData(pkh, admin_pkh!);
+}
+
 const scriptAddress = lucid.utils.validatorToAddress({
   script: CBOR,
   type: "PlutusV2",
@@ -64,16 +83,7 @@ const scriptAddress = lucid.utils.validatorToAddress({
 
 // Setup a lucid instance running against hydra
 
-const hydraHttp = `http://${node}`;
-console.log("Connecting lucid");
-lucid = await Lucid.new(new HydraProvider(hydraHttp), "Preprod");
-lucid.selectWalletFromPrivateKey(privateKey);
-
 // Makeshift hydra client
-
-console.log(`Connecting websocket ws://${node}`);
-const protocol = window.location.protocol == "https:" ? "wss://" : "ws://";
-const conn = new WebSocket(protocol + `${node}?history=no`);
 
 async function getUTxO(): Promise<UTxOResponse> {
   const res = await fetch(`${hydraHttp}/snapshot/utxo`);
@@ -117,6 +127,7 @@ export async function hydraSend(
   player: Player,
   gameState: GameState,
 ) {
+  if (!gameData) throw new Error("Game data not initialized");
   console.log("hydraSend", cmd);
 
   if (gameState != GameState.GS_LEVEL) {
@@ -140,7 +151,7 @@ export async function hydraSend(
       }
     }
     if (!latestUTxO) {
-      throw new Error("No UTxO found for admin");
+      throw new Error("No UTxO found for gamer");
     }
     console.log("Current UTxO owned by gamer", JSON.stringify(latestUTxO));
   }
@@ -256,14 +267,15 @@ const buildTx = async (
     datumHash: inputUtxo.datumHash,
     scriptRef: inputUtxo.scriptRef,
   };
+
   const tx = await lucid
     .newTx()
     .collectFrom([lucidUtxo], redeemer)
     .payToContract(scriptAddress, { inline: datum }, { lovelace: BigInt(0) })
     .readFrom([
       {
-        txHash: scriptRef.split("#")[0],
-        outputIndex: Number(scriptRef.split("#")[1]),
+        txHash: scriptRef!.split("#")[0],
+        outputIndex: Number(scriptRef!.split("#")[1]),
         address: scriptAddress,
         assets: { lovelace: BigInt(0) },
         scriptRef: {

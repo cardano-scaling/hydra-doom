@@ -47,6 +47,7 @@ module.exports = {
         { from: "assets/websockets-doom.js" },
         { from: "assets/websockets-doom.wasm" },
         { from: "assets/websockets-doom.wasm.map" },
+        { from: "assets/images/hydra_outline_small.png", to: "assets/images" },
         { from: "assets/images/favicon.png", to: "assets/images" },
         { from: "assets/images/hydra-logo-2-0x.png", to: "assets/images" },
         { from: "assets/images/hydra-text-1-0x.png", to: "assets/images" },
