@@ -38,13 +38,3 @@ nix run
 ## Persistent sessions
 
 If we want to keep using the same key and remote node configuration between runs, set the `PERSISTENT_SESSION=true` variable in the `.env` file before starting the dev web server.
-
-
-
-### Local Development
-
-To run the project locally (using the POO integration), you need to set a `CABINET_KEY` in the `.env` file. For example:
-
-```sh
-CABIENT_KEY=A610911D628D5475EFFBA5E80ED09D1260B49E6935C40E4195C4D4AA17963CBF
-```

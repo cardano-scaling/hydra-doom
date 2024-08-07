@@ -1,3 +1,4 @@
+import "./osano.js";
 import { hydraSend, hydraRecv, fetchNewGame } from "./hydra";
 import { startQueryingAPI } from "./stats";
 import "./styles.css";
@@ -6,9 +7,6 @@ import { generatePooQrUri, keys } from "./keys";
 declare function callMain(args: string[]): void;
 
 const startButton: HTMLButtonElement | null = document.querySelector("#start");
-const txPerSecond: HTMLDataListElement | null = document.querySelector("#txps");
-const bytesPerSecond: HTMLDataListElement | null =
-  document.querySelector("#bps");
 const qrContainer: HTMLElement | null = document.querySelector("#qr-container");
 
 // Stuff for POO
@@ -81,5 +79,4 @@ if (params.get("watch") != null) {
     callMain(commonArgs.concat("-hydra-recv"));
   }, 1000);
 }
-
 startQueryingAPI();
