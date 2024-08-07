@@ -573,6 +573,23 @@ main {
   font-size: 3.5rem;
 }
 
+/** QR Code */
+.qr-code {
+  text-align: center;
+  background-color: black;
+  border: 2px solid red;
+  margin: 8px auto;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.qr-code img {
+    background-color: white;
+    padding: 8px;
+}
+
 .modal__content::before {
   content: "";
   position: absolute;

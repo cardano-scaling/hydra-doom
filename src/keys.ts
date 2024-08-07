@@ -2,7 +2,16 @@ import * as ed25519 from "@noble/ed25519";
 import * as bech32 from "bech32-buffer";
 import { encode } from "cbor-x";
 import { Lucid } from "lucid-cardano";
-import * as QRCode from "qrcode";
+
+import QRCodeStyling, {
+    DrawType,
+    TypeNumber,
+    Mode,
+    ErrorCorrectionLevel,
+    DotType,
+    CornerSquareType,
+    CornerDotType,
+} from "styled-qr-code";
 
 const cabinetKey =
   window.localStorage.getItem("cabinet-key") ??
@@ -40,6 +49,40 @@ export const keys = {
   cabinetKey,
 };
 
+const qr_code_options = {
+  width: 512,
+  height: 512,
+  type: 'svg' as DrawType,
+  image: './hydra_outline_small.png',
+  margin: 0,
+  qrOptions: {
+      typeNumber: 0 as TypeNumber,
+      mode: "Byte" as Mode,
+      errorCorrectionLevel: "Q" as ErrorCorrectionLevel
+  },
+  imageOptions: {
+      hideBackgroundDots: false,
+      imageSize: 1,
+      margin: 0,
+      crossOrigin: 'anonymous'
+  },
+  dotsOptions: {
+      type: "square" as DotType,
+      color: "#000000",
+  },
+  backgroundOptions: {
+      color: "#ffffff"
+  },
+  cornersSquareOptions: {
+      type: "extra-rounded" as CornerSquareType,
+      color: "#000000"
+  },
+  cornersDotOptions: {
+      type: "dot" as CornerDotType,
+      color: "#000000"
+  }
+};
+
 export async function generatePooQrUri() {
   if (!sessionKey || !cabinetKey) {
     return undefined;
@@ -51,7 +94,8 @@ export async function generatePooQrUri() {
     encode([sessionPk, [cabinetPk, signature]]),
   );
 
-  return await QRCode.toDataURL(
-    `web+cardano://claim/v1?faucet_url=https%3A%2F%2Fauth.hydradoom.fun/v1&code=${code}`,
-  );
+  const qr_code_url = `web+cardano://claim/v1?faucet_url=https%3A%2F%2Fauth.hydradoom.fun/v1&code=${code}`;
+
+  const qrcode = new QRCodeStyling({...qr_code_options, data: qr_code_url});
+  return qrcode.toDataUrl('.svg');
 }
