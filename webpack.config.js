@@ -54,6 +54,7 @@ module.exports = {
         { from: "assets/images/bg-0-5x.jpg", to: "assets/images" },
         { from: "assets/images/bg-1-0x.jpg", to: "assets/images" },
         { from: "assets/images/bg-1-5x.jpg", to: "assets/images" },
+        { from: "assets/images/sundae-labs-logo.svg", to: "assets/images" },
       ],
     }),
   ],

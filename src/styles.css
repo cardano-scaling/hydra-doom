@@ -312,12 +312,29 @@ main {
   top: 65px;
   left: 60px;
   width: 53px;
-  z-index: 2;
+  z-index: 4;
 }
 
 @media (max-width: 1600px) {
   .hydra-logo {
     top: 40px;
+    left: 45px;
+    width: 49px;
+  }
+}
+
+.sundae-labs-logo {
+  position: absolute;
+  display: block;
+  top: 145px;
+  left: 60px;
+  width: 53px;
+  z-index: 4;
+}
+
+@media (max-width: 1600px) {
+  .sundae-labs-logo {
+    top: 120px;
     left: 45px;
     width: 49px;
   }
@@ -658,6 +675,14 @@ main {
     right: 0;
     margin: 46px auto auto;
   }
+
+  .sundae-labs-logo {
+    position: relative;
+    top: auto;
+    left: 0;
+    right: 0;
+    margin: 24px auto auto;
+  }
 }
 
 /* Game View Wrapper */
@@ -751,7 +776,7 @@ main {
 .three-columns {
   display: flex;
   gap: 1.25rem 4.7rem;
-  padding: 4rem 1rem;
+  padding: 7rem 1rem 4rem;
   align-items: center;
 }
 
