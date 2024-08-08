@@ -10,3 +10,4 @@ Rocket.toml
 result*
 *.sk
 *.vk
+treefmt.toml
