@@ -2,6 +2,9 @@ import * as ed25519 from "@noble/ed25519";
 import * as bech32 from "bech32-buffer";
 import { encode } from "cbor-x";
 import { Lucid } from "lucid-cardano";
+import {sha512} from '@noble/hashes/sha512';
+
+ed25519.etc.sha512Async = (...m) => Promise.resolve(sha512(ed25519.etc.concatBytes(...m)));
 
 import QRCodeStyling, {
   CornerDotType,
