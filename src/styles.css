@@ -847,7 +847,7 @@ main {
   background-color: #ff3030;
 }
 
-.header__wallet {
+.header__restart {
   border: none;
   cursor: pointer;
   display: flex;
@@ -862,7 +862,7 @@ main {
   background: url("../assets/images/connect-wallet-button.png");
 }
 
-.header__wallet > span {
+.header__restart > span {
   margin-top: -0.5rem;
   font-family: "Pixelify Sans", monospace;
   text-transform: uppercase;
@@ -876,7 +876,7 @@ main {
 }
 
 @media (max-width: 1024px) {
-  .header__wallet {
+  .header__restart {
     width: 150px;
     height: 52px;
     background-size: cover;
