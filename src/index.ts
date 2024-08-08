@@ -84,7 +84,7 @@ async function startGame() {
   if (startButton) {
     startButton.style.display = "none";
   }
-  callMain(commonArgs.concat(["-hydra-send"]));
+  callMain(commonArgs.concat(["-hydra-send", "-hydra-recv"]));
 }
 
 // Watch game

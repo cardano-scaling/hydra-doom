@@ -88,7 +88,7 @@ export async function fetchNewGame() {
 
   console.log(`Connecting websocket ws://${node}`);
   const protocol = window.location.protocol == "https:" ? "wss://" : "ws://";
-  conn = new WebSocket(protocol + `${node}?history=no`);
+  connectHydra(protocol + `${node}`);
 
   // This is temporary, the initial game state is stored in a UTxO created by the control plane.
   // We need to add the ability to parse game state from the datum here.
@@ -208,41 +208,60 @@ export async function hydraSend(
   frameNumber++;
 }
 
+// FIXME: Receive asynchronously and only pick from queue here
+let cmdQueue: Cmd[] = [];
+
+function connectHydra(url: string) {
+  conn = new WebSocket(`${url}?history=no`);
+  conn.onopen = function () {
+    console.log("Connected to hydra");
+  };
+  conn.onerror = function (error) {
+    console.error("WebSocket Error:", error);
+  };
+  conn.onclose = function () {
+    console.log("WebSocket connection closed");
+  };
+  conn.onmessage = (e: MessageEvent) => {
+    const msg = JSON.parse(e.data);
+    console.warn(msg);
+    switch (msg.tag) {
+      case "TxValid":
+        let elapsed = performance.now() - lastTime;
+        console.log("round trip: ", elapsed, "ms");
+        const tx = lucid.fromTx(msg.transaction.cborHex);
+        const redeemer: Uint8Array | undefined = tx.txComplete
+          .witness_set()
+          .redeemers()
+          ?.get(0)
+          ?.data()
+          .to_bytes();
+        if (!redeemer) {
+          throw new Error("Redeemer not found");
+        }
+        const cmd = decodeRedeemer(toHex(redeemer));
+        console.log("received", cmd);
+        cmdQueue.push(cmd);
+        break;
+      // XXX: Learning: ideally we should be only acting on snapshot confirmed, but I was
+      // inclined to use TxValid instead because it requires less book-keeping.
+      case "SnapshotConfirmed":
+        console.warn("confirmed", msg);
+        break;
+      default:
+        console.warn("Unexpected message: " + e.data);
+    }
+  };
+}
+
 export async function hydraRecv(): Promise<Cmd> {
   console.log("hydraRecv");
   return new Promise((res, rej) => {
-    // TODO: re-use event listeners?
-    const onMessage = (e: MessageEvent) => {
-      const msg = JSON.parse(e.data);
-      switch (msg.tag) {
-        case "TxValid":
-          let elapsed = performance.now() - lastTime;
-          console.log("round trip: ", elapsed, "ms");
-          const tx = lucid.fromTx(msg.transaction.cborHex);
-          const redeemer: Uint8Array | undefined = tx.txComplete
-            .witness_set()
-            .redeemers()
-            ?.get(0)
-            ?.data()
-            .to_bytes();
-          if (!redeemer) {
-            throw new Error("Redeemer not found");
-          }
-          const cmd = decodeRedeemer(toHex(redeemer));
-          console.log("received", cmd);
-          conn.removeEventListener("message", onMessage);
-          res(cmd);
-          break;
-        // XXX: Learning: ideally we should be only acting on snapshot confirmed, but I was
-        // inclined to use TxValid instead because it requires less book-keeping.
-        case "SnapshotConfirmed":
-          break;
-        default:
-          conn.removeEventListener("message", onMessage);
-          rej("Unexpected message: " + e.data);
-      }
-    };
-    conn.addEventListener("message", onMessage);
+    if (cmdQueue.length == 0) {
+      res({ forwardMove: 0, sideMove: 0 });
+    } else {
+      res(cmdQueue.pop()!);
+    }
   });
 }
 
