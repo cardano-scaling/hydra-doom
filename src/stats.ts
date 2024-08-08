@@ -23,6 +23,8 @@ session = {
   secrets: document.querySelector("#session-secrets"),
   playTime: document.querySelector("#session-play-time"),
 };
+const txPreview: HTMLTableElement | null =
+  document.querySelector("#tx-details");
 let gameServerUrl = process.env.SERVER_URL;
 if (!gameServerUrl) {
   gameServerUrl = "http://localhost:8000";
@@ -56,6 +58,17 @@ export function updateUI(elements: typeof global, data: any) {
     elements.playTime.innerText = new Intl.NumberFormat("en").format(
       data.play_time,
     );
+  }
+}
+
+export function appendTx(cmd: any, player: any) {
+  if (txPreview) {
+    const html = `<tr><td>Tx • {forward: ${cmd.forwardMove} • side: ${cmd.sideMove} }</td><td>GameState • { kills: ${player.killCount} • pos_x: ${player.mapObject.position.momentumX}} </td></tr>`;
+    var newRow = txPreview.insertRow(0);
+    newRow.outerHTML = html;
+    if (txPreview.rows.length > 10) {
+      txPreview.deleteRow(txPreview.rows.length - 1);
+    }
   }
 }
 

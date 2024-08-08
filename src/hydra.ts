@@ -21,7 +21,7 @@ import {
 import { CBOR } from "./contract/cbor";
 import { UTxOResponse, recordValueToAssets } from "./types";
 import { keys } from "./keys";
-import { session, updateUI } from "./stats";
+import { appendTx, session, updateUI } from "./stats";
 
 let gameServerUrl = process.env.SERVER_URL;
 if (!gameServerUrl) {
@@ -179,7 +179,7 @@ export async function hydraSend(
     collateralUTxO = utxos[0];
   }
 
-  if (frameNumber % 1 == 0) {
+  if (frameNumber % 3 == 0) {
     console.log("spending from", latestUTxO);
     const [newUtxo, tx] = await buildTx(
       latestUTxO!,
@@ -194,6 +194,7 @@ export async function hydraSend(
 
     lastTime = performance.now();
     const txid = await tx.submit();
+    appendTx(cmd, player);
     console.log("submitted", txid);
     latestUTxO = newUtxo;
   }
