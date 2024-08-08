@@ -94,10 +94,9 @@
           name = "hydra-offline-wrapper";
           runtimeInputs = [ config.packages.cardano-node config.packages.cardano-cli pkgs.jq ];
           text = ''
-            export LOCAL_HYDRA=1
-            if [ -z "''${LOCAL_HYDRA}" ]; then
+            export LOCAL_HYDRA="''${LOCAL_HYDRA:-0}"
+            if [ "''${LOCAL_HYDRA}" -eq 0 ]; then
               echo "Not starting hydra control plane because LOCAL_HYDRA is not set"
-              sleep 600
               exit 0
             fi
             rm -rf "${hydraDataDir}"
@@ -129,22 +128,20 @@
           name = "hydra-doom-wrapper";
           runtimeInputs = [ config.packages.bech32 pkgs.jq pkgs.git pkgs.nodejs pkgs.python3 ];
           text = ''
-            export STATIC=1
-            export LOCAL_HYDRA=1
-            if [ -z "''${STATIC}" ]; then
+            export STATIC="''${STATIC:-1}"
+            export LOCAL_HYDRA="''${LOCAL_HYDRA:-0}"
+            if [ "''${STATIC}" -eq 0 ]; then
               echo "running npm..."
               [ -f assets/doom1.wad ] || ln -s ${doomWad} assets/doom1.wad
               ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
               ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm assets/websockets-doom.wasm
               ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
-              sleep 1
               npm install
               npm start
-            elif [ -z "''${LOCAL_HYDRA}" ]; then
+            elif [ "''${LOCAL_HYDRA}" -eq 0 ]; then
               echo "running http webserver for remote play..."
               pushd ${config.packages.hydra-doom-static-remote}
               python3 -m http.server 3000
-
             else
               echo "running http webserver for local play..."
               pushd ${config.packages.hydra-doom-static-local}
@@ -162,12 +159,13 @@
         hydra-control-plane-wrapper = pkgs.writeShellApplication {
           name = "hydra-control-plane-wrapper";
           text = ''
-            export LOCAL_HYDRA=1
-            if [ -z "''${LOCAL_HYDRA}" ]; then
+            export LOCAL_HYDRA="''${LOCAL_HYDRA:-0}"
+            if [ "''${LOCAL_HYDRA}" -eq 0 ]; then
               echo "Not starting hydra control plane because LOCAL_HYDRA is not set"
-              sleep 600
               exit 0
             fi
+            if [ ! -f Rocket.toml ]
+            then
             cat > Rocket.toml << EOF
             [default]
             ttl_minutes = 5
@@ -182,6 +180,7 @@
             admin_key_file = "admin.sk"
             persisted = false
             EOF
+            fi
             ${lib.getExe' config.packages.hydra-control-plane "hydra_control_plane"}
           '';
         };
