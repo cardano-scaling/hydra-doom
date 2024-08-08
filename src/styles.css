@@ -967,6 +967,18 @@ td.animate::after {
   position: relative;
 }
 
+.speedometer-min {
+  position: absolute;
+  left: -110px;
+  top: -5px;
+}
+
+.speedometer-max {
+  position: absolute;
+  left: 85px;
+  top: -5px;
+}
+
 .speedometer::before {
   content: "";
   position: absolute;
