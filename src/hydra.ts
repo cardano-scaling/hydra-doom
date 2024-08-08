@@ -22,6 +22,7 @@ import { CBOR } from "./contract/cbor";
 import { UTxOResponse, recordValueToAssets } from "./types";
 import { keys } from "./keys";
 import { appendTx, session, updateUI } from "./stats";
+import { setSpeedometerValue } from "./speedometer";
 
 let gameServerUrl = process.env.SERVER_URL;
 if (!gameServerUrl) {
@@ -300,6 +301,7 @@ function connectHydra(url: string) {
           }
         }
         console.warn("tps", tps);
+        setSpeedometerValue(tps);
         break;
       default:
         console.warn("Unexpected message: " + e.data);
