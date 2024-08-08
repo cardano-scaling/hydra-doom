@@ -18,6 +18,7 @@
       mkHydraDoomStatic =
         { serverUrl ? controlPlaneUrl
         , wadFile ? doomWad
+        , cabinetKey ? import ../../deployment/cabinet-key.nix
         }:
         let
           src = inputs.nix-inclusive.lib.inclusive ../../. [
@@ -63,6 +64,10 @@
             ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
 
             echo "SERVER_URL=${serverUrl}" > .env;
+            cat > .env << EOF
+            SERVER_URL=${serverUrl}
+            ${lib.optionalString (cabinetKey != "") "CABINET_KEY=${cabinetKey}"}
+            EOF
 
             npm install
             head -n 1 node_modules/.bin/webpack
@@ -119,7 +124,7 @@
           '';
         };
         hydra-doom-static-local = mkHydraDoomStatic { };
-        hydra-doom-static-remote = mkHydraDoomStatic { serverUrl = "http://3.145.114.225:8000"; };
+        hydra-doom-static-remote = mkHydraDoomStatic { serverUrl = "https://hydra-doom.sundae.fi"; };
         hydra-doom-wrapper = pkgs.writeShellApplication {
           name = "hydra-doom-wrapper";
           runtimeInputs = [ config.packages.bech32 pkgs.jq pkgs.git pkgs.nodejs pkgs.python3 ];

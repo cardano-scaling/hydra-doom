@@ -19,12 +19,29 @@
       ];
     };
   };
+  arcadeHardware = { config, pkgs, ... }: {
+    hardware = {
+      openrazer = {
+        enable = true;
+        users = [ "doom" ];
+      };
+      nvidia = {
+        modesetting.enable = true;
+        open = false;
+        nvidiaSettings = true;
+      };
+    };
+
+    environment.systemPackages = [
+      pkgs.polychromatic
+    ];
+  };
   hydraCageLocal = { config, pkgs, ... }: {
     services = {
       cage = {
         enable = true;
         program = "${pkgs.google-chrome}/bin/google-chrome-stable --app=http://doom-offline.local";
-        user = "nixos";
+        user = "doom";
       };
     };
   };
@@ -32,8 +49,8 @@
     services = {
       cage = {
         enable = true;
-        program = "${pkgs.google-chrome}/bin/google-chrome-stable --app=http://doom-remote.local";
-        user = "nixos";
+        program = "${pkgs.google-chrome}/bin/google-chrome-stable";
+        user = "doom";
       };
     };
   };
@@ -44,19 +61,38 @@
       "127.0.0.1" = [ "localhost" "doom-remote.local" "doom-offline.local" ];
       "::1" = [ "localhost" "doom-remote.local" "doom-offline.local" ];
     };
+    environment.systemPackages = with self.packages.${system}; [
+      hydra-offline-wrapper
+      hydra-control-plane-wrapper
+      hydra-tui-wrapper
+    ];
+    users = {
+      users."doom" = {
+        createHome = true;
+        group = "doom";
+        home = "/home/doom";
+        uid = 9999;
+        isNormalUser = true;
+      };
+      groups.doom = {};
+    };
     services = {
       nginx = {
         enable = true;
         virtualHosts = {
           "doom-remote.local" = {
-            root = self.packages.${system}.hydra-doom-static-remote;
+            root = self.packages.${system}.hydra-doom-static-remote.overrideAttrs (_: {
+              cabinetKey = import ../deployment/cabinet-key.nix;
+            });
             extraConfig = ''
               disable_symlinks off;
               try_files $uri $uri /index.html;
             '';
           };
           "doom-offline.local" = {
-            root = self.packages.${system}.hydra-doom-static-local;
+            root = self.packages.${system}.hydra-doom-static-local.overrideAttrs (_: {
+              cabinetKey = import ../deployment/cabinet-key.nix;
+            });
             extraConfig = ''
               disable_symlinks off;
               try_files $uri $uri /index.html;
@@ -93,6 +129,8 @@
     environment.systemPackages = [
       pkgs.neovim
       pkgs.ssh-to-age
+      pkgs.tmux
+      pkgs.tmate
     ];
 
 
@@ -119,7 +157,7 @@ in {
       };
       hydra-arcade-test = { config, pkgs, ... }: {
         deployment = {
-          targetHost = "10.40.9.5";
+          targetHost = "hydra-arcade-test";
           targetPort = 22;
           targetUser = "root";
         };
@@ -129,11 +167,35 @@ in {
           hydraBase
           hydraCageRemote
           ../deployment/hydra-arcade-test/hardware-configuration.nix
-          (mkWireGuardTunnel [ "10.40.9.5/24" "fd00::5" ] config.sops.secrets.wg0PrivateKey.path)
+          (mkWireGuardTunnel [ "10.40.9.8/24" "fd00::8" ] config.sops.secrets.wg0PrivateKey.path)
         ];
-        networking.hostId = "3ceff0ad"; # required for zfs use
+        networking.hostId = "ca488476"; # required for zfs use
         sops = {
          defaultSopsFile = ../deployment/hydra-arcade-test/secrets.yaml;
+         age = {
+           sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
+         };
+         secrets.wg0PrivateKey = {};
+         };
+      };
+      hydra-arcade-1 = { config, pkgs, ... }: {
+        deployment = {
+          targetHost = "hydra-arcade-1";
+          targetPort = 22;
+          targetUser = "root";
+        };
+        imports = [
+          inputs.sops-nix.nixosModules.sops
+          baseConfig
+          arcadeHardware
+          hydraBase
+          hydraCageRemote
+          ../deployment/hydra-arcade-1/hardware-configuration.nix
+          (mkWireGuardTunnel [ "10.40.9.6/24" "fd00::6" ] config.sops.secrets.wg0PrivateKey.path)
+        ];
+        networking.hostId = "4e825531"; # required for zfs use
+        sops = {
+         defaultSopsFile = ../deployment/hydra-arcade-1/secrets.yaml;
          age = {
            sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
          };
