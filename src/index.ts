@@ -9,6 +9,8 @@ declare function callMain(args: string[]): void;
 const startButton: HTMLButtonElement | null = document.querySelector("#start");
 const qrContainer: HTMLElement | null = document.querySelector("#qr-container");
 const skipButton: HTMLElement | null = document.querySelector("#skip-button");
+const restartButton: HTMLElement | null =
+  document.querySelector("#restart-button");
 const qrCodeWrapper: HTMLElement | null = document.querySelector("#qr-code");
 const canvas: HTMLElement | null = document.querySelector("#canvas");
 
@@ -52,6 +54,11 @@ startButton?.addEventListener("click", async () => {
 // Skip QR code
 skipButton?.addEventListener("click", () => {
   startGame();
+});
+
+// Restart game
+restartButton?.addEventListener("click", () => {
+  location.reload();
 });
 
 async function showQrCode() {
