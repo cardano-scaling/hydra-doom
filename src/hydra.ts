@@ -142,7 +142,6 @@ type SubmissionTimes = {
 };
 let submissionTimes: SubmissionTimes = {};
 
-let lastTime: number = 0;
 let frameNumber = 0;
 
 export enum GameState {
@@ -210,12 +209,12 @@ export async function hydraSend(
     sessionStats.kills = gameData.player.killCount;
     updateUI(session, sessionStats);
 
-    lastTime = performance.now();
+    const now = performance.now();
     const txid = await tx.submit();
     appendTx(cmd, player);
-    console.log("submitted", txid, lastTime);
+    console.log("timing", now, "submitted", txid);
     submissionTimes[txid] = {
-      submitted: lastTime,
+      submitted: now,
       seen: null,
       confirmed: null,
     };
@@ -241,16 +240,22 @@ function connectHydra(url: string) {
     switch (msg.tag) {
       case "TxValid":
         const txid = msg.transaction.txId;
-        const seenTime = performance.now() - submissionTimes[txid].submitted;
-        submissionTimes[txid].seen = seenTime;
-        console.info(
-          "timing",
-          "seen",
-          msg.transaction.txId,
-          "in",
-          seenTime,
-          "ms",
-        );
+        // Record seen time
+        if (submissionTimes[txid]) {
+          const now = performance.now();
+          const seenTime = now - submissionTimes[txid].submitted;
+          submissionTimes[txid].seen = seenTime;
+          console.info(
+            "timing",
+            now,
+            "seen",
+            msg.transaction.txId,
+            "in",
+            seenTime,
+            "ms",
+          );
+        }
+        // Decode cmd from redeemer
         const tx = lucid.fromTx(msg.transaction.cborHex);
         const redeemer: Uint8Array | undefined = tx.txComplete
           .witness_set()
@@ -268,20 +273,33 @@ function connectHydra(url: string) {
       // XXX: Learning: ideally we should be only acting on snapshot confirmed, but I was
       // inclined to use TxValid instead because it requires less book-keeping.
       case "SnapshotConfirmed":
+        const now = performance.now();
+        // Record confirmation time
         for (const txid of msg.snapshot.confirmedTransactions) {
-          const confirmationTime =
-            performance.now() - submissionTimes[txid].submitted;
+          const confirmationTime = now - submissionTimes[txid].submitted;
           submissionTimes[txid].confirmed = confirmationTime;
           console.info(
             "timing",
+            now,
             "confirmed",
             txid,
             "in",
             confirmationTime,
             "ms",
           );
-          delete submissionTimes[txid];
         }
+        // Compute tps and clear submissionTimes
+        // XXX: Weird algorithm: count confirmed txs, drop txs older than 1s
+        let tps = 0;
+        for (const txid in submissionTimes) {
+          if (submissionTimes[txid].confirmed) {
+            tps++;
+          }
+          if (submissionTimes[txid].submitted < now - 1000) {
+            delete submissionTimes[txid];
+          }
+        }
+        console.warn("tps", tps);
         break;
       default:
         console.warn("Unexpected message: " + e.data);
