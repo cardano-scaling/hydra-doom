@@ -13,6 +13,7 @@ const restartButton: HTMLElement | null =
   document.querySelector("#restart-button");
 const qrCodeWrapper: HTMLElement | null = document.querySelector("#qr-code");
 const canvas: HTMLElement | null = document.querySelector("#canvas");
+const message: HTMLElement | null = document.querySelector("#message");
 
 // Stuff for POO
 const { sessionPk } = keys;
@@ -72,18 +73,37 @@ async function showQrCode() {
 }
 
 async function startGame() {
-  if (qrCodeWrapper) {
-    qrCodeWrapper.style.display = "none";
-  }
-  if (canvas) {
-    canvas.style.width = "100%";
-    canvas.style.height = "100%";
-    canvas.style.position = "static";
-  }
-  await fetchNewGame();
   if (startButton) {
     startButton.style.display = "none";
   }
+
+  if (qrCodeWrapper) {
+    qrCodeWrapper.style.display = "none";
+  }
+
+  if (message) {
+    message.style.display = "flex";
+    message.innerHTML = "Starting game...";
+  }
+
+  try {
+    await fetchNewGame();
+
+    if (message) message.style.display = "none";
+
+    if (canvas) {
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+      canvas.style.position = "static";
+    }
+  } catch (error) {
+    console.error(error);
+    if (message) {
+      message.innerHTML =
+        "Too many players are currently online. Please try again in a few moments.";
+    }
+  }
+
   callMain(commonArgs.concat(["-hydra-send"]));
 }
 
