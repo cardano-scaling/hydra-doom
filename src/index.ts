@@ -17,17 +17,6 @@ const { sessionPk } = keys;
 let qrCode = await generatePooQrUri();
 let qrShown = false;
 
-function hideQrAndShowCanvas() {
-  if (qrCodeWrapper) {
-    qrCodeWrapper.style.display = "none";
-  }
-  if (canvas) {
-    canvas.style.width = "100%";
-    canvas.style.height = "100%";
-    canvas.style.position = "static";
-  }
-}
-
 async function pollForPoo(ephemeralKey: string) {
   const request = await fetch(`https://auth.hydradoom.fun/v1/${ephemeralKey}`);
   const status = request.status;
@@ -35,7 +24,6 @@ async function pollForPoo(ephemeralKey: string) {
     throw new Error("Invalid Key");
   }
   if (status === 200) {
-    hideQrAndShowCanvas();
     startGame();
     return;
   }
@@ -63,11 +51,7 @@ startButton?.addEventListener("click", async () => {
 
 // Skip QR code
 skipButton?.addEventListener("click", () => {
-  hideQrAndShowCanvas();
-  // Temporarily commented out so we don't start the game twice;
-  // in practice, we should only show this skip button if we're showing the QR code,
-  // and just start the game immediately if not (if the cabinet key isn't set)
-  // startGame();
+  startGame();
 });
 
 async function showQrCode() {
@@ -81,6 +65,14 @@ async function showQrCode() {
 }
 
 async function startGame() {
+  if (qrCodeWrapper) {
+    qrCodeWrapper.style.display = "none";
+  }
+  if (canvas) {
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+    canvas.style.position = "static";
+  }
   await fetchNewGame();
   if (startButton) {
     startButton.style.display = "none";
