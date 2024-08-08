@@ -64,7 +64,10 @@ startButton?.addEventListener("click", async () => {
 // Skip QR code
 skipButton?.addEventListener("click", () => {
   hideQrAndShowCanvas();
-  startGame();
+  // Temporarily commented out so we don't start the game twice;
+  // in practice, we should only show this skip button if we're showing the QR code,
+  // and just start the game immediately if not (if the cabinet key isn't set)
+  // startGame();
 });
 
 async function showQrCode() {

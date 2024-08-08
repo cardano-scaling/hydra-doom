@@ -233,27 +233,27 @@
                 <table>
                   <tr>
                     <td>transactions:</td>
-                    <td id="txps">1747</td>
+                    <td id="global-txs"> -- </td>
                   </tr>
                   <tr>
                     <td>bytes:</td>
-                    <td id="bps">343044</td>
+                    <td id="global-bytes"> -- </td>
                   </tr>
                   <tr>
                     <td>kills:</td>
-                    <td id="kills">0</td>
+                    <td id="global-kills"> -- </td>
                   </tr>
                   <tr>
                     <td>items:</td>
-                    <td id="items">0</td>
+                    <td id="global-items"> -- </td>
                   </tr>
                   <tr>
                     <td>secrets:</td>
-                    <td id="secrets">0</td>
+                    <td id="global-secrets"> -- </td>
                   </tr>
                   <tr>
                     <td>play_time:</td>
-                    <td id="playTime">0</td>
+                    <td id="global-play-time"> -- </td>
                   </tr>
                 </table>
               </div>
@@ -264,27 +264,27 @@
                 <table>
                   <tr>
                     <td>transactions:</td>
-                    <td>1747</td>
+                    <td id="session-txs""> -- </td>
                   </tr>
                   <tr>
                     <td>bytes:</td>
-                    <td>343044</td>
+                    <td id="session-bytes"> -- </td>
                   </tr>
                   <tr>
                     <td>kills:</td>
-                    <td>0</td>
+                    <td id="session-kills"> -- </td>
                   </tr>
                   <tr>
                     <td>items:</td>
-                    <td>0</td>
+                    <td id="session-items"> -- </td>
                   </tr>
                   <tr>
                     <td>secrets:</td>
-                    <td>0</td>
+                    <td id="session-secrets"> -- </td>
                   </tr>
                   <tr>
                     <td>play_time:</td>
-                    <td>0</td>
+                    <td id="session-play-time"> -- </td>
                   </tr>
                 </table>
               </div>
@@ -292,7 +292,7 @@
             <article class="block">
               <h4 class="block__heading">Hydra Head Live Stats</h4>
               <div class="card card--stats card--console">
-                <table>
+                <table id="tx-details">
                   <tr>
                     <td>hydraSend • {forwardMove: 255}</td>
                     <td>hydra.ts: 47</td>
@@ -343,8 +343,8 @@
               </div>
             </div>
           </div>
-          <div>
-            <article class="block">
+          <div style>
+            <article class="block" style="display: none;">
               <h4 class="block__heading">Leaderboard</h4>
               <div class="card card--stats card--leaderboard">
                 <table>

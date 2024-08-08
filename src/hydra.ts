@@ -21,6 +21,7 @@ import {
 import { CBOR } from "./contract/cbor";
 import { UTxOResponse, recordValueToAssets } from "./types";
 import { keys } from "./keys";
+import { session, updateUI } from "./stats";
 
 let gameServerUrl = process.env.SERVER_URL;
 if (!gameServerUrl) {
@@ -45,6 +46,15 @@ let hydraHttp: string;
 let conn: WebSocket;
 let gameData: GameData;
 
+let sessionStats = {
+  transactions: 0,
+  bytes: 0,
+  kills: 0,
+  items: 0,
+  secrets: 0,
+  play_time: 0,
+};
+
 export async function fetchNewGame() {
   if (!process.env.PERSISTENT_SESSION || node == null || scriptRef == null) {
     console.warn(`Starting new game for ${address}`);
@@ -57,6 +67,14 @@ export async function fetchNewGame() {
     window.localStorage.setItem("hydra-doom-session-node", node);
     scriptRef = newGameResponse.script_ref as string;
     window.localStorage.setItem("hydra-doom-session-ref", scriptRef);
+    sessionStats = {
+      transactions: 0,
+      bytes: 0,
+      kills: 0,
+      items: 0,
+      secrets: 0,
+      play_time: 0,
+    };
   }
   console.log(
     `Using hydra node ${node} and game validator script at reference: ${scriptRef}`,
@@ -128,6 +146,7 @@ export async function hydraSend(
   gameState: GameState,
 ) {
   if (!gameData) throw new Error("Game data not initialized");
+
   console.log("hydraSend", cmd);
 
   if (gameState != GameState.GS_LEVEL) {
@@ -160,16 +179,20 @@ export async function hydraSend(
     collateralUTxO = utxos[0];
   }
 
-  console.log("spending from", latestUTxO);
-  const [newUtxo, tx] = await buildTx(
-    latestUTxO!,
-    encodeRedeemer(cmd),
-    buildDatum(gameData),
-    collateralUTxO!,
-  );
-
-  lastTime = performance.now();
   if (frameNumber % 1 == 0) {
+    console.log("spending from", latestUTxO);
+    const [newUtxo, tx] = await buildTx(
+      latestUTxO!,
+      encodeRedeemer(cmd),
+      buildDatum(gameData),
+      collateralUTxO!,
+    );
+    sessionStats.transactions++;
+    sessionStats.bytes += tx.txSigned.to_bytes().length;
+    sessionStats.kills = gameData.player.killCount;
+    updateUI(session, sessionStats);
+
+    lastTime = performance.now();
     const txid = await tx.submit();
     console.log("submitted", txid);
     latestUTxO = newUtxo;
