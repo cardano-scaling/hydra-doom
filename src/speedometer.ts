@@ -1,8 +1,19 @@
-const speedometerTick: HTMLDivElement | null = document.querySelector("[data-speedometer-value]");
-const speedometerMax: HTMLDivElement | null = document.querySelector(".speedometer-max");
+const speedometerTick: HTMLDivElement | null = document.querySelector(
+  "[data-speedometer-value]",
+);
+const speedometerMax: HTMLDivElement | null =
+  document.querySelector(".speedometer-max");
+const speedometerValue: HTMLDivElement | null =
+  document.querySelector(".speedometer-value");
 
 // Map a value from one range to another
-function mapRange(value : number, inMin : number, inMax : number, outMin : number, outMax : number) {
+function mapRange(
+  value: number,
+  inMin: number,
+  inMax: number,
+  outMin: number,
+  outMax: number,
+) {
   return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
 }
 
@@ -13,4 +24,5 @@ speedometerMax!.innerText = MAX_SPEED.toString();
 export function setSpeedometerValue(value: number) {
   const degree = mapRange(value, 0, MAX_SPEED, 0, 180);
   speedometerTick!.style.transform = `rotate(${degree}deg)`;
+  speedometerValue!.innerText = value.toString();
 }

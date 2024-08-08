@@ -964,7 +964,14 @@ td.animate::after {
   border-top-right-radius: 360px;
   border: 145px solid transparent;
   border-bottom: 0;
+  margin-bottom: 50px;
   position: relative;
+}
+
+.speedometer-value {
+  position: absolute;
+  left: -8px;
+  top: 24px;
 }
 
 .speedometer-min {
