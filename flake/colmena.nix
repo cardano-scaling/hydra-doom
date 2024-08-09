@@ -9,17 +9,22 @@
     networking.wireguard.interfaces.wg0 = {
       inherit ips privateKeyFile;
       listenPort = 51820;
+      postSetup = ''
+        ip link set mtu 1492 dev wg0
+      '';
       peers = [
         {
           publicKey = "RtwIQ8Ni8q+/E5tgYPFUnHrOhwAnkGOEe98h+vUYmyg=";
-          allowedIPs = [ "10.40.33.0/24" "10.40.9.1/32" ];
+          allowedIPs = [ "10.40.33.0/24" "10.40.9.0/24" "10.70.0.0/24" ];
           endpoint = "prophet.samleathers.com:51820";
           persistentKeepalive = 30;
         }
       ];
     };
   };
-  arcadeHardware = { config, pkgs, ... }: {
+  arcadeHardware = { config, pkgs, lib, ... }: {
+    networking.networkmanager.enable = lib.mkForce false;
+    nixpkgs.config.pulseaudio = true;
     hardware = {
       openrazer = {
         enable = true;
@@ -30,11 +35,20 @@
         open = false;
         nvidiaSettings = true;
       };
+      pulseaudio.enable = true;
     };
+    sound.enable = true;
 
     environment.systemPackages = [
       pkgs.polychromatic
     ];
+  };
+  adminGui = { config, pkgs, ... }: {
+    services.xserver = {
+      enable = true;
+      displayManager.gdm.enable = true;
+      desktopManager.gnome.enable = true;
+    };
   };
   hydraCageLocal = { config, pkgs, ... }: {
     services = {
@@ -126,11 +140,18 @@
     };
     nixpkgs.config.allowUnfree = true;
 
-    environment.systemPackages = [
-      pkgs.neovim
-      pkgs.ssh-to-age
-      pkgs.tmux
-      pkgs.tmate
+    environment.systemPackages = with pkgs; [
+      neovim
+      ssh-to-age
+      tmux
+      tmate
+      wezterm
+      termite
+      magic-wormhole
+      google-chrome
+      grim
+      slurp
+      dmenu
     ];
 
 
@@ -166,6 +187,7 @@ in {
           baseConfig
           hydraBase
           hydraCageRemote
+          #adminGui
           ../deployment/hydra-arcade-test/hardware-configuration.nix
           (mkWireGuardTunnel [ "10.40.9.8/24" "fd00::8" ] config.sops.secrets.wg0PrivateKey.path)
         ];
@@ -189,7 +211,8 @@ in {
           baseConfig
           arcadeHardware
           hydraBase
-          hydraCageRemote
+          #hydraCageRemote
+          adminGui
           ../deployment/hydra-arcade-1/hardware-configuration.nix
           (mkWireGuardTunnel [ "10.40.9.6/24" "fd00::6" ] config.sops.secrets.wg0PrivateKey.path)
         ];
@@ -202,9 +225,30 @@ in {
          secrets.wg0PrivateKey = {};
          };
       };
-      #hydra-arcade-2 = { name, nodes, pkgs, ... }: {
-      #  deployment = {
-      #  };
-      #};
+      hydra-arcade-2 = { config, pkgs, ... }: {
+        deployment = {
+          targetHost = "hydra-arcade-2";
+          targetPort = 22;
+          targetUser = "root";
+        };
+        imports = [
+          inputs.sops-nix.nixosModules.sops
+          baseConfig
+          arcadeHardware
+          hydraBase
+          #hydraCageRemote
+          adminGui
+          ../deployment/hydra-arcade-2/hardware-configuration.nix
+          (mkWireGuardTunnel [ "10.40.9.7/24" "fd00::7" ] config.sops.secrets.wg0PrivateKey.path)
+        ];
+        networking.hostId = "0904bbe4"; # required for zfs use
+        sops = {
+         defaultSopsFile = ../deployment/hydra-arcade-2/secrets.yaml;
+         age = {
+           sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
+         };
+         secrets.wg0PrivateKey = {};
+         };
+      };
     };
 }
