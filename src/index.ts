@@ -102,8 +102,7 @@ async function startGame() {
     if (loadingMessage) loadingMessage.style.display = "none";
     if (message) message.style.display = "flex";
   }
-
-  callMain(commonArgs.concat(["-hydra-send"]));
+  callMain(commonArgs.concat(["-hydra-send", "-hydra-recv"]));
 }
 
 // Watch game

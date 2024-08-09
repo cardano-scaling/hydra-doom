@@ -990,7 +990,26 @@ td.animate::after {
   border-top-right-radius: 360px;
   border: 145px solid transparent;
   border-bottom: 0;
+  margin-bottom: 50px;
   position: relative;
+}
+
+.speedometer-value {
+  position: absolute;
+  left: -8px;
+  top: 24px;
+}
+
+.speedometer-min {
+  position: absolute;
+  left: -110px;
+  top: -5px;
+}
+
+.speedometer-max {
+  position: absolute;
+  left: 85px;
+  top: -5px;
 }
 
 .speedometer::before {

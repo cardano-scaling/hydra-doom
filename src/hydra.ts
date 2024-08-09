@@ -22,6 +22,7 @@ import { CBOR } from "./contract/cbor";
 import { UTxOResponse, recordValueToAssets } from "./types";
 import { keys } from "./keys";
 import { appendTx, session, updateUI } from "./stats";
+import { setSpeedometerValue } from "./speedometer";
 
 let gameServerUrl = process.env.SERVER_URL;
 if (!gameServerUrl) {
@@ -43,7 +44,6 @@ let admin_pkh: string;
 let node = window.localStorage.getItem("hydra-doom-session-node");
 let scriptRef = window.localStorage.getItem("hydra-doom-session-ref");
 let hydraHttp: string;
-let conn: WebSocket;
 let gameData: GameData;
 
 let sessionStats = {
@@ -88,7 +88,7 @@ export async function fetchNewGame() {
 
   console.log(`Connecting websocket wss://${node}`);
   const protocol = window.location.protocol == "https:" ? "wss://" : "ws://";
-  conn = new WebSocket(protocol + `${node}?history=no`);
+  connectHydra(protocol + `${node}`);
 
   // This is temporary, the initial game state is stored in a UTxO created by the control plane.
   // We need to add the ability to parse game state from the datum here.
@@ -125,13 +125,24 @@ async function getUTxOsAtAddress(address: string): Promise<UTxO[]> {
       };
     });
 }
+
 // Callbacks from forked doom-wasm
 
 type Cmd = { forwardMove: number; sideMove: number };
 
+let cmdQueue: Cmd[] = [];
 let latestUTxO: UTxO | null = null;
 let collateralUTxO: UTxO | null = null;
-let lastTime: number = 0;
+
+type SubmissionTimes = {
+  [key: string]: {
+    submitted: number;
+    seen: number | null;
+    confirmed: number | null;
+  };
+};
+let submissionTimes: SubmissionTimes = {};
+
 let frameNumber = 0;
 
 export enum GameState {
@@ -148,11 +159,11 @@ export async function hydraSend(
 ) {
   if (!gameData) throw new Error("Game data not initialized");
 
-  console.log("hydraSend", cmd);
-
   if (gameState != GameState.GS_LEVEL) {
     return;
   }
+
+  console.log("hydraSend", cmd);
 
   gameData.player = player;
   // TODO: the latestUTxO should be fetched from the script address, filtering by admin in datum.
@@ -199,51 +210,119 @@ export async function hydraSend(
     sessionStats.kills = gameData.player.killCount;
     updateUI(session, sessionStats);
 
-    lastTime = performance.now();
+    const now = performance.now();
     const txid = await tx.submit();
     appendTx(cmd, player);
-    console.log("submitted", txid);
+    console.log("timing", now, "submitted", txid);
+    submissionTimes[txid] = {
+      submitted: now,
+      seen: null,
+      confirmed: null,
+    };
     latestUTxO = newUtxo;
   }
   frameNumber++;
 }
 
-export async function hydraRecv(): Promise<Cmd> {
-  console.log("hydraRecv");
-  return new Promise((res, rej) => {
-    // TODO: re-use event listeners?
-    const onMessage = (e: MessageEvent) => {
-      const msg = JSON.parse(e.data);
-      switch (msg.tag) {
-        case "TxValid":
-          let elapsed = performance.now() - lastTime;
-          console.log("round trip: ", elapsed, "ms");
-          const tx = lucid.fromTx(msg.transaction.cborHex);
-          const redeemer: Uint8Array | undefined = tx.txComplete
-            .witness_set()
-            .redeemers()
-            ?.get(0)
-            ?.data()
-            .to_bytes();
-          if (!redeemer) {
-            throw new Error("Redeemer not found");
+function connectHydra(url: string) {
+  let conn = new WebSocket(`${url}?history=no`);
+  conn.onopen = function () {
+    console.log("Connected to hydra");
+  };
+  conn.onerror = function (error) {
+    console.error("WebSocket Error:", error);
+  };
+  conn.onclose = function () {
+    console.log("WebSocket connection closed");
+  };
+  conn.onmessage = (e: MessageEvent) => {
+    const msg = JSON.parse(e.data);
+    console.warn(msg);
+    switch (msg.tag) {
+      case "TxValid":
+        const txid = msg.transaction.txId;
+        // Record seen time
+        if (submissionTimes[txid]) {
+          const now = performance.now();
+          const seenTime = now - submissionTimes[txid].submitted;
+          submissionTimes[txid].seen = seenTime;
+          console.info(
+            "timing",
+            now,
+            "seen",
+            msg.transaction.txId,
+            "in",
+            seenTime,
+            "ms",
+          );
+        }
+        // Decode cmd from redeemer
+        const tx = lucid.fromTx(msg.transaction.cborHex);
+        const redeemer: Uint8Array | undefined = tx.txComplete
+          .witness_set()
+          .redeemers()
+          ?.get(0)
+          ?.data()
+          .to_bytes();
+        if (!redeemer) {
+          throw new Error("Redeemer not found");
+        }
+        const cmd = decodeRedeemer(toHex(redeemer));
+        console.log("received", cmd);
+        cmdQueue.push(cmd);
+        // FIXME: if our mainloop does not use `-hydraRecv` this queue grows big -> should cleanup
+        if (cmdQueue.length > 1000) {
+          console.warn(
+            "Command queue grows big, should cleanup",
+            cmdQueue.length,
+          );
+        }
+        break;
+      // XXX: Learning: ideally we should be only acting on snapshot confirmed, but I was
+      // inclined to use TxValid instead because it requires less book-keeping.
+      case "SnapshotConfirmed":
+        const now = performance.now();
+        // Record confirmation time
+        for (const txid of msg.snapshot.confirmedTransactions) {
+          const confirmationTime = now - submissionTimes[txid].submitted;
+          submissionTimes[txid].confirmed = confirmationTime;
+          console.info(
+            "timing",
+            now,
+            "confirmed",
+            txid,
+            "in",
+            confirmationTime,
+            "ms",
+          );
+        }
+        // Compute tps and clear submissionTimes
+        // XXX: Weird algorithm: count confirmed txs, drop txs older than 1s
+        let tps = 0;
+        for (const txid in submissionTimes) {
+          if (submissionTimes[txid].confirmed) {
+            tps++;
           }
-          const cmd = decodeRedeemer(toHex(redeemer));
-          console.log("received", cmd);
-          conn.removeEventListener("message", onMessage);
-          res(cmd);
-          break;
-        // XXX: Learning: ideally we should be only acting on snapshot confirmed, but I was
-        // inclined to use TxValid instead because it requires less book-keeping.
-        case "SnapshotConfirmed":
-          break;
-        default:
-          conn.removeEventListener("message", onMessage);
-          rej("Unexpected message: " + e.data);
-      }
-    };
-    conn.addEventListener("message", onMessage);
-  });
+          if (submissionTimes[txid].submitted < now - 1000) {
+            delete submissionTimes[txid];
+          }
+        }
+        console.warn("tps", tps);
+        setSpeedometerValue(tps);
+        break;
+      default:
+        console.warn("Unexpected message: " + e.data);
+    }
+  };
+}
+
+export function hydraRecv(): Cmd {
+  if (cmdQueue.length == 0) {
+    return { forwardMove: 0, sideMove: 0 };
+  }
+  const cmd = cmdQueue.pop()!;
+  console.log("hydraRecv", cmd);
+  return cmd;
 }
 
 const buildCollateralInput = (txHash: string, txIx: number) => {
