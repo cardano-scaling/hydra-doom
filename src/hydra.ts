@@ -81,12 +81,12 @@ export async function fetchNewGame() {
     `Using hydra node ${node} and game validator script at reference: ${scriptRef}`,
   );
 
-  hydraHttp = `http://${node}`;
+  hydraHttp = `https://${node}`;
   console.log("Connecting lucid");
   lucid = await Lucid.new(new HydraProvider(hydraHttp), "Preprod");
   lucid.selectWalletFromPrivateKey(privateKey);
 
-  console.log(`Connecting websocket ws://${node}`);
+  console.log(`Connecting websocket wss://${node}`);
   const protocol = window.location.protocol == "https:" ? "wss://" : "ws://";
   connectHydra(protocol + `${node}`);
 

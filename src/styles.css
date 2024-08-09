@@ -632,6 +632,32 @@ td.animate::after {
   margin-bottom: 1.5rem;
 }
 
+.message {
+  align-items: center;
+  color: yellow;
+  display: none;
+  font-size: 2rem;
+  height: 100%;
+  justify-content: center;
+  margin: 0 auto;
+  max-width: 710px;
+  text-align: center;
+}
+
+.message a {
+  color: yellow;
+  text-decoration: underline;
+  transition: all 0.3s;
+}
+
+.message p {
+  margin-bottom: 24px;
+}
+
+.message a:hover {
+  color: #ff2f2f;
+}
+
 /** QR Code */
 .qr-code {
   align-items: center;
