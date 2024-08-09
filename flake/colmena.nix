@@ -63,7 +63,7 @@
     services = {
       cage = {
         enable = true;
-        program = "${pkgs.google-chrome}/bin/google-chrome-stable";
+        program = "${pkgs.google-chrome}/bin/google-chrome-stable --app=http://doom-remote.local";
         user = "doom";
       };
     };
@@ -211,8 +211,8 @@ in {
           baseConfig
           arcadeHardware
           hydraBase
-          #hydraCageRemote
-          adminGui
+          hydraCageRemote
+          #adminGui
           ../deployment/hydra-arcade-1/hardware-configuration.nix
           (mkWireGuardTunnel [ "10.40.9.6/24" "fd00::6" ] config.sops.secrets.wg0PrivateKey.path)
         ];
@@ -236,8 +236,8 @@ in {
           baseConfig
           arcadeHardware
           hydraBase
-          #hydraCageRemote
-          adminGui
+          hydraCageRemote
+          #adminGui
           ../deployment/hydra-arcade-2/hardware-configuration.nix
           (mkWireGuardTunnel [ "10.40.9.7/24" "fd00::7" ] config.sops.secrets.wg0PrivateKey.path)
         ];
