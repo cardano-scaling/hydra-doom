@@ -62,6 +62,7 @@ export async function fetchNewGame() {
       `${gameServerUrl}/new_game?address=${address}`,
     );
     const newGameResponse = await response.json();
+    console.log(`New game successful with UTxO ${newGameResponse.player_utxo}`);
     node = newGameResponse.ip as string;
     admin_pkh = newGameResponse.admin_pkh as string;
     window.localStorage.setItem("hydra-doom-session-node", node);
@@ -157,20 +158,26 @@ export async function hydraSend(
   // TODO: the latestUTxO should be fetched from the script address, filtering by admin in datum.
   if (latestUTxO == null) {
     const utxos = await getUTxOsAtAddress(scriptAddress);
+    const runningGames = [];
     console.log(utxos);
     for (const utxo of utxos) {
       if (!utxo.datum) {
         continue;
       }
-      console.log(utxo);
       const data = decodeDatum(utxo.datum);
-      if (!!data && data.owner == pkh) {
-        latestUTxO = utxo;
-        break;
+      if (!!data) {
+        runningGames.push(data.owner);
+        if (data.owner == pkh) {
+          latestUTxO = utxo;
+          break;
+        }
       }
     }
     if (!latestUTxO) {
-      throw new Error("No UTxO found for gamer");
+      console.warn(
+        `No UTxO found for gamer ${pkh}, out of ${utxos.length} games: ${runningGames.join(", ")}`,
+      );
+      return;
     }
     console.log("Current UTxO owned by gamer", JSON.stringify(latestUTxO));
   }
