@@ -57,12 +57,20 @@ export function updateUI(elements: any, data: any) {
     );
   }
   if (elements.txs && data.transactions !== undefined) {
-    elements.txs.innerText = new Intl.NumberFormat("en").format(
-      data.transactions,
-    );
+    if (elements === global) {
+      elements.txs.style.setProperty("--num", data.transactions);
+    } else {
+      elements.txs.innerText = new Intl.NumberFormat("en").format(
+        data.transactions,
+      );
+    }
   }
   if (elements.bytes && data.bytes !== undefined) {
-    elements.bytes.innerText = new Intl.NumberFormat("en").format(data.bytes);
+    if (elements === global) {
+      elements.bytes.style.setProperty("--num", data.bytes);
+    } else {
+      elements.bytes.innerText = new Intl.NumberFormat("en").format(data.bytes);
+    }
   }
   if (elements.kills && data.kills !== undefined) {
     elements.kills.innerText = new Intl.NumberFormat("en").format(data.kills);

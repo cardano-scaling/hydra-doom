@@ -223,7 +223,9 @@
               </li>
             </ul>
           </nav>
-          <button class="header__restart" id="restart-button"><span>Restart</span></button>
+          <button class="header__restart" id="restart-button">
+            <span>Restart</span>
+          </button>
         </header>
         <div class="three-columns">
           <div>
@@ -232,36 +234,36 @@
               <div class="card card--stats">
                 <table>
                   <tr>
-                      <td>games (all-time):</td>
-                      <td id="global-games"> -- </td>
+                    <td>games (all-time):</td>
+                    <td id="global-games">--</td>
                   </tr>
                   <tr>
-                      <td>games (active):</td>
-                      <td id="global-games-active"> -- </td>
+                    <td>games (active):</td>
+                    <td id="global-games-active">--</td>
                   </tr>
                   <tr>
                     <td>transactions:</td>
-                    <td id="global-txs"> -- </td>
+                    <td id="global-txs" class="animate"></td>
                   </tr>
                   <tr>
                     <td>bytes:</td>
-                    <td id="global-bytes"> -- </td>
+                    <td id="global-bytes" class="animate"></td>
                   </tr>
                   <tr>
                     <td>kills:</td>
-                    <td id="global-kills"> -- </td>
+                    <td id="global-kills">--</td>
                   </tr>
                   <tr>
                     <td>items:</td>
-                    <td id="global-items"> -- </td>
+                    <td id="global-items">--</td>
                   </tr>
                   <tr>
                     <td>secrets:</td>
-                    <td id="global-secrets"> -- </td>
+                    <td id="global-secrets">--</td>
                   </tr>
                   <tr>
                     <td>play_time:</td>
-                    <td id="global-play-time"> -- </td>
+                    <td id="global-play-time">--</td>
                   </tr>
                 </table>
               </div>
@@ -272,27 +274,27 @@
                 <table>
                   <tr>
                     <td>transactions:</td>
-                    <td id="session-txs""> -- </td>
+                    <td id="session-txs">--</td>
                   </tr>
                   <tr>
                     <td>bytes:</td>
-                    <td id="session-bytes"> -- </td>
+                    <td id="session-bytes">--</td>
                   </tr>
                   <tr>
                     <td>kills:</td>
-                    <td id="session-kills"> -- </td>
+                    <td id="session-kills">--</td>
                   </tr>
                   <tr>
                     <td>items:</td>
-                    <td id="session-items"> -- </td>
+                    <td id="session-items">--</td>
                   </tr>
                   <tr>
                     <td>secrets:</td>
-                    <td id="session-secrets"> -- </td>
+                    <td id="session-secrets">--</td>
                   </tr>
                   <tr>
                     <td>play_time:</td>
-                    <td id="session-play-time"> -- </td>
+                    <td id="session-play-time">--</td>
                   </tr>
                 </table>
               </div>
@@ -300,8 +302,7 @@
             <article class="block">
               <h4 class="block__heading">Hydra Head Live Txs</h4>
               <div class="card card--stats card--console">
-                <table id="tx-details">
-                </table>
+                <table id="tx-details"></table>
               </div>
             </article>
           </div>
@@ -328,7 +329,7 @@
             </div>
           </div>
           <div style>
-            <article class="block" style="display: none;">
+            <article class="block" style="display: none">
               <h4 class="block__heading">Leaderboard</h4>
               <div class="card card--stats card--leaderboard">
                 <table>
@@ -564,14 +565,14 @@
             "doom1.wad",
             "doom1.wad",
             true,
-            true
+            true,
           );
           Module.FS.createPreloadedFile(
             "",
             "default.cfg",
             "default.cfg",
             true,
-            true
+            true,
           );
         },
         printErr: (text) => {
@@ -586,7 +587,7 @@
               alert("WebGL context lost. You will need to reload the page.");
               e.preventDefault();
             },
-            false
+            false,
           );
           return canvas;
         })(),

@@ -423,6 +423,20 @@ main {
   color: #fffb24;
 }
 
+@property --num {
+  syntax: "<integer>";
+  initial-value: 0;
+  inherits: false;
+}
+
+td.animate {
+  transition: --num 1s linear;
+  counter-reset: num var(--num);
+}
+td.animate::after {
+  content: counter(num);
+}
+
 .card--console {
   position: relative;
   height: 150px;
