@@ -2,6 +2,10 @@ import * as ed25519 from "@noble/ed25519";
 import * as bech32 from "bech32-buffer";
 import { encode } from "cbor-x";
 import { Lucid } from "lucid-cardano";
+import { sha512 } from "@noble/hashes/sha512";
+
+ed25519.etc.sha512Async = (...m) =>
+  Promise.resolve(sha512(ed25519.etc.concatBytes(...m)));
 
 import QRCodeStyling, {
   CornerDotType,
@@ -13,16 +17,7 @@ import QRCodeStyling, {
   TypeNumber,
 } from "styled-qr-code";
 
-const cabinetKey =
-  window.localStorage.getItem("cabinet-key") ??
-  (() => {
-    const key = process.env.CABINET_KEY;
-    if (key) {
-      window.localStorage.setItem("cabinet-key", key);
-      return key;
-    }
-  })();
-
+const cabinetKey = process.env.CABINET_KEY;
 let lucid = await Lucid.new(undefined, "Preprod");
 
 // Load or generate a session key
@@ -91,7 +86,7 @@ export async function generatePooQrUri() {
   const cabinetPk = await ed25519.getPublicKeyAsync(cabinetKey);
   const signature = await ed25519.signAsync(sessionPk, cabinetKey);
   const code = ed25519.etc.bytesToHex(
-    encode([sessionPk, [cabinetPk, signature]])
+    encode([sessionPk, [cabinetPk, signature]]),
   );
 
   const qr_code_url = `web+cardano://claim/v1?faucet_url=https%3A%2F%2Fauth.hydradoom.fun/v1&code=${code}`;

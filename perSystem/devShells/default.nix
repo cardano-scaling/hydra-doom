@@ -2,9 +2,6 @@
   perSystem = {config, system, pkgs, lib, ...}: {
     devShells.default = pkgs.mkShell
       {
-        sopsPGPKeyDirs = [
-          "${toString ../../.}/secrets/keys"
-        ];
         nativeBuildInputs = let
           inherit (inputs.sops-nix.packages."${system}") sops-import-keys-hook ssh-to-pgp sops-init-gpg-key;
         in [
@@ -20,6 +17,9 @@
           pkgs.nodejs
           pkgs.jq
           pkgs.age
+          pkgs.ssh-to-age
+          pkgs.pwgen
+          pkgs.just
           inputs.colmena.packages.${system}.colmena
           sops-import-keys-hook
           ssh-to-pgp
