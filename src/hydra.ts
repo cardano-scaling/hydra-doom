@@ -270,6 +270,13 @@ function connectHydra(url: string) {
         const cmd = decodeRedeemer(toHex(redeemer));
         console.log("received", cmd);
         cmdQueue.push(cmd);
+        // FIXME: if our mainloop does not use `-hydraRecv` this queue grows big -> should cleanup
+        if (cmdQueue.length > 1000) {
+          console.warn(
+            "Command queue grows big, should cleanup",
+            cmdQueue.length,
+          );
+        }
         break;
       // XXX: Learning: ideally we should be only acting on snapshot confirmed, but I was
       // inclined to use TxValid instead because it requires less book-keeping.
