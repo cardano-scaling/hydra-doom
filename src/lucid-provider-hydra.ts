@@ -10,7 +10,7 @@ import {
   Transaction,
   TxHash,
   Unit,
-  UTxO
+  UTxO,
 } from "lucid-cardano";
 
 export class HydraProvider implements Provider {
@@ -19,7 +19,8 @@ export class HydraProvider implements Provider {
 
   constructor(apiUrl: string) {
     this.apiUrl = apiUrl;
-    const wsUrl = apiUrl.replace("http", "ws") + "?history=no";
+    const wsUrl =
+      apiUrl.replace("http", "ws").replace("https", "wss") + "?history=no";
     console.log("HydraProvider", apiUrl, wsUrl);
     this.conn = new WebSocket(wsUrl);
   }
