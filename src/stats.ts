@@ -1,4 +1,6 @@
 let global: {
+  games: HTMLDataListElement | null;
+  gamesActive: HTMLDataListElement | null;
   txs: HTMLDataListElement | null;
   bytes: HTMLDataListElement | null;
   kills: HTMLDataListElement | null;
@@ -6,8 +8,17 @@ let global: {
   secrets: HTMLDataListElement | null;
   playTime: HTMLDataListElement | null;
 };
-export let session: typeof global;
+export let session: {
+  txs: HTMLDataListElement | null;
+  bytes: HTMLDataListElement | null;
+  kills: HTMLDataListElement | null;
+  items: HTMLDataListElement | null;
+  secrets: HTMLDataListElement | null;
+  playTime: HTMLDataListElement | null;
+};
 global = {
+  games: document.querySelector("#global-games"),
+  gamesActive: document.querySelector("#global-games-active"),
   txs: document.querySelector("#global-txs"),
   bytes: document.querySelector("#global-bytes"),
   kills: document.querySelector("#global-kills"),
@@ -34,7 +45,17 @@ if (!gameServerUrl) {
 }
 
 // Function to update UI with fetched data
-export function updateUI(elements: typeof global, data: any) {
+export function updateUI(elements: any, data: any) {
+  if (elements.games && data.total_games !== undefined) {
+    elements.games.innerText = new Intl.NumberFormat("en").format(
+      data.total_games,
+    );
+  }
+  if (elements.gamesActive && data.active_games !== undefined) {
+    elements.gamesActive.innerText = new Intl.NumberFormat("en").format(
+      data.active_games,
+    );
+  }
   if (elements.txs && data.transactions !== undefined) {
     elements.txs.innerText = new Intl.NumberFormat("en").format(
       data.transactions,
