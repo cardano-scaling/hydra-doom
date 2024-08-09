@@ -70,9 +70,7 @@
             EOF
 
             npm install
-            head -n 1 node_modules/.bin/webpack
             patchShebangs --build node_modules/webpack/bin/webpack.js
-            head -n 1 node_modules/.bin/webpack
             npm run build
           '';
           installPhase = ''
