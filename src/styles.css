@@ -630,6 +630,20 @@ main {
   text-align: center;
 }
 
+.message a {
+  color: yellow;
+  text-decoration: underline;
+  transition: all 0.3s;
+}
+
+.message p {
+  margin-bottom: 24px;
+}
+
+.message a:hover {
+  color: #ff2f2f;
+}
+
 /** QR Code */
 .qr-code {
   align-items: center;

@@ -223,7 +223,9 @@
               </li>
             </ul>
           </nav>
-          <button class="header__restart" id="restart-button"><span>Restart</span></button>
+          <button class="header__restart" id="restart-button">
+            <span>Restart</span>
+          </button>
         </header>
         <div class="three-columns">
           <div>
@@ -233,27 +235,27 @@
                 <table>
                   <tr>
                     <td>transactions:</td>
-                    <td id="global-txs"> -- </td>
+                    <td id="global-txs">--</td>
                   </tr>
                   <tr>
                     <td>bytes:</td>
-                    <td id="global-bytes"> -- </td>
+                    <td id="global-bytes">--</td>
                   </tr>
                   <tr>
                     <td>kills:</td>
-                    <td id="global-kills"> -- </td>
+                    <td id="global-kills">--</td>
                   </tr>
                   <tr>
                     <td>items:</td>
-                    <td id="global-items"> -- </td>
+                    <td id="global-items">--</td>
                   </tr>
                   <tr>
                     <td>secrets:</td>
-                    <td id="global-secrets"> -- </td>
+                    <td id="global-secrets">--</td>
                   </tr>
                   <tr>
                     <td>play_time:</td>
-                    <td id="global-play-time"> -- </td>
+                    <td id="global-play-time">--</td>
                   </tr>
                 </table>
               </div>
@@ -264,27 +266,27 @@
                 <table>
                   <tr>
                     <td>transactions:</td>
-                    <td id="session-txs""> -- </td>
+                    <td id="session-txs">--</td>
                   </tr>
                   <tr>
                     <td>bytes:</td>
-                    <td id="session-bytes"> -- </td>
+                    <td id="session-bytes">--</td>
                   </tr>
                   <tr>
                     <td>kills:</td>
-                    <td id="session-kills"> -- </td>
+                    <td id="session-kills">--</td>
                   </tr>
                   <tr>
                     <td>items:</td>
-                    <td id="session-items"> -- </td>
+                    <td id="session-items">--</td>
                   </tr>
                   <tr>
                     <td>secrets:</td>
-                    <td id="session-secrets"> -- </td>
+                    <td id="session-secrets">--</td>
                   </tr>
                   <tr>
                     <td>play_time:</td>
-                    <td id="session-play-time"> -- </td>
+                    <td id="session-play-time">--</td>
                   </tr>
                 </table>
               </div>
@@ -292,8 +294,7 @@
             <article class="block">
               <h4 class="block__heading">Hydra Head Live Txs</h4>
               <div class="card card--stats card--console">
-                <table id="tx-details">
-                </table>
+                <table id="tx-details"></table>
               </div>
             </article>
           </div>
@@ -311,7 +312,27 @@
                     <span>Skip</span>
                   </button>
                 </div>
-                <div class="message" id="message"></div>
+                <div class="message" id="loading-message">Starting game...</div>
+                <div class="message" id="message">
+                  <div>
+                    <p>
+                      For this tech-demo we have 10 hydra heads, which can
+                      support 100 concurrent players, and we've reached that
+                      limit.
+                    </p>
+                    <p>
+                      At this point, a production-grade deployment could
+                      dynamically allocate a new hydra head to meet that demand!
+                    </p>
+                    <p>
+                      For now, try again in a few minutes and in the mean time,
+                      why not check out
+                      <a href="https://hydra.family" target="_blank"
+                        >hydra.family</a
+                      >?
+                    </p>
+                  </div>
+                </div>
                 <canvas
                   id="canvas"
                   oncontextmenu="event.preventDefault()"
@@ -321,7 +342,7 @@
             </div>
           </div>
           <div style>
-            <article class="block" style="display: none;">
+            <article class="block" style="display: none">
               <h4 class="block__heading">Leaderboard</h4>
               <div class="card card--stats card--leaderboard">
                 <table>

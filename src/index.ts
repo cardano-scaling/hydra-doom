@@ -14,6 +14,8 @@ const restartButton: HTMLElement | null =
 const qrCodeWrapper: HTMLElement | null = document.querySelector("#qr-code");
 const canvas: HTMLElement | null = document.querySelector("#canvas");
 const message: HTMLElement | null = document.querySelector("#message");
+const loadingMessage: HTMLElement | null =
+  document.querySelector("#loading-message");
 
 // Stuff for POO
 const { sessionPk } = keys;
@@ -81,15 +83,14 @@ async function startGame() {
     qrCodeWrapper.style.display = "none";
   }
 
-  if (message) {
-    message.style.display = "flex";
-    message.innerHTML = "Starting game...";
+  if (loadingMessage) {
+    loadingMessage.style.display = "flex";
   }
 
   try {
     await fetchNewGame();
 
-    if (message) message.style.display = "none";
+    if (loadingMessage) loadingMessage.style.display = "none";
 
     if (canvas) {
       canvas.style.width = "100%";
@@ -98,10 +99,8 @@ async function startGame() {
     }
   } catch (error) {
     console.error(error);
-    if (message) {
-      message.innerHTML =
-        "Too many players are currently online. Please try again in a few moments.";
-    }
+    if (loadingMessage) loadingMessage.style.display = "none";
+    if (message) message.style.display = "flex";
   }
 
   callMain(commonArgs.concat(["-hydra-send"]));
