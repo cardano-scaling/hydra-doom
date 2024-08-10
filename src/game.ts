@@ -94,23 +94,22 @@ export async function fetchNewGame() {
       // append some representation of the tx into the UI
       appendTx(cmd);
       if (cmdQueue.length > 1000) {
-        console.warn(
-          "Command queue grows big, should cleanup",
-          cmdQueue.length,
-        );
+        console.warn("Command queue grew big, purging 100 entries");
+        cmdQueue = cmdQueue.slice(-100);
       }
     };
-    hydra.onTxConfirmed = () => {
+    hydra.onTxConfirmed = (txId) => {
+      console.log("confirmed", txId);
+      // XXX: TPS only computed when tx confirmed -> does not go to 0 after some time
       const now = performance.now();
       let tps = 0;
       for (const txid in hydra!.tx_timings) {
-        const timing = hydra!.tx_timings[txid];
-        const confirm_time = timing.sent + (timing?.confirmed ?? 0);
-        if (hydra!.tx_timings[txid]?.confirmed && confirm_time > now - 1000) {
-          console.log("confirmed", txid, "after", timing?.confirmed);
+        const timing = hydra!.tx_timings[txid]!;
+        if (timing.confirmed && timing.sent + timing.confirmed > now - 1000) {
           tps++;
         }
       }
+      console.log("confirmed tps", tps);
       setSpeedometerValue(tps);
     };
     latestUTxO = await hydra.awaitUtxo(newGameResponse.player_utxo, 5000);
@@ -229,7 +228,7 @@ export async function hydraSend(
     );
     updateUI(session, sessionStats);
 
-    hydra.submitTx(tx.toString());
+    await hydra.submitTx(tx.toString());
     latestUTxO = newUtxo;
     console.log(`hydraSend took ${performance.now() - hydraSendStart}ms`);
   }
