@@ -37,7 +37,6 @@ export class Hydra {
   onTxConfirmed?: (txid: TxHash) => void;
   onTxInvalid?: (txid: TxHash) => void;
 
-  tx_count: number;
   tx_timings: {
     [tx: string]: TransactionTiming;
   };
@@ -46,7 +45,6 @@ export class Hydra {
     public url: string | URL,
     public queue_length: number = 10,
   ) {
-    this.tx_count = 0;
     this.tx_timings = {};
     this.outbound_transactions = [];
     this.utxos = {};
@@ -80,55 +78,56 @@ export class Hydra {
     }
   }
 
+  // TODO: busy loop?
   public async startEventLoop() {
     if (this.interval) {
       return;
     }
-    this.interval = setInterval(async () => await this.sendMessages());
+    this.interval = setInterval(async () => this.resendTransactions(), 1);
   }
 
-  async sendMessages() {
+  // Keep track of outbound_transactions and resend if needed
+  resendTransactions() {
     const now = performance.now();
-    while (true) {
-      if (this.outbound_transactions.length === 0) {
-        return;
-      }
-      const [next_tx, next_tx_id] = this.outbound_transactions[0];
-      if (!this.tx_timings[next_tx_id]) {
-        // If this transaction hasn't been sent, send it
-        this.tx_count++;
-        this.tx_timings[next_tx_id] = {
-          sent: now,
-        };
-        this.connection.send(
-          JSON.stringify({
-            tag: "NewTx",
-            transaction: {
-              type: "Tx BabbageEra",
-              cborHex: next_tx,
-            },
-          }),
-        );
-        // We don't want to risk sending another tx until that one is seen,
-        // so we return here and do things on the next scheduled event loop
-        return;
-      } else if (
-        this.tx_timings[next_tx_id].seen ||
-        this.tx_timings[next_tx_id].invalid
-      ) {
-        // This transaction was either invalid or seen, so we can shift it off the outbound transactions;
-        this.outbound_transactions.shift();
-        // we can try to submit the next tx, so we can continue to the next one
-        continue;
-      } else if (this.tx_timings[next_tx_id]?.seen ?? now < now - 500) {
-        // We have been waiting a half second for this tx to be seen, so log a warning
-        console.warn(`Transaction not confirmed within 500ms: ${next_tx_id}`);
-        this.outbound_transactions.shift();
-        continue;
-      } else {
-        // We haven't seen it confirmed yet, so lets exit and wait for the next event loop
-        return;
-      }
+    if (this.outbound_transactions.length === 0) {
+      return;
+    }
+    const [tx, txId] = this.outbound_transactions[0];
+
+    // Transaction should have been sent
+    if (!this.tx_timings[txId]) {
+      // TODO: merge outbound_transactions with tx_timings to avoid inconsistencies
+      throw new Error("resendTransactions: inconsistent tx_timings");
+    }
+
+    // We have seen this transaction, so we can shift it off the outbound transactions
+    if (this.tx_timings[txId].seen) {
+      this.outbound_transactions.shift();
+      return;
+    }
+
+    // Transaction was invalid, try to resubmit
+    if (this.tx_timings[txId].invalid) {
+      // TODO: maximum number of retries using sent time
+      console.warn(`Resubmitting invalid transaction: ${txId}`);
+      this.connection.send(
+        JSON.stringify({
+          tag: "NewTx",
+          transaction: {
+            type: "Tx BabbageEra",
+            cborHex: tx,
+          },
+        }),
+      );
+      this.tx_timings[txId].invalid = undefined;
+      return;
+    }
+
+    // REVIEW: what does ?? do?
+    if (this.tx_timings[txId]?.seen ?? now < now - 500) {
+      // We have been waiting a half second for this tx to be seen, so log a warning
+      console.warn(`Transaction not seen within 500ms: ${txId}`);
+      return;
     }
   }
 
@@ -141,6 +140,7 @@ export class Hydra {
       case "TxValid":
         {
           const txid = data.transaction.txId;
+          console.log("TxValid", txid);
           // Record seen time
           if (this.tx_timings[txid]?.sent) {
             const seenTime = now - this.tx_timings[txid].sent;
@@ -168,6 +168,7 @@ export class Hydra {
         break;
       case "TxInvalid":
         {
+          console.error("TxInvalid", data);
           const txid = data.transaction.txId;
           if (this.tx_timings[txid]?.sent) {
             const invTime = now - this.tx_timings[txid].sent;
@@ -178,6 +179,7 @@ export class Hydra {
         break;
       case "SnapshotConfirmed":
         {
+          console.log("SnapshotConfirmed", data.snapshot.number);
           for (const txid of data.snapshot.confirmedTransactions) {
             if (!this.tx_timings[txid]?.sent) {
               continue;
@@ -190,19 +192,6 @@ export class Hydra {
         break;
       default:
         console.warn("Unexpected message: " + data);
-    }
-
-    if (this.tx_count > 10000) {
-      // Purge anything older than 5s
-      for (const tx in this.tx_timings) {
-        if (this.tx_timings[tx]?.sent ?? 0 > now - 5000) {
-          this.tx_count--;
-          delete this.tx_timings[tx];
-        }
-        if (this.tx_count < 5000) {
-          break;
-        }
-      }
     }
   }
 
@@ -228,6 +217,19 @@ export class Hydra {
   }
 
   public queueTx(tx: Transaction, txId: TxHash) {
+    // Submit tx right away, but also keep in outbound transactions for potential resubmission
+    this.tx_timings[txId] = {
+      sent: performance.now(),
+    };
+    this.connection.send(
+      JSON.stringify({
+        tag: "NewTx",
+        transaction: {
+          type: "Tx BabbageEra",
+          cborHex: tx,
+        },
+      }),
+    );
     this.outbound_transactions.push([tx, txId]);
     if (this.outbound_transactions.length > this.queue_length) {
       console.warn(
