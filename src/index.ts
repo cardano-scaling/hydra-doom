@@ -1,7 +1,7 @@
 import { fetchNewGame, hydraRecv, hydraSend } from "./game";
 import { generatePooQrUri, keys } from "./keys";
-import { startQueryingAPI } from "./stats";
 import "./osano.js";
+import { startQueryingAPI } from "./stats";
 import "./styles.css";
 
 declare function callMain(args: string[]): void;
@@ -16,6 +16,9 @@ const canvas: HTMLElement | null = document.querySelector("#canvas");
 const message: HTMLElement | null = document.querySelector("#message");
 const loadingMessage: HTMLElement | null =
   document.querySelector("#loading-message");
+const muteButton: HTMLButtonElement | null =
+  document.querySelector("#mute-button");
+const muteIcon: HTMLElement | null = document.querySelector("#mute-icon");
 
 // Stuff for POO
 const { sessionPk } = keys;
@@ -48,6 +51,65 @@ const commonArgs = [
   "-config",
   "default.cfg",
 ];
+
+// Array of MP3 file paths
+const musicFiles = [
+  "assets/music/blue-screen-of-death.mp3",
+  "assets/music/demons-prowl.mp3",
+  "assets/music/dooms-fate.mp3",
+  "assets/music/mark-of-malice.mp3",
+  "assets/music/unnamed.mp3",
+];
+
+function shuffleArray(array: string[]) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+let currentAudio: HTMLAudioElement | null = null;
+let isMuted = false;
+
+// Function to play music files in order and loop infinitely
+function playMusic(files: string[]) {
+  if (files.length === 0) return;
+
+  let currentIndex = 0;
+
+  function playNext() {
+    if (currentAudio) {
+      currentAudio.removeEventListener("ended", playNext);
+    }
+
+    currentAudio = new Audio(files[currentIndex]);
+    currentAudio.play();
+
+    currentAudio.addEventListener("ended", playNext);
+
+    currentIndex = (currentIndex + 1) % files.length; // Loop back to the first song
+  }
+
+  playNext();
+
+  if (isMuted && currentAudio) {
+    currentAudio.muted = true;
+  }
+
+  // Show the mute button when the music starts
+  if (muteButton) muteButton.style.display = "block";
+}
+
+// Mute/Unmute functionality
+muteButton?.addEventListener("click", () => {
+  isMuted = !isMuted;
+  if (currentAudio) {
+    currentAudio.muted = isMuted;
+  }
+  if (muteIcon) {
+    muteIcon.className = isMuted ? "fas fa-volume-mute" : "fas fa-volume-up";
+  }
+});
 
 // Start a new game
 startButton?.addEventListener("click", async () => {
@@ -97,6 +159,10 @@ async function startGame() {
       canvas.style.height = "100%";
       canvas.style.position = "static";
     }
+
+    // Shuffle and play music files
+    shuffleArray(musicFiles);
+    playMusic(musicFiles);
   } catch (error) {
     console.error(error);
     if (loadingMessage) loadingMessage.style.display = "none";

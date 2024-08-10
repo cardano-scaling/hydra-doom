@@ -9,6 +9,10 @@
       content="Experience Doom running on Blockchain powered by Cardano’s Hydra technology in this tech demo."
     />
     <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
 
     <meta property="og:title" content="Hydra Doom" />
     <meta
@@ -223,6 +227,9 @@
               </li>
             </ul>
           </nav>
+          <button id="mute-button" class="mute-button">
+            <i id="mute-icon" class="fas fa-volume-up"></i>
+          </button>
           <button class="header__restart" id="restart-button">
             <span>Restart</span>
           </button>
@@ -586,14 +593,14 @@
             "doom1.wad",
             "doom1.wad",
             true,
-            true,
+            true
           );
           Module.FS.createPreloadedFile(
             "",
             "default.cfg",
             "default.cfg",
             true,
-            true,
+            true
           );
         },
         printErr: (text) => {
@@ -608,7 +615,7 @@
               alert("WebGL context lost. You will need to reload the page.");
               e.preventDefault();
             },
-            false,
+            false
           );
           return canvas;
         })(),
