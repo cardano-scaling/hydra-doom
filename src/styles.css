@@ -984,6 +984,10 @@ td.animate::after {
 
 /* Game Slot */
 
+.game-slot-container {
+  min-height: 770px;
+}
+
 .game-slot {
   aspect-ratio: 1028/805;
   background: linear-gradient(11.57deg, #000000 5.67%, #ff2f2f 68.21%);
