@@ -120,12 +120,12 @@ export async function fetchNewGame(region: string) {
         const timing = hydra!.tx_timings[txid];
         const confirm_time = timing.sent + (timing?.confirmed ?? 0);
         if (hydra!.tx_timings[txid]?.confirmed && confirm_time > now - 1000) {
+          console.log("confirmed", txid, "after", timing?.confirmed);
           tps++;
         }
       }
       setLocalSpeedometerValue(tps);
     };
-    hydra.startEventLoop();
     latestUTxO = await hydra.awaitUtxo(newGameResponse.player_utxo, 5000);
     // HACK: until hydra returns the datum bytes, all the datum bytes will be wrong
     // so we return it from the newGameResponse and set it manually here
