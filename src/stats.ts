@@ -90,9 +90,9 @@ export function updateUI(elements: any, data: any) {
   }
 }
 
-export function appendTx(cmd: any, player: any) {
+export function appendTx(cmd: any) {
   if (txPreview) {
-    const html = `<tr><td>Tx • {forward: ${cmd.forwardMove} • side: ${cmd.sideMove} }</td><td>GameState • { kills: ${player.killCount} • pos_x: ${player.mapObject.position.momentumX}} </td></tr>`;
+    const html = `<tr><td>Tx • {forward: ${cmd.forwardMove} • side: ${cmd.sideMove} }</td></tr>`;
     var newRow = txPreview.insertRow(0);
     newRow.outerHTML = html;
     if (txPreview.rows.length > 10) {
