@@ -80,6 +80,15 @@ function shuffleArray(array: string[]) {
 let currentAudio: HTMLAudioElement | null = null;
 let isMuted = false;
 
+// Load the mute state from local storage
+const savedMuteState = localStorage.getItem("isMuted");
+if (savedMuteState !== null) {
+  isMuted = JSON.parse(savedMuteState);
+  if (muteIcon) {
+    muteIcon.className = isMuted ? "fas fa-volume-mute" : "fas fa-volume-up";
+  }
+}
+
 // Function to play music files in order and loop infinitely
 function playMusic(files: string[]) {
   if (files.length === 0) return;
@@ -115,6 +124,7 @@ muteButton?.addEventListener("click", () => {
   if (muteIcon) {
     muteIcon.className = isMuted ? "fas fa-volume-mute" : "fas fa-volume-up";
   }
+  localStorage.setItem("isMuted", JSON.stringify(isMuted));
 });
 
 // Start a new game
