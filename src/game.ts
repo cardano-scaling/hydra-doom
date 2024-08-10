@@ -12,6 +12,7 @@ import {
 import {
   GameData,
   Player,
+  PlayerStats,
   buildDatum,
   decodeDatum,
   hydraDatumToPlutus,
@@ -155,6 +156,7 @@ export async function hydraSend(
   cmd: Cmd,
   player: Player,
   gameState: GameState,
+  leveltime?: number,
 ) {
   if (!gameData || !hydra) throw new Error("Game data not initialized");
 
@@ -164,7 +166,20 @@ export async function hydraSend(
 
   console.log("hydraSend", cmd);
 
-  gameData.player = player;
+  gameData.player = {
+    ...player,
+    totalStats: addPlayerStats(
+      gameData.player.totalStats,
+      subtractPlayerStats(player.levelStats, gameData.player.levelStats),
+    ),
+  };
+  if (leveltime !== undefined) {
+    if (leveltime < gameData.leveltime[0]) {
+      gameData.leveltime.unshift(0);
+    }
+
+    gameData.leveltime[0] = leveltime;
+  }
   // TODO: the latestUTxO should be fetched from the script address, filtering by admin in datum.
   if (latestUTxO == null) {
     const utxos = await hydra.getUtxos(scriptAddress);
@@ -201,9 +216,16 @@ export async function hydraSend(
       buildDatum(gameData),
       collateralUTxO!,
     );
+
     sessionStats.transactions++;
     sessionStats.bytes += tx.txSigned.to_bytes().length;
-    sessionStats.kills = gameData.player.killCount;
+    sessionStats.kills = gameData.player.totalStats.killCount;
+    sessionStats.items = gameData.player.totalStats.itemCount;
+    sessionStats.secrets = gameData.player.totalStats.secretCount;
+    sessionStats.play_time = gameData.leveltime.reduce(
+      (acc, curr) => acc + curr,
+      0,
+    );
     updateUI(session, sessionStats);
 
     hydra.queueTx(tx.toString(), tx.toHash());
@@ -344,3 +366,27 @@ const buildTx = async (
 
   return [newUtxo!, signedTx];
 };
+
+const subtractPlayerStats = (left: PlayerStats, right: PlayerStats) => {
+  if (isZeroStats(left)) {
+    return left;
+  }
+
+  return {
+    itemCount: left.itemCount - right.itemCount,
+    killCount: left.killCount - right.killCount,
+    secretCount: left.secretCount - right.secretCount,
+  };
+};
+
+const addPlayerStats = (
+  left: PlayerStats,
+  right: PlayerStats,
+): PlayerStats => ({
+  itemCount: left.itemCount + right.itemCount,
+  killCount: left.killCount + right.killCount,
+  secretCount: left.secretCount + right.secretCount,
+});
+
+const isZeroStats = (stats: PlayerStats) =>
+  stats.itemCount === 0 && stats.killCount === 0 && stats.secretCount === 0;
