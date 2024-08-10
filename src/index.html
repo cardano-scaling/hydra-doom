@@ -32,30 +32,32 @@
   </head>
   <body>
     <div class="layer--wrapper">
-      <div class="logos">
-        <a
-          target="_blank"
-          class="js-hide-when-modal-opens"
-          href="https://hydra.family"
-        >
+      <div class="logos js-hide-when-modal-opens">
+        <a target="_blank" href="https://hydra.family">
           <img src="assets/images/hydra-logo-2-0x.png" alt="Hydra Logo" />
         </a>
-        <a
-          target="_blank"
-          class="js-hide-when-modal-opens"
-          href="https://sundae.fi/"
-        >
+        <a target="_blank" href="https://sundae.fi/">
           <img
             src="assets/images/sundae-labs-logo.svg"
             alt="Sundae Labs Logo"
           />
         </a>
+        <a target="_blank" class="iog-logo" href="https://iog.io">
+          <img src="assets/images/iog-logo.png" alt="IOG Logo" />
+        </a>
         <a
           target="_blank"
-          class="js-hide-when-modal-opens iog-logo"
-          href="https://iog.io"
+          href="http://onboard.ninja"
+          class="js-cabinet-logos onboard-logo"
         >
-          <img src="assets/images/iog-logo.png" alt="IOG Logo" />
+          <img src="assets/images/onboard-logo.png" alt="Onboard Logo" />
+        </a>
+        <a
+          target="_blank"
+          href="https://www.facebook.com/popupvirtualent"
+          class="popup-logo js-cabinet-logos"
+        >
+          <img src="assets/images/popup-logo.png" alt="Popup Logo" />
         </a>
       </div>
       <main class="layer--base">
@@ -127,6 +129,20 @@
           <a target="_blank" href="https://iog.io" class="iog-logo">
             <img src="assets/images/iog-logo.png" alt="IOG Logo" />
           </a>
+          <a
+            target="_blank"
+            href="http://onboard.ninja"
+            class="js-cabinet-logos onboard-logo"
+          >
+            <img src="assets/images/onboard-logo.png" alt="Onboard Logo" />
+          </a>
+          <a
+            target="_blank"
+            href="https://www.facebook.com/popupvirtualent"
+            class="popup-logo js-cabinet-logos"
+          >
+            <img src="assets/images/popup-logo.png" alt="Popup Logo" />
+          </a>
         </div>
       </div>
     </div>
@@ -190,6 +206,20 @@
           <a target="_blank" href="https://iog.io" class="iog-logo">
             <img src="assets/images/iog-logo.png" alt="IOG Logo" />
           </a>
+          <a
+            target="_blank"
+            href="http://onboard.ninja"
+            class="js-cabinet-logos onboard-logo"
+          >
+            <img src="assets/images/onboard-logo.png" alt="Onboard Logo" />
+          </a>
+          <a
+            target="_blank"
+            href="https://www.facebook.com/popupvirtualent"
+            class="popup-logo js-cabinet-logos"
+          >
+            <img src="assets/images/popup-logo.png" alt="Popup Logo" />
+          </a>
         </div>
       </div>
     </div>
@@ -206,6 +236,20 @@
         </a>
         <a target="_blank" href="https://iog.io" class="iog-logo">
           <img src="assets/images/iog-logo.png" alt="IOG Logo" />
+        </a>
+        <a
+          target="_blank"
+          href="http://onboard.ninja"
+          class="js-cabinet-logos onboard-logo"
+        >
+          <img src="assets/images/onboard-logo.png" alt="Onboard Logo" />
+        </a>
+        <a
+          target="_blank"
+          href="https://www.facebook.com/popupvirtualent"
+          class="popup-logo js-cabinet-logos"
+        >
+          <img src="assets/images/popup-logo.png" alt="Popup Logo" />
         </a>
       </div>
       <div class="game-view-wrapper">
@@ -235,7 +279,7 @@
           </button>
         </header>
         <div class="three-columns">
-          <div>
+          <div id="left-column">
             <article class="block">
               <h4 class="block__heading">Global Totals</h4>
               <div class="card card--stats">
@@ -457,23 +501,30 @@
             <article class="block">
               <h4 class="block__heading">Global TPS</h4>
               <div class="global speedometer">
-                <div class="global speedometer__tick" data-speedometer-value="0"></div>
+                <div
+                  class="global speedometer__tick"
+                  data-speedometer-value="0"
+                ></div>
                 <div class="global speedometer-min">0</div>
                 <div class="global speedometer-max">100</div>
                 <div class="global speedometer-value">0</div>
               </div>
             </article>
             <article class="block">
-                <div class="card--small card--stats">
-                    <p>
-                        A comparison between the throughput from your game session (bottom) and all the Hydra heads in aggregate (top).
-                    </p>
-                </div>
+              <div class="card--small card--stats">
+                <p>
+                  A comparison between the throughput from your game session
+                  (bottom) and all the Hydra heads in aggregate (top).
+                </p>
+              </div>
             </article>
             <article class="block">
               <h4 class="block__heading">Local TPS</h4>
               <div class="local speedometer">
-                <div class="local speedometer__tick" data-speedometer-value="0"></div>
+                <div
+                  class="local speedometer__tick"
+                  data-speedometer-value="0"
+                ></div>
                 <div class="local speedometer-min">0</div>
                 <div class="local speedometer-max">100</div>
                 <div class="local speedometer-value">0</div>

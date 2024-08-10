@@ -57,6 +57,8 @@ module.exports = {
         { from: "assets/images/bg-1-5x.jpg", to: "assets/images" },
         { from: "assets/images/sundae-labs-logo.svg", to: "assets/images" },
         { from: "assets/images/iog-logo.png", to: "assets/images" },
+        { from: "assets/images/onboard-logo.png", to: "assets/images" },
+        { from: "assets/images/popup-logo.png", to: "assets/images" },
         { from: "assets/music/blue-screen-of-death.mp3", to: "assets/music" },
         { from: "assets/music/demons-prowl.mp3", to: "assets/music" },
         { from: "assets/music/dooms-fate.mp3", to: "assets/music" },

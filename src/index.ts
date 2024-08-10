@@ -19,6 +19,7 @@ const loadingMessage: HTMLElement | null =
 const muteButton: HTMLButtonElement | null =
   document.querySelector("#mute-button");
 const muteIcon: HTMLElement | null = document.querySelector("#mute-icon");
+const leftColumn: HTMLElement | null = document.querySelector("#left-column");
 
 // Stuff for POO
 const { sessionPk } = keys;
@@ -41,6 +42,14 @@ async function pollForPoo(ephemeralKey: string) {
 // Glue together callbacks available from doom-wasm
 (window as any).hydraSend = hydraSend;
 (window as any).hydraRecv = hydraRecv;
+
+if (!!process.env.CABINET_KEY) {
+  document.querySelectorAll(".js-cabinet-logos").forEach((element) => {
+    const e = element as HTMLElement | null;
+    if (e) e.style.display = "block";
+  });
+  leftColumn?.classList.add("left-column");
+}
 
 const commonArgs = [
   "-iwad",
