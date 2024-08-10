@@ -32,7 +32,6 @@ export class Hydra {
   interval?: ReturnType<typeof setInterval>;
   utxos: { [txRef: string]: UTxO };
   tombstones: { [txRef: string]: boolean };
-  dead_lucid?: Lucid; // A dead lucid instance, not wired up to anything, for parsing transactions
 
   onTxSeen?: (txId: TxHash, tx: TxComplete) => void;
   onTxConfirmed?: (txid: TxHash) => void;
@@ -327,9 +326,9 @@ export class Hydra {
   public async getDatum(datumHash: DatumHash): Promise<string> {
     for (const txRef in this.utxos) {
       if (this.utxos[txRef].datum) {
-        const hash = utils.datumToHash(this.utxos[txRef].datum);
+        const hash = utils.datumToHash(this.utxos[txRef].datum!);
         if (hash === datumHash) {
-          return this.utxos[txRef].datum;
+          return this.utxos[txRef].datum!;
         }
       }
     }
