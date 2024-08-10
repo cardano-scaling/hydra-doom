@@ -1897,11 +1897,11 @@
         "nixpkgs": "nixpkgs_11"
       },
       "locked": {
-        "lastModified": 1723136052,
-        "narHash": "sha256-l+yp7RvwPRszzMAXi+6b1UkdRmf3wadZ+boR+ADCx1k=",
+        "lastModified": 1723275742,
+        "narHash": "sha256-GdtVVAs3r+LrNvhaEX4otZPYBLIA4HLGNyiQKa3YE0s=",
         "owner": "cardano-scaling",
         "repo": "doom-wasm",
-        "rev": "fdf98350355a15f31d5edd7187c6ba108d0fb9ee",
+        "rev": "2bb568e5d94e251ca4fec9881659c3971b3dabd2",
         "type": "github"
       },
       "original": {
