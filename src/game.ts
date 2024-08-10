@@ -194,7 +194,7 @@ export async function hydraSend(
   if (gameState != GameState.GS_LEVEL) {
     return;
   }
-
+  console.log("hydraSend", cmd);
   let hydraSendStart = performance.now();
   gameData.level = level;
 
@@ -244,7 +244,7 @@ export async function hydraSend(
 
   redeemerQueue.push(cmd);
 
-  if (frameNumber % 4 == 0) {
+  if (frameNumber % 1 == 0) {
     const [newUtxo, tx] = await buildTx(
       latestUTxO!,
       encodeRedeemer(redeemerQueue),
@@ -263,7 +263,7 @@ export async function hydraSend(
     );
     updateUI(session, sessionStats);
 
-    hydra.queueTx(tx.toString(), tx.toHash());
+    hydra.submitTx(tx.toString());
     latestUTxO = newUtxo;
     redeemerQueue = [];
     console.log(
@@ -274,6 +274,7 @@ export async function hydraSend(
 }
 
 export function hydraRecv(): Cmd {
+  console.log("hydraRecv", cmdQueue.length);
   if (cmdQueue.length == 0) {
     return {
       forwardMove: 0,

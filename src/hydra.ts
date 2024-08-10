@@ -238,8 +238,18 @@ export class Hydra {
   public async submitTx(tx: Transaction): Promise<string> {
     const txParsed = tx_parser.fromTx(tx);
     const txId = txParsed.toHash();
-    this.queueTx(tx, txId);
-    await this.awaitTx(txId);
+    // this.queueTx(tx, txId);
+    // await this.awaitTx(txId);
+    this.tx_timings[txId] = { sent: performance.now() };
+    this.connection.send(
+      JSON.stringify({
+        tag: "NewTx",
+        transaction: {
+          type: "Tx BabbageEra",
+          cborHex: tx,
+        },
+      }),
+    );
     return txId;
   }
   public async awaitTx(txId: TxHash, checkInterval?: number): Promise<boolean> {
