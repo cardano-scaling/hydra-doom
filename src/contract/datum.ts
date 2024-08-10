@@ -6,16 +6,26 @@ export interface GameData {
   admin: string;
   player: Player;
   monsters: MabObject[];
+  leveltime: number[];
 }
 export interface Player {
   playerState: PlayerState;
   mapObject: MabObject;
-  killCount: number;
+  totalStats: PlayerStats;
+  levelStats: PlayerStats;
 }
+
+export interface PlayerStats {
+  killCount: number;
+  secretCount: number;
+  itemCount: number;
+}
+
 export interface MabObject {
   position: Position;
   health: number;
 }
+
 export interface Position {
   momentumX: number;
   momentumY: number;
@@ -48,9 +58,19 @@ export const initialGameData = (ownerKey: string, adminKey: string) => ({
       },
       health: 100,
     },
-    killCount: 0,
+    totalStats: {
+      killCount: 0,
+      secretCount: 0,
+      itemCount: 0,
+    },
+    levelStats: {
+      killCount: 0,
+      secretCount: 0,
+      itemCount: 0,
+    },
   },
   monsters: [],
+  leveltime: [],
 });
 
 export const buildDatum = (state: GameData): string => {
@@ -61,6 +81,7 @@ export const buildDatum = (state: GameData): string => {
       encodeByteString(state.admin),
       encodePlayer(state.player),
       state.monsters.map((monster) => encodeMapObject(monster)),
+      state.leveltime.map((time) => BigInt(time)),
     ]),
   );
 };
@@ -82,7 +103,16 @@ const encodePlayer = (player: Player) => {
   return new Constr(0, [
     encodePlayerState(player.playerState),
     encodeMapObject(player.mapObject),
-    BigInt(player.killCount),
+    encodePlayerStats(player.totalStats),
+    encodePlayerStats(player.levelStats),
+  ]);
+};
+
+const encodePlayerStats = (stats: PlayerStats) => {
+  return new Constr(0, [
+    BigInt(stats.killCount),
+    BigInt(stats.secretCount),
+    BigInt(stats.itemCount),
   ]);
 };
 

@@ -44,6 +44,8 @@ if (!gameServerUrl) {
   );
 }
 
+const TIC_RATE_MAGIC = 35; // 35 is the ticrate in DOOM WASM they use to calculate time.
+
 // Function to update UI with fetched data
 export function updateUI(elements: any, data: any) {
   if (elements.games && data.total_games !== undefined) {
@@ -84,15 +86,26 @@ export function updateUI(elements: any, data: any) {
     );
   }
   if (elements.playTime && data.play_time !== undefined) {
-    elements.playTime.innerText = new Intl.NumberFormat("en").format(
-      data.play_time,
+    elements.playTime.innerText = formatPlayTime(
+      data.play_time / TIC_RATE_MAGIC,
     );
   }
 }
 
-export function appendTx(cmd: any, player: any) {
+function formatPlayTime(playTimeSeconds: number): string {
+  const days = Math.floor(playTimeSeconds / (24 * 3600));
+  playTimeSeconds %= 24 * 3600;
+  const hours = Math.floor(playTimeSeconds / 3600);
+  playTimeSeconds %= 3600;
+  const minutes = Math.floor(playTimeSeconds / 60);
+  playTimeSeconds %= 60;
+
+  return `${String(days).padStart(2, "0")}:${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(Math.trunc(playTimeSeconds)).padStart(2, "0")}`;
+}
+
+export function appendTx(cmd: any) {
   if (txPreview) {
-    const html = `<tr><td>Tx • {forward: ${cmd.forwardMove} • side: ${cmd.sideMove} }</td><td>GameState • { kills: ${player.killCount} • pos_x: ${player.mapObject.position.momentumX}} </td></tr>`;
+    const html = `<tr><td>Tx • {forward: ${cmd.forwardMove} • side: ${cmd.sideMove} }</td></tr>`;
     var newRow = txPreview.insertRow(0);
     newRow.outerHTML = html;
     if (txPreview.rows.length > 10) {

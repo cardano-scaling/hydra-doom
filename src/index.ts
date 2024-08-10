@@ -1,7 +1,7 @@
-import { fetchNewGame, hydraRecv, hydraSend } from "./hydra";
+import { fetchNewGame, hydraRecv, hydraSend } from "./game";
 import { generatePooQrUri, keys } from "./keys";
-import "./osano.js";
 import { startQueryingAPI } from "./stats";
+import "./osano.js";
 import "./styles.css";
 
 declare function callMain(args: string[]): void;
@@ -102,8 +102,8 @@ async function startGame() {
     if (loadingMessage) loadingMessage.style.display = "none";
     if (message) message.style.display = "flex";
   }
-
-  callMain(commonArgs.concat(["-hydra-send"]));
+  // hydra-recv is temporarily disabled so we can move around
+  callMain(commonArgs.concat(["-hydra-send" /* "-hydra-recv" */]));
 }
 
 // Watch game
