@@ -103,7 +103,7 @@ async function startGame() {
     if (message) message.style.display = "flex";
   }
   // hydra-recv is temporarily disabled so we can move around
-  callMain(commonArgs.concat(["-hydra-send" /* "-hydra-recv" */]));
+  callMain(commonArgs.concat(["-hydra-send", "-hydra-recv"]));
 }
 
 // Watch game

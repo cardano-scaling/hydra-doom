@@ -79,7 +79,8 @@ export async function fetchNewGame() {
     // TODO: protocol from host
     hydra = new Hydra(`https://${node}`);
     await hydra.populateUTxO();
-    hydra.onTxSeen = (_txId, tx) => {
+    hydra.onTxSeen = (txId, tx) => {
+      console.log("seen", txId);
       const redeemer: Uint8Array | undefined = tx.txComplete
         .witness_set()
         .redeemers()
@@ -97,6 +98,7 @@ export async function fetchNewGame() {
         console.warn("Command queue grew big, purging 100 entries");
         cmdQueue = cmdQueue.slice(-100);
       }
+      console.log("seen", txId, "in", hydra!.tx_timings[txId]!.seen, "ms");
     };
     hydra.onTxConfirmed = (txId) => {
       console.log("confirmed", txId);
@@ -106,6 +108,7 @@ export async function fetchNewGame() {
       for (const txid in hydra!.tx_timings) {
         const timing = hydra!.tx_timings[txid]!;
         if (timing.confirmed && timing.sent + timing.confirmed > now - 1000) {
+          // console.log("confirmed", txId, "in", timing.confirmed, "ms");
           tps++;
         }
       }
@@ -144,6 +147,7 @@ type Cmd = { forwardMove: number; sideMove: number };
 
 let cmdQueue: Cmd[] = [];
 let latestUTxO: UTxO | null = null;
+let lastSent: number | null = null;
 let collateralUTxO: UTxO | null = null;
 
 let frameNumber = 0;
@@ -233,19 +237,39 @@ export async function hydraSend(
     updateUI(session, sessionStats);
 
     await hydra.submitTx(tx.toString());
+    // TODO: DRY with hydra.tx_timings
+    lastSent = performance.now();
     latestUTxO = newUtxo;
     console.log(`hydraSend took ${performance.now() - hydraSendStart}ms`);
   }
   frameNumber++;
 }
 
-export function hydraRecv(): Cmd {
-  console.log("hydraRecv", cmdQueue.length);
-  if (cmdQueue.length == 0) {
-    return { forwardMove: 0, sideMove: 0 };
-  }
-  const cmd = cmdQueue.pop()!;
-  return cmd;
+export async function hydraRecv(): Promise<Cmd | null> {
+  return new Promise((res) => {
+    const now = performance.now();
+    console.log("hydraRecv", cmdQueue.length, lastSent ? now - lastSent : 0);
+    if (cmdQueue.length > 0) {
+      res(cmdQueue.shift()!);
+      return;
+    }
+
+    // If the queue is empty we "let it fill up" by just yielding an empty Cmd
+    // to the game, but only to a maximum delay of 100ms
+    if (!lastSent || now - lastSent < 100) {
+      res(null);
+      return;
+    }
+
+    // Otherwise block and wait for the queue to fill up
+    // FIXME: why does this not properly block the game?
+    const interval = setInterval(() => {
+      if (cmdQueue.length > 0) {
+        clearInterval(interval);
+        res(cmdQueue.shift()!);
+      }
+    }, 10);
+  });
 }
 
 const buildCollateralInput = (txHash: string, txIx: number) => {
