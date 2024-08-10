@@ -92,6 +92,7 @@ function playMusic(files: string[]) {
     }
 
     currentAudio = new Audio(files[currentIndex]);
+    currentAudio.muted = isMuted;
     currentAudio.play();
 
     currentAudio.addEventListener("ended", playNext);
@@ -100,10 +101,6 @@ function playMusic(files: string[]) {
   }
 
   playNext();
-
-  if (isMuted && currentAudio) {
-    currentAudio.muted = true;
-  }
 
   // Show the mute button when the music starts
   if (muteButton) muteButton.style.display = "block";
