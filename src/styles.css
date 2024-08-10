@@ -187,6 +187,10 @@ a:hover {
   text-decoration: none;
 }
 
+button:focus-visible {
+  outline: none;
+}
+
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -656,6 +660,25 @@ td.animate::after {
 
 .message a:hover {
   color: #ff2f2f;
+}
+
+.mute-button {
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: none;
+  font-size: 25px;
+  justify-content: center;
+  position: absolute;
+  right: 205px;
+  top: 3px;
+  transition: all 0.3s;
+}
+
+.mute-button:hover {
+  transform: scale(1.08);
 }
 
 /** QR Code */
