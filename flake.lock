@@ -1897,11 +1897,11 @@
         "nixpkgs": "nixpkgs_11"
       },
       "locked": {
-        "lastModified": 1722956383,
-        "narHash": "sha256-8wqOledxLaDo8F494SCiEpmUdj9rTwgHJJnKs0GgJ6M=",
+        "lastModified": 1723136052,
+        "narHash": "sha256-l+yp7RvwPRszzMAXi+6b1UkdRmf3wadZ+boR+ADCx1k=",
         "owner": "cardano-scaling",
         "repo": "doom-wasm",
-        "rev": "464f2cddb1eeffad7cfd73467493da5f10cc703a",
+        "rev": "fdf98350355a15f31d5edd7187c6ba108d0fb9ee",
         "type": "github"
       },
       "original": {
@@ -4732,11 +4732,11 @@
         "utils": "utils_9"
       },
       "locked": {
-        "lastModified": 1723152316,
-        "narHash": "sha256-tW+6rGcipgk6V9qdCtMeFD/jrrntGxZiZYtq0ZgQiKU=",
+        "lastModified": 1723214165,
+        "narHash": "sha256-GHwU97Q7xDR4pbZWlJQ1ZoBJPIyo1+eyFUyztEMggyM=",
         "owner": "cardano-scaling",
         "repo": "hydra-control-plane",
-        "rev": "f57cba6d6bb0b6ff398cb54435f77e2a3b59d841",
+        "rev": "2972c91439645ec08bc3a88eb2be5482882aa03e",
         "type": "github"
       },
       "original": {

@@ -84,11 +84,13 @@
       users."doom" = {
         createHome = true;
         group = "doom";
+        extraGroups = ["plugdev"];
         home = "/home/doom";
         uid = 9999;
         isNormalUser = true;
       };
       groups.doom = {};
+      groups.plugdev = {};
     };
     services = {
       nginx = {
