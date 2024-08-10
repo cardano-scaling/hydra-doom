@@ -112,6 +112,10 @@ export async function fetchNewGame() {
       console.log("confirmed tps", tps);
       setSpeedometerValue(tps);
     };
+    hydra.onTxInvalid = (txId) => {
+      console.error("invalid", txId);
+      setSpeedometerValue(0);
+    };
     latestUTxO = await hydra.awaitUtxo(newGameResponse.player_utxo, 5000);
     // HACK: until hydra returns the datum bytes, all the datum bytes will be wrong
     // so we return it from the newGameResponse and set it manually here
