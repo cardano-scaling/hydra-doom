@@ -98,7 +98,7 @@ export async function fetchNewGame() {
         console.warn("Command queue grew big, purging 100 entries");
         cmdQueue = cmdQueue.slice(-100);
       }
-      console.log("seen", txId, "in", hydra!.tx_timings[txId]!.seen, "ms");
+      // console.log("seen", txId, "in", hydra!.tx_timings[txId]!.seen, "ms");
     };
     hydra.onTxConfirmed = (txId) => {
       console.log("confirmed", txId);
@@ -254,9 +254,8 @@ export async function hydraRecv(): Promise<Cmd | null> {
       return;
     }
 
-    // If the queue is empty we "let it fill up" by just yielding an empty Cmd
-    // to the game, but only to a maximum delay of 100ms
-    if (!lastSent || now - lastSent < 100) {
+    // If we never sent, yield an empty cmd to the game
+    if (!lastSent) {
       res(null);
       return;
     }
