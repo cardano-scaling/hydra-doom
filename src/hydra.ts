@@ -93,6 +93,7 @@ export class Hydra {
       case "TxValid":
         {
           const txid = data.transaction.txId;
+          console.log("TxValid", txid);
           // Record seen time
           if (this.tx_timings[txid]?.sent) {
             const seenTime = now - this.tx_timings[txid].sent;
@@ -120,6 +121,7 @@ export class Hydra {
         break;
       case "TxInvalid":
         {
+          console.error("TxInvalid", data);
           const txid = data.transaction.txId;
           if (this.tx_timings[txid]?.sent) {
             const invTime = now - this.tx_timings[txid].sent;
@@ -130,6 +132,7 @@ export class Hydra {
         break;
       case "SnapshotConfirmed":
         {
+          console.log("SnapshotConfirmed", data.snapshot.number);
           for (const txid of data.snapshot.confirmedTransactions) {
             if (!this.tx_timings[txid]?.sent) {
               continue;
@@ -192,6 +195,22 @@ export class Hydra {
         },
       }),
     );
+    // FIXME: As we chain transactions, at some point we start seeing errors
+    // when spent txins are not there yet. The following block can be used to
+    // work around that, but obviously reduces performance to the network
+    // roundtrip.
+    //
+    // return new Promise((res, rej) => {
+    //   const interval = setInterval(() => {
+    //     if (this.tx_timings[txId]?.invalid) {
+    //       clearInterval(interval);
+    //       rej(txId);
+    //     } else if (this.tx_timings[txId]?.seen) {
+    //       clearInterval(interval);
+    //       res(txId);
+    //     }
+    //   }, 10);
+    // });
     return txId;
   }
   public async awaitTx(txId: TxHash, checkInterval?: number): Promise<boolean> {
