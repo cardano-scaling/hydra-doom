@@ -52,14 +52,14 @@ let sessionStats = {
   kills: 0,
   items: 0,
   secrets: 0,
-  play_time: 0,
+  total_play_time: 0,
 };
 
 export async function fetchNewGame() {
   try {
     console.log(`Starting new game for ${address}`);
     const response = await fetch(
-      `${gameServerUrl}/new_game?address=${address}`,
+      `${gameServerUrl}/new_game?address=${address}&region=${process.env.REGION ?? "us-east-2"}&reserved=${!!process.env.CABINET_KEY}`,
     );
     const newGameResponse = await response.json();
     console.log(`New game successful with UTxO ${newGameResponse.player_utxo}`);
@@ -74,7 +74,7 @@ export async function fetchNewGame() {
       kills: 0,
       items: 0,
       secrets: 0,
-      play_time: 0,
+      total_play_time: 0,
     };
     // TODO: protocol from host
     hydra = new Hydra(`https://${node}`);
@@ -222,7 +222,7 @@ export async function hydraSend(
     sessionStats.kills = gameData.player.totalStats.killCount;
     sessionStats.items = gameData.player.totalStats.itemCount;
     sessionStats.secrets = gameData.player.totalStats.secretCount;
-    sessionStats.play_time = gameData.leveltime.reduce(
+    sessionStats.total_play_time = gameData.leveltime.reduce(
       (acc, curr) => acc + curr,
       0,
     );

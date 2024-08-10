@@ -85,9 +85,15 @@ export function updateUI(elements: any, data: any) {
       data.secrets,
     );
   }
-  if (elements.playTime && data.play_time !== undefined) {
+  if (elements.playTime && data.total_play_time !== undefined) {
+    let total_play_time = data.total_play_time;
+    for (const player in data.player_play_time ?? []) {
+      for (const time of data.player_play_time[player] ?? []) {
+        total_play_time += time;
+      }
+    }
     elements.playTime.innerText = formatPlayTime(
-      data.play_time / TIC_RATE_MAGIC,
+      total_play_time / TIC_RATE_MAGIC,
     );
   }
 }
