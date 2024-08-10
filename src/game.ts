@@ -165,6 +165,7 @@ export async function hydraSend(
   }
 
   console.log("hydraSend", cmd);
+  let hydraSendStart = performance.now();
 
   gameData.player = {
     ...player,
@@ -209,7 +210,7 @@ export async function hydraSend(
     collateralUTxO = utxos[0];
   }
 
-  if (frameNumber % 3 == 0) {
+  if (frameNumber % 1 == 0) {
     const [newUtxo, tx] = await buildTx(
       latestUTxO!,
       encodeRedeemer(cmd),
@@ -228,13 +229,15 @@ export async function hydraSend(
     );
     updateUI(session, sessionStats);
 
-    hydra.queueTx(tx.toString(), tx.toHash());
+    hydra.submitTx(tx.toString());
     latestUTxO = newUtxo;
+    console.log(`hydraSend took ${performance.now() - hydraSendStart}ms`);
   }
   frameNumber++;
 }
 
 export function hydraRecv(): Cmd {
+  console.log("hydraRecv", cmdQueue.length);
   if (cmdQueue.length == 0) {
     return { forwardMove: 0, sideMove: 0 };
   }
@@ -332,7 +335,7 @@ const buildTx = async (
   // console.log("tx", tx);
   const signedTx = await tx.sign().complete();
   // console.log("signed", tx);
-  console.log(toHex(signedTx.txSigned.to_bytes()));
+  // console.log(toHex(signedTx.txSigned.to_bytes()));
   const body = signedTx.txSigned.body();
   const outputs = body.outputs();
   body.free();
