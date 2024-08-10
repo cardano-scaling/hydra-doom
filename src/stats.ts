@@ -1,3 +1,4 @@
+import { setGlobalSpeedometerValue } from './speedometer';
 let global: {
   games: HTMLDataListElement | null;
   gamesActive: HTMLDataListElement | null;
@@ -47,6 +48,7 @@ if (!gameServerUrl) {
 const TIC_RATE_MAGIC = 35; // 35 is the ticrate in DOOM WASM they use to calculate time.
 
 // Function to update UI with fetched data
+let last_query: any;
 export function updateUI(elements: any, data: any) {
   if (elements.games && data.total_games !== undefined) {
     elements.games.innerText = new Intl.NumberFormat("en").format(
@@ -58,8 +60,13 @@ export function updateUI(elements: any, data: any) {
       data.active_games,
     );
   }
+
   if (elements.txs && data.transactions !== undefined) {
     if (elements === global) {
+      if (last_query && data.transactions !== undefined) {
+        setGlobalSpeedometerValue(data.transactions - last_query.transactions);
+      }
+      last_query = data;
       elements.txs.style.setProperty("--num", data.transactions);
     } else {
       elements.txs.innerText = new Intl.NumberFormat("en").format(

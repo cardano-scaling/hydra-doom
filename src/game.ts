@@ -21,7 +21,7 @@ import {
 import { CBOR } from "./contract/cbor";
 import { keys } from "./keys";
 import { appendTx, session, updateUI } from "./stats";
-import { setSpeedometerValue } from "./speedometer";
+import { setLocalSpeedometerValue } from "./speedometer";
 import { Hydra } from "./hydra";
 
 let gameServerUrl = process.env.SERVER_URL;
@@ -77,7 +77,7 @@ export async function fetchNewGame() {
       total_play_time: 0,
     };
     // TODO: protocol from host
-    hydra = new Hydra(`https://${node}`);
+    hydra = new Hydra(`https://${node}`, 100);
     await hydra.populateUTxO();
     hydra.onTxSeen = (_txId, tx) => {
       const redeemer: Uint8Array | undefined = tx.txComplete
@@ -110,7 +110,7 @@ export async function fetchNewGame() {
           tps++;
         }
       }
-      setSpeedometerValue(tps);
+      setLocalSpeedometerValue(tps);
     };
     hydra.startEventLoop();
     latestUTxO = await hydra.awaitUtxo(newGameResponse.player_utxo, 5000);
@@ -164,7 +164,6 @@ export async function hydraSend(
     return;
   }
 
-  console.log("hydraSend", cmd);
 
   gameData.player = {
     ...player,
@@ -209,7 +208,7 @@ export async function hydraSend(
     collateralUTxO = utxos[0];
   }
 
-  if (frameNumber % 3 == 0) {
+  if (frameNumber % 8 !== 0 && frameNumber % 2 == 0) {
     const [newUtxo, tx] = await buildTx(
       latestUTxO!,
       encodeRedeemer(cmd),
@@ -329,10 +328,7 @@ const buildTx = async (
   auxData?.free();
   collateral.free();
   tx.txComplete = collateralTx;
-  // console.log("tx", tx);
   const signedTx = await tx.sign().complete();
-  // console.log("signed", tx);
-  console.log(toHex(signedTx.txSigned.to_bytes()));
   const body = signedTx.txSigned.body();
   const outputs = body.outputs();
   body.free();
