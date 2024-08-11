@@ -4763,16 +4763,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1720624816,
-        "narHash": "sha256-Qk/FShVRuTroTEDN/Nbl1mZzQYNJwpOw3L+TP/rwA14=",
+        "lastModified": 1723191018,
+        "narHash": "sha256-y6oH8Gllogg9aC4ViSmd+z707m2+++eN+usW9RjuS+A=",
         "owner": "input-output-hk",
         "repo": "hydra",
-        "rev": "30ecb7dc00a1f45adab2e771b966b456ab93c354",
+        "rev": "168e37c85b11157a6b56db7554b40f0bfa265f61",
         "type": "github"
       },
       "original": {
         "owner": "input-output-hk",
-        "ref": "non-persisting-prototype",
+        "ref": "doom",
         "repo": "hydra",
         "type": "github"
       }

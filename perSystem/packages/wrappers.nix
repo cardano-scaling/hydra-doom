@@ -58,7 +58,7 @@
             cat > .env << EOF
             SERVER_URL=${serverUrl}
             ${lib.optionalString (cabinetKey != "") "CABINET_KEY=${cabinetKey}"}
-            ${lib.optionalString (serverUrl == "http://127.0.0.1:8000") "ROCKET_PROFILE=local"}
+            ${lib.optionalString (serverUrl == "http://127.0.0.1:8000") "REGION=us-west-2"}
             EOF
             yarn build
           '';
@@ -147,6 +147,7 @@
           name = "hydra-control-plane-wrapper";
           text = ''
             export LOCAL_HYDRA="''${LOCAL_HYDRA:-0}"
+            export ROCKET_PROFILE=local
             if [ "''${LOCAL_HYDRA}" -eq 0 ]; then
               echo "Not starting hydra control plane because LOCAL_HYDRA is not set"
               exit 0
