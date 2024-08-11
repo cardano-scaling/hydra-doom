@@ -108,7 +108,10 @@ const encodePlayer = (player: Player) => {
   ]);
 };
 
-const encodePlayerStats = (stats: PlayerStats) => {
+const encodePlayerStats = (stats?: PlayerStats) => {
+  if (!stats) {
+    return new Constr(0, [BigInt(0), BigInt(0), BigInt(0)]);
+  }
   return new Constr(0, [
     BigInt(stats.killCount),
     BigInt(stats.secretCount),

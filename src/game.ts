@@ -164,7 +164,6 @@ export async function hydraSend(
     return;
   }
 
-
   gameData.player = {
     ...player,
     totalStats: addPlayerStats(
@@ -363,7 +362,14 @@ const buildTx = async (
   return [newUtxo!, signedTx];
 };
 
-const subtractPlayerStats = (left: PlayerStats, right: PlayerStats) => {
+const subtractPlayerStats = (left?: PlayerStats, right?: PlayerStats) => {
+  if (!left || !right) {
+    return {
+      itemCount: 0,
+      killCount: 0,
+      secretCount: 0,
+    };
+  }
   if (isZeroStats(left)) {
     return left;
   }
@@ -385,4 +391,4 @@ const addPlayerStats = (
 });
 
 const isZeroStats = (stats: PlayerStats) =>
-  stats.itemCount === 0 && stats.killCount === 0 && stats.secretCount === 0;
+  stats?.itemCount === 0 && stats.killCount === 0 && stats.secretCount === 0;

@@ -118,6 +118,7 @@ function playMusic(files: string[]) {
 
     currentAudio = new Audio(files[currentIndex]);
     currentAudio.muted = isMuted;
+    currentAudio.volume = 0.2;
     currentAudio.play();
 
     currentAudio.addEventListener("ended", playNext);
