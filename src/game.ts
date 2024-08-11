@@ -25,6 +25,8 @@ import { keys } from "./keys";
 import { setLocalSpeedometerValue } from "./speedometer";
 import { appendTx, session, updateUI } from "./stats";
 
+import * as ed25519 from "@noble/ed25519";
+
 let gameServerUrl = process.env.SERVER_URL;
 if (!gameServerUrl) {
   gameServerUrl = "http://localhost:8000";
@@ -145,7 +147,18 @@ const scriptAddress = lucid.utils.validatorToAddress({
 
 // Callbacks from forked doom-wasm
 
-type Cmd = { forwardMove: number; sideMove: number };
+type Cmd = {
+  forwardMove: number;
+  sideMove: number;
+  angleTurn: number;
+  chatChar: Uint8Array;
+  buttons: Uint8Array;
+  buttons2: Uint8Array;
+  consistancy: Uint8Array;
+  inventory: number;
+  lookFly: Uint8Array;
+  arti: Uint8Array;
+};
 
 let cmdQueue: Cmd[] = [];
 let latestUTxO: UTxO | null = null;
@@ -248,7 +261,18 @@ export async function hydraSend(
 
 export function hydraRecv(): Cmd {
   if (cmdQueue.length == 0) {
-    return { forwardMove: 0, sideMove: 0 };
+    return {
+      forwardMove: 0,
+      sideMove: 0,
+      angleTurn: 0,
+      chatChar: new Uint8Array(0),
+      buttons: new Uint8Array(0),
+      buttons2: new Uint8Array(0),
+      consistancy: new Uint8Array(0),
+      inventory: 0,
+      lookFly: new Uint8Array(0),
+      arti: new Uint8Array(0),
+    };
   }
   const cmd = cmdQueue.pop()!;
   return cmd;
@@ -290,12 +314,14 @@ const decodeRedeemer = (redeemer: string): Cmd[] => {
     Constr<Data>
   >;
   // TODO: return an array
-  return cmds.map((cmd) => ({
-    forwardMove: Number(cmd.fields[0]),
-    sideMove: Number(cmd.fields[1]),
-  }));
+  return cmds.map(
+    (cmd) =>
+      ({
+        forwardMove: Number(cmd.fields[0]),
+        sideMove: Number(cmd.fields[1]),
+      }) as Cmd,
+  );
 };
-
 const buildTx = async (
   inputUtxo: UTxO,
   redeemer: string,
