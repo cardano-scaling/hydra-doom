@@ -4732,11 +4732,11 @@
         "utils": "utils_9"
       },
       "locked": {
-        "lastModified": 1723399293,
-        "narHash": "sha256-6Kd8L6BGP8ZrfKIrESTJ1sx83ATZt1957eXb4ChE0MU=",
+        "lastModified": 1723403588,
+        "narHash": "sha256-StX3b9GCMngIkbUjHDZVMYDn8ucoT0iU/ohWXWRvAPs=",
         "owner": "cardano-scaling",
         "repo": "hydra-control-plane",
-        "rev": "d372f14f9ca93f9701ac7055a1549d1acb90caf7",
+        "rev": "e533ca92bda33aa93aa090f378c96bad848d678c",
         "type": "github"
       },
       "original": {
