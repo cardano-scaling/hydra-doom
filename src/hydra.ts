@@ -268,15 +268,12 @@ export class Hydra {
   }
 
   public async getUtxos(
-    addressOrCredential: Address | Credential,
+    address: Address
   ): Promise<UTxO[]> {
-    if (addressOrCredential instanceof Credential) {
-      throw new Error("not implemented");
-    }
     const ret = [];
     for (const key in this.utxos) {
       const utxo = this.utxos[key];
-      if (utxo.address === addressOrCredential) {
+      if (utxo.address === address) {
         ret.push(utxo);
       }
     }
