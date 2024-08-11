@@ -51,9 +51,9 @@
           buildPhase = ''
             ln -s ${nodeModules}/libexec/hydra-doom/node_modules node_modules
             ln -sf ${wadFile} assets/doom1.wad
-            #ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
-            #ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm assets/websockets-doom.wasm
-            #ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
+            ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
+            ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm assets/websockets-doom.wasm
+            ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
 
             cat > .env << EOF
             SERVER_URL=${serverUrl}
