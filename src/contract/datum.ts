@@ -7,6 +7,7 @@ export interface GameData {
   player: Player;
   monsters: MabObject[];
   leveltime: number[];
+  level: LevelId;
 }
 export interface Player {
   playerState: PlayerState;
@@ -36,6 +37,12 @@ export enum PlayerState {
   LIVE,
   DEAD,
   REBORN,
+}
+
+export interface LevelId {
+  map: number;
+  skill: number;
+  episode: number;
 }
 
 export const initialGameData = (
@@ -68,6 +75,11 @@ export const initialGameData = (
   },
   monsters: [],
   leveltime: [],
+  level: {
+    map: -1,
+    skill: -1,
+    episode: -1,
+  },
 });
 
 export const buildDatum = (state: GameData): string => {
@@ -79,6 +91,7 @@ export const buildDatum = (state: GameData): string => {
       encodePlayer(state.player),
       state.monsters.map((monster) => encodeMapObject(monster)),
       state.leveltime.map((time) => BigInt(time)),
+      encodeLevelId(state.level),
     ]),
   );
 };
@@ -140,6 +153,14 @@ const encodePlayerState = (state: PlayerState): Data => {
     case PlayerState.REBORN:
       return new Constr(2, []);
   }
+};
+
+const encodeLevelId = (level: LevelId): Data => {
+  return new Constr(0, [
+    BigInt(level.map),
+    BigInt(level.skill),
+    BigInt(level.episode),
+  ]);
 };
 
 const encodeBoolean = (b: boolean) => {

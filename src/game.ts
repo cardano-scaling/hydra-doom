@@ -12,6 +12,7 @@ import {
 import { CBOR } from "./contract/cbor";
 import {
   GameData,
+  LevelId,
   Player,
   PlayerStats,
   buildDatum,
@@ -94,16 +95,18 @@ export async function fetchNewGame(region: string) {
       if (!redeemer) {
         return;
       }
-      const cmd = decodeRedeemer(toHex(redeemer));
-      cmdQueue.push(cmd);
-      // append some representation of the tx into the UI
-      appendTx(cmd);
-      if (cmdQueue.length > 1000) {
-        console.warn(
-          "Command queue grows big, should cleanup",
-          cmdQueue.length,
-        );
-      }
+      const cmds = decodeRedeemer(toHex(redeemer));
+      cmds.forEach((cmd) => {
+        cmdQueue.push(cmd);
+        // append some representation of the tx into the UI
+        appendTx(cmd);
+        if (cmdQueue.length > 1000) {
+          console.warn(
+            "Command queue grows big, should cleanup",
+            cmdQueue.length,
+          );
+        }
+      });
     };
     hydra.onTxConfirmed = () => {
       const now = performance.now();
@@ -161,7 +164,8 @@ export async function hydraSend(
   cmd: Cmd,
   player: Player,
   gameState: GameState,
-  leveltime?: number,
+  leveltime: number,
+  level: LevelId,
 ) {
   if (!gameData || !hydra) throw new Error("Game data not initialized");
 
@@ -183,6 +187,7 @@ export async function hydraSend(
 
     gameData.leveltime[0] = leveltime;
   }
+  gameData.level = level;
   // TODO: the latestUTxO should be fetched from the script address, filtering by admin in datum.
   if (latestUTxO == null) {
     const utxos = await hydra.getUtxos(scriptAddress);
@@ -274,10 +279,16 @@ const encodeRedeemer = (cmd: Cmd): string => {
   );
 };
 
-const decodeRedeemer = (redeemer: string): Cmd => {
-  const d = (Data.from(redeemer) as Constr<Data>).fields[0] as Constr<Data>;
-
-  return { forwardMove: Number(d.fields[0]), sideMove: Number(d.fields[1]) };
+const decodeRedeemer = (redeemer: string): Cmd[] => {
+  console.log(redeemer);
+  const cmds = (Data.from(redeemer) as Constr<Data>).fields[0] as Array<
+    Constr<Data>
+  >;
+  // TODO: return an array
+  return cmds.map((cmd) => ({
+    forwardMove: Number(cmd.fields[0]),
+    sideMove: Number(cmd.fields[1]),
+  }));
 };
 
 const buildTx = async (
@@ -300,32 +311,36 @@ const buildTx = async (
     scriptRef: inputUtxo.scriptRef,
   };
 
-  const tx = await lucid
-    .newTx()
-    .collectFrom([lucidUtxo], redeemer)
-    .payToContract(scriptAddress, { inline: datum }, { lovelace: BigInt(0) })
-    .readFrom([
-      {
-        txHash: scriptRef!.split("#")[0],
-        outputIndex: Number(scriptRef!.split("#")[1]),
-        address: scriptAddress,
-        assets: { lovelace: BigInt(0) },
-        scriptRef: {
-          type: "PlutusV2",
-          script: CBOR,
-        },
-      },
-    ])
-    .addSigner(address)
-    .complete();
+  const tx = lucid.newTx();
+  tx.collectFrom([lucidUtxo], redeemer);
 
+  tx.payToContract(scriptAddress, { inline: datum }, { lovelace: BigInt(0) });
+  tx.readFrom([
+    {
+      txHash: scriptRef!.split("#")[0],
+      outputIndex: Number(scriptRef!.split("#")[1]),
+      address: scriptAddress,
+      assets: { lovelace: BigInt(0) },
+      scriptRef: {
+        type: "PlutusV2",
+        script: CBOR,
+      },
+    },
+  ]);
+  tx.addSigner(address);
+  let complete;
+  try {
+    complete = await tx.complete();
+  } catch (e) {
+    throw e;
+  }
   const collateral = buildCollateralInput(
     collateralUtxo.txHash,
     collateralUtxo.outputIndex,
   );
-  const txBody = tx.txComplete.body();
-  const witnessSet = tx.txComplete.witness_set();
-  const auxData = tx.txComplete.auxiliary_data();
+  const txBody = complete.txComplete.body();
+  const witnessSet = complete.txComplete.witness_set();
+  const auxData = complete.txComplete.auxiliary_data();
 
   txBody.set_collateral(collateral);
   const collateralTx = C.Transaction.new(txBody, witnessSet, auxData);
@@ -333,8 +348,8 @@ const buildTx = async (
   witnessSet.free();
   auxData?.free();
   collateral.free();
-  tx.txComplete = collateralTx;
-  const signedTx = await tx.sign().complete();
+  complete.txComplete = collateralTx;
+  const signedTx = await complete.sign().complete();
   const body = signedTx.txSigned.body();
   const outputs = body.outputs();
   body.free();
