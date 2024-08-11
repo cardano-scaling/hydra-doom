@@ -187,21 +187,24 @@ export async function hydraSend(
     return;
   }
 
-  gameData.player = {
-    ...player,
-    totalStats: addPlayerStats(
-      gameData.player.totalStats,
-      subtractPlayerStats(player.levelStats, gameData.player.levelStats),
-    ),
-  };
-  if (leveltime !== undefined) {
-    if (leveltime < gameData.leveltime[0]) {
-      gameData.leveltime.unshift(0);
+  console.log(leveltime, gameData.leveltime);
+  if (!level.demoplayback) {
+    gameData.player = {
+      ...player,
+      totalStats: addPlayerStats(
+        gameData.player.totalStats,
+        subtractPlayerStats(player.levelStats, gameData.player.levelStats),
+      ),
+    };
+
+    if (leveltime < gameData.leveltime[0] || gameData.leveltime.length == 0) {
+      gameData.leveltime.unshift(leveltime);
     }
 
     gameData.leveltime[0] = leveltime;
+
+    gameData.level = level;
   }
-  gameData.level = level;
   // TODO: the latestUTxO should be fetched from the script address, filtering by admin in datum.
   if (latestUTxO == null) {
     const utxos = await hydra.getUtxos(scriptAddress);

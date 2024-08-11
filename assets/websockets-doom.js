@@ -491,7 +491,7 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 449239: $0 => {
+ 449328: $0 => {
   var str = UTF8ToString($0) + "\n\n" + "Abort/Retry/Ignore/AlwaysIgnore? [ariA] :";
   var reply = window.prompt(str, "i");
   if (reply === null) {
@@ -499,7 +499,7 @@ var ASM_CONSTS = {
   }
   return allocate(intArrayFromString(reply), "i8", ALLOC_NORMAL);
  },
- 449464: () => {
+ 449553: () => {
   if (typeof (AudioContext) !== "undefined") {
    return true;
   } else if (typeof (webkitAudioContext) !== "undefined") {
@@ -507,7 +507,7 @@ var ASM_CONSTS = {
   }
   return false;
  },
- 449611: () => {
+ 449700: () => {
   if ((typeof (navigator.mediaDevices) !== "undefined") && (typeof (navigator.mediaDevices.getUserMedia) !== "undefined")) {
    return true;
   } else if (typeof (navigator.webkitGetUserMedia) !== "undefined") {
@@ -515,7 +515,7 @@ var ASM_CONSTS = {
   }
   return false;
  },
- 449845: $0 => {
+ 449934: $0 => {
   if (typeof (Module["SDL2"]) === "undefined") {
    Module["SDL2"] = {};
   }
@@ -537,11 +537,11 @@ var ASM_CONSTS = {
   }
   return SDL2.audioContext === undefined ? -1 : 0;
  },
- 450338: () => {
+ 450427: () => {
   var SDL2 = Module["SDL2"];
   return SDL2.audioContext.sampleRate;
  },
- 450406: ($0, $1, $2, $3) => {
+ 450495: ($0, $1, $2, $3) => {
   var SDL2 = Module["SDL2"];
   var have_microphone = function(stream) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -582,7 +582,7 @@ var ASM_CONSTS = {
    }, have_microphone, no_microphone);
   }
  },
- 452058: ($0, $1, $2, $3) => {
+ 452147: ($0, $1, $2, $3) => {
   var SDL2 = Module["SDL2"];
   SDL2.audio.scriptProcessorNode = SDL2.audioContext["createScriptProcessor"]($1, 0, $0);
   SDL2.audio.scriptProcessorNode["onaudioprocess"] = function(e) {
@@ -594,7 +594,7 @@ var ASM_CONSTS = {
   };
   SDL2.audio.scriptProcessorNode["connect"](SDL2.audioContext["destination"]);
  },
- 452468: ($0, $1) => {
+ 452557: ($0, $1) => {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.capture.currentCaptureBuffer.numberOfChannels;
   for (var c = 0; c < numChannels; ++c) {
@@ -613,7 +613,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 453073: ($0, $1) => {
+ 453162: ($0, $1) => {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.audio.currentOutputBuffer["numberOfChannels"];
   for (var c = 0; c < numChannels; ++c) {
@@ -626,7 +626,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 453553: $0 => {
+ 453642: $0 => {
   var SDL2 = Module["SDL2"];
   if ($0) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -664,7 +664,7 @@ var ASM_CONSTS = {
    SDL2.audioContext = undefined;
   }
  },
- 454725: ($0, $1, $2) => {
+ 454814: ($0, $1, $2) => {
   var w = $0;
   var h = $1;
   var pixels = $2;
@@ -735,7 +735,7 @@ var ASM_CONSTS = {
   }
   SDL2.ctx.putImageData(SDL2.image, 0, 0);
  },
- 456194: ($0, $1, $2, $3, $4) => {
+ 456283: ($0, $1, $2, $3, $4) => {
   var w = $0;
   var h = $1;
   var hot_x = $2;
@@ -772,24 +772,24 @@ var ASM_CONSTS = {
   stringToUTF8(url, urlBuf, url.length + 1);
   return urlBuf;
  },
- 457183: $0 => {
+ 457272: $0 => {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = UTF8ToString($0);
   }
  },
- 457266: () => {
+ 457355: () => {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = "none";
   }
  },
- 457335: () => window.innerWidth,
- 457365: () => window.innerHeight,
- 457396: ($0, $1) => {
+ 457424: () => window.innerWidth,
+ 457454: () => window.innerHeight,
+ 457485: ($0, $1) => {
   alert(UTF8ToString($0) + "\n\n" + UTF8ToString($1));
  }
 };
 
-function __asyncjs__hydra_send(forwardmove, sidemove, angleturn, chatchar, buttons, consistency, buttons2, inventory, lookfly, artyi, player_state, kill_count, secret_count, item_count, health, x, y, z, gamestate, leveltics, gamemap, gameskill, gameepisode) {
+function __asyncjs__hydra_send(forwardmove, sidemove, angleturn, chatchar, buttons, consistency, buttons2, inventory, lookfly, artyi, player_state, kill_count, secret_count, item_count, cheats, health, x, y, z, gamestate, leveltics, gamemap, gameskill, gameepisode, demoplayback) {
  return Asyncify.handleAsync(async () => {
   await hydraSend({
    forwardMove: forwardmove,
@@ -821,11 +821,13 @@ function __asyncjs__hydra_send(forwardmove, sidemove, angleturn, chatchar, butto
     killCount: kill_count,
     secretCount: secret_count,
     itemCount: item_count
-   }
+   },
+   cheats: cheats !== 0
   }, gamestate, leveltics, {
    map: gamemap,
    skill: gameskill,
-   episode: gameepisode
+   episode: gameepisode,
+   demoplayback: demoplayback === 1
   });
  });
 }
@@ -8781,7 +8783,7 @@ var _asyncify_stop_rewind = () => (_asyncify_stop_rewind = wasmExports["asyncify
 
 var ___start_em_js = Module["___start_em_js"] = 448096;
 
-var ___stop_em_js = Module["___stop_em_js"] = 449239;
+var ___stop_em_js = Module["___stop_em_js"] = 449328;
 
 function intArrayFromBase64(s) {
  if (typeof ENVIRONMENT_IS_NODE != "undefined" && ENVIRONMENT_IS_NODE) {
