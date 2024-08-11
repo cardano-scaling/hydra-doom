@@ -491,7 +491,7 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 448949: $0 => {
+ 449239: $0 => {
   var str = UTF8ToString($0) + "\n\n" + "Abort/Retry/Ignore/AlwaysIgnore? [ariA] :";
   var reply = window.prompt(str, "i");
   if (reply === null) {
@@ -499,7 +499,7 @@ var ASM_CONSTS = {
   }
   return allocate(intArrayFromString(reply), "i8", ALLOC_NORMAL);
  },
- 449174: () => {
+ 449464: () => {
   if (typeof (AudioContext) !== "undefined") {
    return true;
   } else if (typeof (webkitAudioContext) !== "undefined") {
@@ -507,7 +507,7 @@ var ASM_CONSTS = {
   }
   return false;
  },
- 449321: () => {
+ 449611: () => {
   if ((typeof (navigator.mediaDevices) !== "undefined") && (typeof (navigator.mediaDevices.getUserMedia) !== "undefined")) {
    return true;
   } else if (typeof (navigator.webkitGetUserMedia) !== "undefined") {
@@ -515,7 +515,7 @@ var ASM_CONSTS = {
   }
   return false;
  },
- 449555: $0 => {
+ 449845: $0 => {
   if (typeof (Module["SDL2"]) === "undefined") {
    Module["SDL2"] = {};
   }
@@ -537,11 +537,11 @@ var ASM_CONSTS = {
   }
   return SDL2.audioContext === undefined ? -1 : 0;
  },
- 450048: () => {
+ 450338: () => {
   var SDL2 = Module["SDL2"];
   return SDL2.audioContext.sampleRate;
  },
- 450116: ($0, $1, $2, $3) => {
+ 450406: ($0, $1, $2, $3) => {
   var SDL2 = Module["SDL2"];
   var have_microphone = function(stream) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -582,7 +582,7 @@ var ASM_CONSTS = {
    }, have_microphone, no_microphone);
   }
  },
- 451768: ($0, $1, $2, $3) => {
+ 452058: ($0, $1, $2, $3) => {
   var SDL2 = Module["SDL2"];
   SDL2.audio.scriptProcessorNode = SDL2.audioContext["createScriptProcessor"]($1, 0, $0);
   SDL2.audio.scriptProcessorNode["onaudioprocess"] = function(e) {
@@ -594,7 +594,7 @@ var ASM_CONSTS = {
   };
   SDL2.audio.scriptProcessorNode["connect"](SDL2.audioContext["destination"]);
  },
- 452178: ($0, $1) => {
+ 452468: ($0, $1) => {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.capture.currentCaptureBuffer.numberOfChannels;
   for (var c = 0; c < numChannels; ++c) {
@@ -613,7 +613,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 452783: ($0, $1) => {
+ 453073: ($0, $1) => {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.audio.currentOutputBuffer["numberOfChannels"];
   for (var c = 0; c < numChannels; ++c) {
@@ -626,7 +626,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 453263: $0 => {
+ 453553: $0 => {
   var SDL2 = Module["SDL2"];
   if ($0) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -664,7 +664,7 @@ var ASM_CONSTS = {
    SDL2.audioContext = undefined;
   }
  },
- 454435: ($0, $1, $2) => {
+ 454725: ($0, $1, $2) => {
   var w = $0;
   var h = $1;
   var pixels = $2;
@@ -735,7 +735,7 @@ var ASM_CONSTS = {
   }
   SDL2.ctx.putImageData(SDL2.image, 0, 0);
  },
- 455904: ($0, $1, $2, $3, $4) => {
+ 456194: ($0, $1, $2, $3, $4) => {
   var w = $0;
   var h = $1;
   var hot_x = $2;
@@ -772,28 +772,36 @@ var ASM_CONSTS = {
   stringToUTF8(url, urlBuf, url.length + 1);
   return urlBuf;
  },
- 456893: $0 => {
+ 457183: $0 => {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = UTF8ToString($0);
   }
  },
- 456976: () => {
+ 457266: () => {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = "none";
   }
  },
- 457045: () => window.innerWidth,
- 457075: () => window.innerHeight,
- 457106: ($0, $1) => {
+ 457335: () => window.innerWidth,
+ 457365: () => window.innerHeight,
+ 457396: ($0, $1) => {
   alert(UTF8ToString($0) + "\n\n" + UTF8ToString($1));
  }
 };
 
-function __asyncjs__hydra_send(cmd, player_state, kill_count, secret_count, item_count, health, x, y, z, gamestate, leveltics, gamemap, gameskill, gameepisode) {
+function __asyncjs__hydra_send(forwardmove, sidemove, angleturn, chatchar, buttons, consistency, buttons2, inventory, lookfly, artyi, player_state, kill_count, secret_count, item_count, health, x, y, z, gamestate, leveltics, gamemap, gameskill, gameepisode) {
  return Asyncify.handleAsync(async () => {
   await hydraSend({
-   forwardMove: SAFE_HEAP_LOAD(cmd, 1, 0),
-   sideMove: SAFE_HEAP_LOAD(cmd + 1, 1, 0)
+   forwardMove: forwardmove,
+   sideMove: sidemove,
+   angleTurn: angleturn,
+   chatChar: chatchar,
+   buttons: buttons,
+   consistancy: consistency,
+   buttons2: buttons2,
+   inventory: inventory,
+   lookFly: lookfly,
+   arti: artyi
   }, {
    mapObject: {
     position: {
@@ -8773,7 +8781,7 @@ var _asyncify_stop_rewind = () => (_asyncify_stop_rewind = wasmExports["asyncify
 
 var ___start_em_js = Module["___start_em_js"] = 448096;
 
-var ___stop_em_js = Module["___stop_em_js"] = 448949;
+var ___stop_em_js = Module["___stop_em_js"] = 449239;
 
 function intArrayFromBase64(s) {
  if (typeof ENVIRONMENT_IS_NODE != "undefined" && ENVIRONMENT_IS_NODE) {
