@@ -14,6 +14,7 @@ export interface Player {
   mapObject: MabObject;
   totalStats: PlayerStats;
   levelStats: PlayerStats;
+  cheats: number;
 }
 
 export interface PlayerStats {
@@ -43,6 +44,7 @@ export interface LevelId {
   map: number;
   skill: number;
   episode: number;
+  demoplayback: boolean;
 }
 
 export const initialGameData = (
@@ -72,6 +74,7 @@ export const initialGameData = (
       secretCount: 0,
       itemCount: 0,
     },
+    cheats: 0,
   },
   monsters: [],
   leveltime: [],
@@ -79,6 +82,7 @@ export const initialGameData = (
     map: -1,
     skill: -1,
     episode: -1,
+    demoplayback: false,
   },
 });
 
@@ -115,6 +119,7 @@ const encodePlayer = (player: Player) => {
     encodeMapObject(player.mapObject),
     encodePlayerStats(player.totalStats),
     encodePlayerStats(player.levelStats),
+    BigInt(player.cheats),
   ]);
 };
 
@@ -160,6 +165,7 @@ const encodeLevelId = (level: LevelId): Data => {
     BigInt(level.map),
     BigInt(level.skill),
     BigInt(level.episode),
+    encodeBoolean(level.demoplayback),
   ]);
 };
 
