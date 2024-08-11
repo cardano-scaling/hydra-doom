@@ -25,19 +25,19 @@
             ../../src
             ../../assets
             ../../package.json
-            ../../package-lock.json
+            ../../yarn.lock
             ../../tsconfig.json
             ../../webpack.config.js
           ];
-          packageLock = builtins.fromJSON (builtins.readFile (src + "/package-lock.json"));
-          deps = builtins.attrValues (removeAttrs packageLock.packages [ "" ]);
 
-          nodeModules = pkgs.writeTextFile {
-            name = "tarballs";
-            text = ''
-              ${builtins.concatStringsSep "\n" (map (p: pkgs.fetchurl { url = p.resolved; hash = p.integrity; }) deps)}
-            '';
-          };
+          nodeModules = pkgs.mkYarnPackage {
+            name = "hydra-doom-node-modules";
+            inherit src;
+            packageJSON = ../../package.json;
+            yarnLock = ../../yarn.lock;
+            nodejs = pkgs.nodejs;
+           };
+
         in
         pkgs.stdenv.mkDerivation {
           name = "hydra-doom-static";
@@ -45,33 +45,22 @@
           inherit src;
           buildInputs = [
             pkgs.nodejs
-            pkgs.curl
-            pkgs.coreutils
+            pkgs.yarn
+            nodeModules
           ];
           buildPhase = ''
-            export HOME="$PWD/.home"
-            mkdir -p "$HOME"
-            export npm_config_cache=$HOME/.npm
-            while read package
-            do
-              echo "caching $package"
-              npm cache add "$package"
-            done <${nodeModules} > /dev/null
-
+            ln -s ${nodeModules}/libexec/hydra-doom/node_modules node_modules
             ln -sf ${wadFile} assets/doom1.wad
             ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
             ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm assets/websockets-doom.wasm
             ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
 
-            echo "SERVER_URL=${serverUrl}" > .env;
             cat > .env << EOF
             SERVER_URL=${serverUrl}
             ${lib.optionalString (cabinetKey != "") "CABINET_KEY=${cabinetKey}"}
+            ${lib.optionalString (serverUrl == "http://127.0.0.1:8000") "ROCKET_PROFILE=local"}
             EOF
-
-            npm install
-            patchShebangs --build node_modules/webpack/bin/webpack.js
-            npm run build
+            yarn build
           '';
           installPhase = ''
             cp -a dist $out
@@ -167,16 +156,18 @@
             cat > Rocket.toml << EOF
             [default]
             ttl_minutes = 5
-            max_players = 100
             port = ${controlPlanePort}
             address = "${controlPlaneListenAddr}"
 
-            [[default.nodes]]
-            local_url = "ws://${hydraHost}:${hydraPort}"
-            remote_url = "ws://${hydraHost}:${hydraPort}"
-            max_players = 5
+            [[local.nodes]]
+            local_url = "ws://${hydraHost}"
+            remote_url = "ws://${hydraHost}"
+            port = ${hydraPort}
+            max_players = 10
             admin_key_file = "admin.sk"
             persisted = false
+            reserved = false
+            stats-file = "local-stats"
             EOF
             fi
             ${lib.getExe' config.packages.hydra-control-plane "hydra_control_plane"}

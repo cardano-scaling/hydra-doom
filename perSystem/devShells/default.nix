@@ -14,6 +14,7 @@
             config.packages.cardano-cli
             config.packages.bech32
             pkgs.nodejs
+            pkgs.yarn
             pkgs.jq
             pkgs.age
             pkgs.ssh-to-age
