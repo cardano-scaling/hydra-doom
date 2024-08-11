@@ -152,6 +152,7 @@ let latestUTxO: UTxO | null = null;
 let collateralUTxO: UTxO | null = null;
 
 let frameNumber = 0;
+let redeemerQueue: Cmd[] = [];
 
 export enum GameState {
   GS_LEVEL,
@@ -217,10 +218,12 @@ export async function hydraSend(
     collateralUTxO = utxos[0];
   }
 
+  redeemerQueue.push(cmd);
+
   if (frameNumber % 8 !== 0 && frameNumber % 2 == 0) {
     const [newUtxo, tx] = await buildTx(
       latestUTxO!,
-      encodeRedeemer(cmd),
+      encodeRedeemer(redeemerQueue),
       buildDatum(gameData),
       collateralUTxO!,
     );
@@ -238,6 +241,7 @@ export async function hydraSend(
 
     hydra.queueTx(tx.toString(), tx.toHash());
     latestUTxO = newUtxo;
+    redeemerQueue = [];
   }
   frameNumber++;
 }
@@ -264,17 +268,18 @@ const buildCollateralInput = (txHash: string, txIx: number) => {
   return inputs;
 };
 
-const encodeRedeemer = (cmd: Cmd): string => {
+const encodeRedeemer = (cmds: Cmd[]): string => {
   return Data.to(
     new Constr(1, [
-      [
-        new Constr(0, [
-          BigInt(cmd.forwardMove),
-          BigInt(cmd.sideMove),
-          BigInt(0),
-          [],
-        ]),
-      ],
+      cmds.map(
+        (cmd) =>
+          new Constr(0, [
+            BigInt(cmd.forwardMove),
+            BigInt(cmd.sideMove),
+            BigInt(0),
+            [],
+          ]),
+      ),
     ]),
   );
 };
