@@ -74,6 +74,13 @@
         </h1>
         <div class="js-hide-when-modal-opens">
           <button
+            id="select-continent"
+            class="play-doom-button"
+            data-modal-target="modal-continent"
+          >
+            <span>Play Doom On Hydra</span>
+          </button>
+          <button
             id="start"
             class="play-doom-button"
             data-modal-target="modal-game"
@@ -367,7 +374,7 @@
                   </p>
                   <div id="qr-container"></div>
                   <p>Or, jump straight into the action!</p>
-                  <button class="qr-skip-button" id="skip-button">
+                  <button class="primary-button" id="skip-button">
                     <span>Skip</span>
                   </button>
                 </div>
@@ -628,6 +635,103 @@
                     well suited to work with Cardano smart contracts, and the
                     code is fully open source.
                   </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-continent" class="modal" role="dialog">
+      <div class="modal__outer-container">
+        <div class="modal__container">
+          <div class="modal__outer-border">
+            <div class="modal__top-left-bar"></div>
+            <div class="modal__top-right-bar"></div>
+            <div class="modal__bottom-left-bar"></div>
+            <div class="modal__bottom-right-bar"></div>
+            <div class="modal__mid-gradient">
+              <div class="modal__inner-border">
+                <div class="modal__content">
+                  <button
+                    type="button"
+                    class="modal__close-btn"
+                    data-modal-close
+                    aria-label="Close modal"
+                  >
+                    X
+                  </button>
+                  <div class="modal__inner-content">
+                    <h1>Select your continent</h1>
+                    <form id="continent-form" class="continent-form">
+                      <label>
+                        <input
+                          type="radio"
+                          name="continent"
+                          value="us-east-2"
+                          checked
+                        />
+                        Ohio, NA
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name="continent"
+                          value="us-west-2"
+                        />
+                        Oregon, NA
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name="continent"
+                          value="eu-central-1"
+                        />
+                        Frankfurt, Europe
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name="continent"
+                          value="af-south-1"
+                        />
+                        Cape Town, Africa
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name="continent"
+                          value="ap-southeast-4"
+                        />
+                        Melbourne, Australia
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name="continent"
+                          value="ap-northeast-2"
+                        />
+                        Seoul, Asia
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name="continent"
+                          value="sa-east-1"
+                        />
+                        Sao Paulo, SA
+                      </label>
+                    </form>
+                    <button
+                      class="primary-button"
+                      data-modal-close
+                      data-modal-target="modal-game"
+                      id="start-game-button"
+                    >
+                      <span>Start Game</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

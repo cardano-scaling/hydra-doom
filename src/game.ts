@@ -1,14 +1,15 @@
 import {
   C,
+  Constr,
   Data,
   Lucid,
-  UTxO,
-  valueToAssets,
-  toHex,
-  Constr,
   TxSigned,
+  UTxO,
+  toHex,
+  valueToAssets,
 } from "lucid-cardano";
 
+import { CBOR } from "./contract/cbor";
 import {
   GameData,
   Player,
@@ -18,11 +19,10 @@ import {
   hydraDatumToPlutus,
   initialGameData,
 } from "./contract/datum";
-import { CBOR } from "./contract/cbor";
-import { keys } from "./keys";
-import { appendTx, session, updateUI } from "./stats";
-import { setLocalSpeedometerValue } from "./speedometer";
 import { Hydra } from "./hydra";
+import { keys } from "./keys";
+import { setLocalSpeedometerValue } from "./speedometer";
+import { appendTx, session, updateUI } from "./stats";
 
 let gameServerUrl = process.env.SERVER_URL;
 if (!gameServerUrl) {
@@ -55,11 +55,11 @@ let sessionStats = {
   total_play_time: 0,
 };
 
-export async function fetchNewGame() {
+export async function fetchNewGame(region: string) {
   try {
     console.log(`Starting new game for ${address}`);
     const response = await fetch(
-      `${gameServerUrl}/new_game?address=${address}&region=${process.env.REGION ?? "us-east-2"}&reserved=${!!process.env.CABINET_KEY}`,
+      `${gameServerUrl}/new_game?address=${address}&region=${process.env.REGION ?? region}&reserved=${!!process.env.CABINET_KEY}`
     );
     const newGameResponse = await response.json();
     console.log(`New game successful with UTxO ${newGameResponse.player_utxo}`);

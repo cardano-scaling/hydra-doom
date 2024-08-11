@@ -657,6 +657,10 @@ td.animate::after {
   margin-bottom: 2rem;
 }
 
+.modal__inner-content {
+  position: relative;
+}
+
 .modal__content p {
   font-size: 2.5rem;
   margin-bottom: 1.5rem;
@@ -686,6 +690,27 @@ td.animate::after {
 
 .message a:hover {
   color: #ff2f2f;
+}
+
+.continent-form {
+  column-gap: 6rem;
+  display: grid;
+  font-size: 2rem;
+  grid-template-columns: 1fr 1fr;
+  margin: 5rem 0;
+  row-gap: 2rem;
+  text-align: start;
+}
+
+.continent-form input[type="radio"] {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.continent-form label {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
 }
 
 .mute-button {
@@ -730,7 +755,7 @@ td.animate::after {
   padding: 8px;
 }
 
-.qr-skip-button {
+.primary-button {
   align-items: center;
   background-color: transparent;
   background-image: url("../assets/images/play-doom-button.png");
@@ -747,7 +772,7 @@ td.animate::after {
   width: 359px;
 }
 
-.qr-skip-button::before {
+.primary-button::before {
   content: "";
   z-index: -1;
   position: absolute;
@@ -759,7 +784,7 @@ td.animate::after {
   pointer-events: none;
 }
 
-.qr-skip-button > span {
+.primary-button > span {
   margin-top: -0.4rem;
   font-family: "Pixelify Sans", monospace;
   text-transform: uppercase;
@@ -857,12 +882,12 @@ td.animate::after {
     max-width: 350px;
   }
 
-  .qr-skip-button {
+  .primary-button {
     width: 287px;
     height: 55px;
   }
 
-  .qr-skip-button span {
+  .primary-button span {
     font-size: 1.5rem;
   }
 }

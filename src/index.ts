@@ -7,6 +7,8 @@ import "./styles.css";
 declare function callMain(args: string[]): void;
 
 const startButton: HTMLButtonElement | null = document.querySelector("#start");
+const selectContinent: HTMLButtonElement | null =
+  document.querySelector("#select-continent");
 const qrContainer: HTMLElement | null = document.querySelector("#qr-container");
 const skipButton: HTMLElement | null = document.querySelector("#skip-button");
 const restartButton: HTMLElement | null =
@@ -20,6 +22,10 @@ const muteButton: HTMLButtonElement | null =
   document.querySelector("#mute-button");
 const muteIcon: HTMLElement | null = document.querySelector("#mute-icon");
 const leftColumn: HTMLElement | null = document.querySelector("#left-column");
+const continentForm: HTMLFormElement | null =
+  document.querySelector("#continent-form");
+const startGameButton: HTMLButtonElement | null =
+  document.querySelector("#start-game-button");
 
 // Stuff for POO
 const { sessionPk } = keys;
@@ -43,12 +49,21 @@ async function pollForPoo(ephemeralKey: string) {
 (window as any).hydraSend = hydraSend;
 (window as any).hydraRecv = hydraRecv;
 
-if (!!process.env.CABINET_KEY) {
+if (process.env.CABINET_KEY) {
   document.querySelectorAll(".js-cabinet-logos").forEach((element) => {
     const e = element as HTMLElement | null;
     if (e) e.style.display = "block";
   });
   leftColumn?.classList.add("left-column");
+}
+
+if (process.env.REGION) {
+  if (selectContinent) selectContinent.style.display = "none";
+  startButton?.addEventListener("click", async () => {
+    !!qrCode && !qrShown ? await showQrCode() : await startGame();
+  });
+} else {
+  if (startButton) startButton.style.display = "none";
 }
 
 const commonArgs = [
@@ -79,6 +94,7 @@ function shuffleArray(array: string[]) {
 
 let currentAudio: HTMLAudioElement | null = null;
 let isMuted = false;
+let selectedContinent = "us-east-2";
 
 // Load the mute state from local storage
 const savedMuteState = localStorage.getItem("isMuted");
@@ -127,8 +143,12 @@ muteButton?.addEventListener("click", () => {
   localStorage.setItem("isMuted", JSON.stringify(isMuted));
 });
 
-// Start a new game
-startButton?.addEventListener("click", async () => {
+// Start game with selected continent
+startGameButton?.addEventListener("click", async () => {
+  if (continentForm) {
+    const formData = new FormData(continentForm);
+    selectedContinent = formData.get("continent") as string;
+  }
   !!qrCode && !qrShown ? await showQrCode() : await startGame();
 });
 
@@ -166,7 +186,7 @@ async function startGame() {
   }
 
   try {
-    await fetchNewGame();
+    await fetchNewGame(selectedContinent);
 
     if (loadingMessage) loadingMessage.style.display = "none";
 
