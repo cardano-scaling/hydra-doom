@@ -151,13 +151,13 @@ type Cmd = {
   forwardMove: number;
   sideMove: number;
   angleTurn: number;
-  chatChar: Uint8Array;
-  buttons: Uint8Array;
-  buttons2: Uint8Array;
-  consistancy: Uint8Array;
+  chatChar: number;
+  buttons: number;
+  buttons2: number;
+  consistancy: number;
   inventory: number;
-  lookFly: Uint8Array;
-  arti: Uint8Array;
+  lookFly: number;
+  arti: number;
 };
 
 let cmdQueue: Cmd[] = [];
@@ -265,13 +265,13 @@ export function hydraRecv(): Cmd {
       forwardMove: 0,
       sideMove: 0,
       angleTurn: 0,
-      chatChar: new Uint8Array(0),
-      buttons: new Uint8Array(0),
-      buttons2: new Uint8Array(0),
-      consistancy: new Uint8Array(0),
+      chatChar: 0,
+      buttons: 0,
+      buttons2: 0,
+      consistancy: 0,
       inventory: 0,
-      lookFly: new Uint8Array(0),
-      arti: new Uint8Array(0),
+      lookFly: 0,
+      arti: 0,
     };
   }
   const cmd = cmdQueue.pop()!;
@@ -296,12 +296,29 @@ const encodeRedeemer = (cmds: Cmd[]): string => {
   return Data.to(
     new Constr(1, [
       cmds.map(
-        (cmd) =>
+        ({
+          forwardMove,
+          sideMove,
+          angleTurn,
+          chatChar,
+          buttons,
+          buttons2,
+          consistancy,
+          inventory,
+          lookFly,
+          arti,
+        }) =>
           new Constr(0, [
-            BigInt(cmd.forwardMove),
-            BigInt(cmd.sideMove),
-            BigInt(0),
-            [],
+            BigInt(forwardMove),
+            BigInt(sideMove),
+            BigInt(angleTurn),
+            BigInt(chatChar),
+            BigInt(buttons),
+            BigInt(buttons2),
+            BigInt(consistancy),
+            BigInt(inventory),
+            BigInt(lookFly),
+            BigInt(arti),
           ]),
       ),
     ]),
@@ -309,16 +326,22 @@ const encodeRedeemer = (cmds: Cmd[]): string => {
 };
 
 const decodeRedeemer = (redeemer: string): Cmd[] => {
-  console.log(redeemer);
   const cmds = (Data.from(redeemer) as Constr<Data>).fields[0] as Array<
     Constr<Data>
   >;
-  // TODO: return an array
   return cmds.map(
     (cmd) =>
       ({
         forwardMove: Number(cmd.fields[0]),
         sideMove: Number(cmd.fields[1]),
+        angleTurn: Number(cmd.fields[2]),
+        chatChar: Number(cmd.fields[3]),
+        buttons: Number(cmd.fields[4]),
+        buttons2: Number(cmd.fields[5]),
+        consistancy: Number(cmd.fields[6]),
+        inventory: Number(cmd.fields[7]),
+        lookFly: Number(cmd.fields[8]),
+        arti: Number(cmd.fields[9]),
       }) as Cmd,
   );
 };
