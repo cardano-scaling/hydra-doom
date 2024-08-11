@@ -27,12 +27,9 @@ export interface MabObject {
 }
 
 export interface Position {
-  momentumX: number;
-  momentumY: number;
-  momentumZ: number;
-  angle: number;
+  x: number;
+  y: number;
   z: number;
-  floorZ: number;
 }
 
 export enum PlayerState {
@@ -41,7 +38,10 @@ export enum PlayerState {
   REBORN,
 }
 
-export const initialGameData = (ownerKey: string, adminKey: string) => ({
+export const initialGameData = (
+  ownerKey: string,
+  adminKey: string,
+): GameData => ({
   isOver: false,
   owner: ownerKey,
   admin: adminKey,
@@ -49,12 +49,9 @@ export const initialGameData = (ownerKey: string, adminKey: string) => ({
     playerState: PlayerState.LIVE,
     mapObject: {
       position: {
-        momentumX: 0,
-        momentumY: 0,
-        momentumZ: 0,
-        angle: 0,
+        x: 0,
+        y: 0,
         z: 0,
-        floorZ: 0,
       },
       health: 100,
     },
@@ -128,12 +125,9 @@ const encodeMapObject = (mapObject: MabObject) => {
 
 const encodePosition = (position: Position) => {
   return new Constr(0, [
-    BigInt(position.momentumX),
-    BigInt(position.momentumY),
-    BigInt(position.momentumZ),
-    BigInt(position.angle),
+    BigInt(position.x),
+    BigInt(position.y),
     BigInt(position.z),
-    BigInt(position.floorZ),
   ]);
 };
 

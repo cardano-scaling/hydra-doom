@@ -259,7 +259,7 @@ const buildCollateralInput = (txHash: string, txIx: number) => {
 };
 
 const encodeRedeemer = (cmd: Cmd): string => {
-  return Data.to(
+  return Data.to([
     new Constr(1, [
       new Constr(0, [
         BigInt(cmd.forwardMove),
@@ -268,7 +268,7 @@ const encodeRedeemer = (cmd: Cmd): string => {
         [],
       ]),
     ]),
-  );
+  ]);
 };
 
 const decodeRedeemer = (redeemer: string): Cmd => {
