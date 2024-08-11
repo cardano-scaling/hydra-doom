@@ -81,6 +81,7 @@ export async function fetchNewGame(region: string) {
     };
     // TODO: protocol from host
     const protocol = gameServerUrl.startsWith("https") ? "https" : "http";
+
     hydra = new Hydra(`${protocol}://${node}`, 100);
     await hydra.populateUTxO();
     hydra.onTxSeen = (_txId, tx) => {
@@ -259,16 +260,18 @@ const buildCollateralInput = (txHash: string, txIx: number) => {
 };
 
 const encodeRedeemer = (cmd: Cmd): string => {
-  return Data.to([
+  return Data.to(
     new Constr(1, [
-      new Constr(0, [
-        BigInt(cmd.forwardMove),
-        BigInt(cmd.sideMove),
-        BigInt(0),
-        [],
-      ]),
+      [
+        new Constr(0, [
+          BigInt(cmd.forwardMove),
+          BigInt(cmd.sideMove),
+          BigInt(0),
+          [],
+        ]),
+      ],
     ]),
-  ]);
+  );
 };
 
 const decodeRedeemer = (redeemer: string): Cmd => {
