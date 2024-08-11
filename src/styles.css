@@ -313,14 +313,14 @@ main {
 .logos {
   align-items: center;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   font-size: 0;
-  gap: 18px;
-  left: 20px;
-  min-width: 100px;
+  gap: 24px;
+  justify-content: center;
+  left: 60px;
   position: absolute;
   top: 65px;
-  width: max-content;
+  width: 230px;
   z-index: 4;
 }
 
@@ -355,14 +355,11 @@ main {
   width: 100%;
 }
 
-.left-column {
-  margin-top: 230px;
-}
-
 @media (max-width: 1600px) {
   .logos {
-    top: 40px;
+    gap: 20px;
     left: 20px;
+    top: 40px;
   }
 
   .logos img {
@@ -378,12 +375,12 @@ main {
     width: 100%;
   }
 
-  .popup-logo img {
-    width: 100%;
+  .popup-logo {
+    width: 85px;
   }
 
-  .left-column {
-    margin-top: 170px;
+  .popup-logo img {
+    width: 100%;
   }
 }
 
@@ -1034,10 +1031,6 @@ td.animate::after {
 }
 
 /* Game Slot */
-
-.game-slot-container {
-  min-height: 770px;
-}
 
 .game-slot {
   aspect-ratio: 1028/805;

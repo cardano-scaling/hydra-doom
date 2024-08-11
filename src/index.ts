@@ -21,7 +21,6 @@ const loadingMessage: HTMLElement | null =
 const muteButton: HTMLButtonElement | null =
   document.querySelector("#mute-button");
 const muteIcon: HTMLElement | null = document.querySelector("#mute-icon");
-const leftColumn: HTMLElement | null = document.querySelector("#left-column");
 const continentForm: HTMLFormElement | null =
   document.querySelector("#continent-form");
 const startGameButton: HTMLButtonElement | null =
@@ -54,7 +53,6 @@ if (process.env.CABINET_KEY) {
     const e = element as HTMLElement | null;
     if (e) e.style.display = "block";
   });
-  leftColumn?.classList.add("left-column");
 }
 
 if (process.env.REGION) {
