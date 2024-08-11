@@ -52,9 +52,9 @@ let gameData: GameData;
 let sessionStats = {
   transactions: 0,
   bytes: 0,
-  kills: 0,
-  items: 0,
-  secrets: 0,
+  total_kills: 0,
+  total_items: 0,
+  total_secrets: 0,
   total_play_time: 0,
 };
 
@@ -77,15 +77,15 @@ export async function fetchNewGame(region: string) {
     sessionStats = {
       transactions: 0,
       bytes: 0,
-      kills: 0,
-      items: 0,
-      secrets: 0,
+      total_kills: 0,
+      total_items: 0,
+      total_secrets: 0,
       total_play_time: 0,
     };
     // TODO: protocol from host
     const protocol = gameServerUrl.startsWith("https") ? "https" : "http";
 
-    hydra = new Hydra(`${protocol}://${node}`, 100);
+    hydra = new Hydra(`https://${node}`, 100);
     await hydra.populateUTxO();
     hydra.onTxSeen = (_txId, tx) => {
       const redeemer: Uint8Array | undefined = tx.txComplete
@@ -99,7 +99,7 @@ export async function fetchNewGame(region: string) {
       }
       const cmds = decodeRedeemer(toHex(redeemer));
       cmds.forEach((cmd) => {
-        cmdQueue.push(cmd);
+        false && cmdQueue.push(cmd);
         // append some representation of the tx into the UI
         appendTx(cmd);
         if (cmdQueue.length > 1000) {
@@ -246,9 +246,9 @@ export async function hydraSend(
 
     sessionStats.transactions++;
     sessionStats.bytes += tx.txSigned.to_bytes().length;
-    sessionStats.kills = gameData.player.totalStats.killCount;
-    sessionStats.items = gameData.player.totalStats.itemCount;
-    sessionStats.secrets = gameData.player.totalStats.secretCount;
+    sessionStats.total_kills = gameData.player.totalStats.killCount;
+    sessionStats.total_items = gameData.player.totalStats.itemCount;
+    sessionStats.total_secrets = gameData.player.totalStats.secretCount;
     sessionStats.total_play_time = gameData.leveltime.reduce(
       (acc, curr) => acc + curr,
       0,

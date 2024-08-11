@@ -35,8 +35,7 @@ session = {
   secrets: document.querySelector("#session-secrets"),
   playTime: document.querySelector("#session-play-time"),
 };
-const txPreview: HTMLTableElement | null =
-  document.querySelector("#tx-details");
+const txPreview: HTMLTableElement | null = document.querySelector("#tx-details");
 let gameServerUrl = process.env.SERVER_URL;
 if (!gameServerUrl) {
   gameServerUrl = "http://localhost:8000";
@@ -81,15 +80,27 @@ export function updateUI(elements: any, data: any) {
       elements.bytes.innerText = new Intl.NumberFormat("en").format(data.bytes);
     }
   }
-  if (elements.kills && data.kills !== undefined) {
-    elements.kills.innerText = new Intl.NumberFormat("en").format(data.kills);
+  if (elements.kills && data.total_kills !== undefined) {
+    let kills = data.total_kills;
+    for (const player in data.kills ?? []) {
+      kills += data.kills[player];
+    }
+    elements.kills.innerText = new Intl.NumberFormat("en").format(kills);
   }
-  if (elements.items && data.items !== undefined) {
-    elements.items.innerText = new Intl.NumberFormat("en").format(data.items);
+  if (elements.items && data.total_items !== undefined) {
+    let items = data.total_items;
+    for (const player in data.items ?? []) {
+      items += data.items[player];
+    }
+    elements.items.innerText = new Intl.NumberFormat("en").format(items);
   }
-  if (elements.secrets && data.secrets !== undefined) {
+  if (elements.secrets && data.total_secrets !== undefined) {
+    let secrets = data.total_secrets;
+    for (const player in data.secrets ?? []) {
+      secrets += data.secrets[player];
+    }
     elements.secrets.innerText = new Intl.NumberFormat("en").format(
-      data.secrets,
+      secrets,
     );
   }
   if (elements.playTime && data.total_play_time !== undefined) {
