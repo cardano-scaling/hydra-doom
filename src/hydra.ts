@@ -342,11 +342,11 @@ function hydraUtxoToLucidUtxo(txHash: TxHash, idx: number, output: any): UTxO {
     : output.inlineDatum?.Data?.original;
   const assets = output.amount
     ? {
-        lovelace: output.amount.coin ?? 0n,
+        lovelace: BigInt(output.amount.coin ?? 0n),
         ...output.amount.multiasset,
       }
     : {
-        lovelace: output.value.lovelace ?? 0n,
+        lovelace: BigInt(output.value.lovelace ?? 0n),
       };
   return {
     address: output.address,
