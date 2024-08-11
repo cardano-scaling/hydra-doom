@@ -51,14 +51,14 @@
           buildPhase = ''
             ln -s ${nodeModules}/libexec/hydra-doom/node_modules node_modules
             ln -sf ${wadFile} assets/doom1.wad
-            ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
-            ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm assets/websockets-doom.wasm
-            ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
+            #ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
+            #ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm assets/websockets-doom.wasm
+            #ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
 
             cat > .env << EOF
             SERVER_URL=${serverUrl}
             ${lib.optionalString (cabinetKey != "") "CABINET_KEY=${cabinetKey}"}
-            ${lib.optionalString (serverUrl == "http://127.0.0.1:8000") "REGION=us-west-2"}
+            ${lib.optionalString (serverUrl == "http://127.0.0.1:8000" || cabinetKey != "") "REGION=us-west-2"}
             EOF
             yarn build
           '';
