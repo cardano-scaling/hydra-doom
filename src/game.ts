@@ -56,10 +56,13 @@ let sessionStats = {
 };
 
 export async function fetchNewGame(region: string) {
+  if (!gameServerUrl) {
+    throw new Error("No game server URL configured");
+  }
   try {
     console.log(`Starting new game for ${address}`);
     const response = await fetch(
-      `${gameServerUrl}/new_game?address=${address}&region=${process.env.REGION ?? region}&reserved=${!!process.env.CABINET_KEY}`
+      `${gameServerUrl}/new_game?address=${address}&region=${process.env.REGION ?? region}&reserved=${!!process.env.CABINET_KEY}`,
     );
     const newGameResponse = await response.json();
     console.log(`New game successful with UTxO ${newGameResponse.player_utxo}`);
@@ -77,7 +80,8 @@ export async function fetchNewGame(region: string) {
       total_play_time: 0,
     };
     // TODO: protocol from host
-    hydra = new Hydra(`https://${node}`, 100);
+    const protocol = gameServerUrl.startsWith("https") ? "https" : "http";
+    hydra = new Hydra(`${protocol}://${node}`, 100);
     await hydra.populateUTxO();
     hydra.onTxSeen = (_txId, tx) => {
       const redeemer: Uint8Array | undefined = tx.txComplete
