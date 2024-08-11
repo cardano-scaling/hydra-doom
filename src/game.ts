@@ -85,7 +85,7 @@ export async function fetchNewGame(region: string) {
     // TODO: protocol from host
     const protocol = gameServerUrl.startsWith("https") ? "https" : "http";
 
-    hydra = new Hydra(`https://${node}`, 100);
+    hydra = new Hydra(`${protocol}://${node}`, 100);
     await hydra.populateUTxO();
     hydra.onTxSeen = (_txId, tx) => {
       const redeemer: Uint8Array | undefined = tx.txComplete
