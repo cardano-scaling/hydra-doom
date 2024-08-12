@@ -29,6 +29,7 @@ const tabButtons = document.querySelectorAll(".js-tab-button");
 
 // Stuff for POO
 const { sessionPk, sessionPkh } = keys;
+let pollingInterval: any = undefined;
 let qrCode = await generatePooQrUri();
 let qrShown = false;
 
@@ -43,7 +44,7 @@ async function pollForPoo(ephemeralKeyHash: string) {
     return;
   }
 
-  setTimeout(() => pollForPoo(ephemeralKeyHash), 5000);
+  pollingInterval = setTimeout(() => pollForPoo(ephemeralKeyHash), 5000);
 }
 // Glue together callbacks available from doom-wasm
 (window as any).hydraSend = hydraSend;
@@ -168,6 +169,7 @@ startGameButton?.addEventListener("click", async () => {
 
 // Skip QR code
 skipButton?.addEventListener("click", () => {
+  clearInterval(pollingInterval);
   startGame();
 });
 
