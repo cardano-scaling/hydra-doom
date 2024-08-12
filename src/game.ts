@@ -196,6 +196,7 @@ export async function hydraSend(
   }
 
   let hydraSendStart = performance.now();
+  gameData.level = level;
 
   if (!level.demoplayback) {
     gameData.player = {
@@ -211,8 +212,6 @@ export async function hydraSend(
     }
 
     gameData.leveltime[0] = leveltime;
-
-    gameData.level = level;
   }
   // TODO: the latestUTxO should be fetched from the script address, filtering by admin in datum.
   if (latestUTxO == null) {
