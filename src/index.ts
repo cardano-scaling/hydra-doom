@@ -25,6 +25,7 @@ const continentForm: HTMLFormElement | null =
   document.querySelector("#continent-form");
 const startGameButton: HTMLButtonElement | null =
   document.querySelector("#start-game-button");
+const tabButtons = document.querySelectorAll(".js-tab-button");
 
 // Stuff for POO
 const { sessionPk } = keys;
@@ -63,6 +64,20 @@ if (process.env.REGION) {
 } else {
   if (startButton) startButton.style.display = "none";
 }
+
+tabButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const tab = button.getAttribute("data-tab");
+    document.querySelectorAll(".js-tab-content").forEach((content) => {
+      content.classList.remove("active");
+    });
+    document.querySelectorAll(".js-tab-button").forEach((content) => {
+      content.classList.remove("active");
+    });
+    if (tab) document.getElementById(tab)?.classList.add("active");
+    if (tab) document.getElementById(`tab-${tab}`)?.classList.add("active");
+  });
+});
 
 const commonArgs = [
   "-iwad",

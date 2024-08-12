@@ -276,6 +276,11 @@
                   How it works
                 </button>
               </li>
+              <li>
+                <button data-modal-target="modal-leaderboard">
+                  Leaderboard
+                </button>
+              </li>
             </ul>
           </nav>
           <button id="mute-button" class="mute-button">
@@ -731,6 +736,128 @@
                     >
                       <span>Start Game</span>
                     </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-leaderboard" class="modal" role="dialog">
+      <div class="modal__outer-container">
+        <div class="modal__container">
+          <div class="modal__outer-border">
+            <div class="modal__top-left-bar"></div>
+            <div class="modal__top-right-bar"></div>
+            <div class="modal__bottom-left-bar"></div>
+            <div class="modal__bottom-right-bar"></div>
+            <div class="modal__mid-gradient">
+              <div class="modal__inner-border">
+                <div class="modal__content">
+                  <button
+                    type="button"
+                    class="modal__close-btn"
+                    data-modal-close
+                    aria-label="Close modal"
+                  >
+                    X
+                  </button>
+                  <div class="modal__inner-content">
+                    <h1>Leaderboard</h1>
+                    <div class="tabs">
+                      <button
+                        class="js-tab-button tab-button active"
+                        data-tab="current"
+                        id="tab-current"
+                      >
+                        Current
+                      </button>
+                      <button
+                        class="js-tab-button tab-button"
+                        data-tab="all-time"
+                        id="tab-all-time"
+                      >
+                        All Time
+                      </button>
+                    </div>
+                    <div class="js-tab-content tab-content active" id="current">
+                      <div>
+                        <h3>Kills</h3>
+                        <table
+                          id="current-kills-leaderboard"
+                          class="leaderboard"
+                        >
+                          <tr>
+                            <th>Player</th>
+                            <th>Score</th>
+                          </tr>
+                        </table>
+                      </div>
+                      <div>
+                        <h3>Items</h3>
+                        <table
+                          id="current-items-leaderboard"
+                          class="leaderboard"
+                        >
+                          <tr>
+                            <th>Player</th>
+                            <th>Score</th>
+                          </tr>
+                        </table>
+                      </div>
+                      <div>
+                        <h3>Secrets</h3>
+                        <table
+                          id="current-secrets-leaderboard"
+                          class="leaderboard"
+                        >
+                          <tr>
+                            <th>Player</th>
+                            <th>Score</th>
+                          </tr>
+                        </table>
+                      </div>
+                    </div>
+                    <div class="js-tab-content tab-content" id="all-time">
+                      <div>
+                        <h3>Kills</h3>
+                        <table
+                          id="all-time-kills-leaderboard"
+                          class="leaderboard"
+                        >
+                          <tr>
+                            <th>Player</th>
+                            <th>Score</th>
+                          </tr>
+                        </table>
+                      </div>
+                      <div>
+                        <h3>Items</h3>
+                        <table
+                          id="all-time-items-leaderboard"
+                          class="leaderboard"
+                        >
+                          <tr>
+                            <th>Player</th>
+                            <th>Score</th>
+                          </tr>
+                        </table>
+                      </div>
+                      <div>
+                        <h3>Secrets</h3>
+                        <table
+                          id="all-time-secrets-leaderboard"
+                          class="leaderboard"
+                        >
+                          <tr>
+                            <th>Player</th>
+                            <th>Score</th>
+                          </tr>
+                        </table>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

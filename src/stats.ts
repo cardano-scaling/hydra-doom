@@ -1,4 +1,5 @@
-import { setGlobalSpeedometerValue } from './speedometer';
+import { setGlobalSpeedometerValue } from "./speedometer";
+import { GameStatistics, LeaderboardEntry, PlayerStats } from "./types";
 let global: {
   games: HTMLDataListElement | null;
   gamesActive: HTMLDataListElement | null;
@@ -35,12 +36,13 @@ session = {
   secrets: document.querySelector("#session-secrets"),
   playTime: document.querySelector("#session-play-time"),
 };
-const txPreview: HTMLTableElement | null = document.querySelector("#tx-details");
+const txPreview: HTMLTableElement | null =
+  document.querySelector("#tx-details");
 let gameServerUrl = process.env.SERVER_URL;
 if (!gameServerUrl) {
   gameServerUrl = "http://localhost:8000";
   console.warn(
-    `Defaulting SERVER_URL to ${gameServerUrl}, use .env to configure`,
+    `Defaulting SERVER_URL to ${gameServerUrl}, use .env to configure`
   );
 }
 
@@ -51,12 +53,12 @@ let last_query: any;
 export function updateUI(elements: any, data: any) {
   if (elements.games && data.total_games !== undefined) {
     elements.games.innerText = new Intl.NumberFormat("en").format(
-      data.total_games,
+      data.total_games
     );
   }
   if (elements.gamesActive && data.active_games !== undefined) {
     elements.gamesActive.innerText = new Intl.NumberFormat("en").format(
-      data.active_games,
+      data.active_games
     );
   }
 
@@ -69,7 +71,7 @@ export function updateUI(elements: any, data: any) {
       elements.txs.style.setProperty("--num", data.transactions);
     } else {
       elements.txs.innerText = new Intl.NumberFormat("en").format(
-        data.transactions,
+        data.transactions
       );
     }
   }
@@ -99,9 +101,7 @@ export function updateUI(elements: any, data: any) {
     for (const player in data.secrets ?? []) {
       secrets += data.secrets[player];
     }
-    elements.secrets.innerText = new Intl.NumberFormat("en").format(
-      secrets,
-    );
+    elements.secrets.innerText = new Intl.NumberFormat("en").format(secrets);
   }
   if (elements.playTime && data.total_play_time !== undefined) {
     let total_play_time = data.total_play_time;
@@ -111,7 +111,7 @@ export function updateUI(elements: any, data: any) {
       }
     }
     elements.playTime.innerText = formatPlayTime(
-      total_play_time / TIC_RATE_MAGIC,
+      total_play_time / TIC_RATE_MAGIC
     );
   }
 }
@@ -138,6 +138,90 @@ export function appendTx(cmd: any) {
   }
 }
 
+function truncateString(
+  str: string,
+  frontLen: number,
+  backLen: number
+): string {
+  if (str.length <= frontLen + backLen) {
+    return str;
+  }
+  return `${str.substring(0, frontLen)}...${str.substring(str.length - backLen)}`;
+}
+
+function populateAllTimeTable(
+  table: HTMLTableElement,
+  leaderboard: LeaderboardEntry[]
+) {
+  // Clear existing rows
+  while (table.rows.length > 1) {
+    table.deleteRow(1);
+  }
+
+  // Filter out entries with a score of 0
+  const filteredLeaderboard = leaderboard.filter(([, score]) => score > 0);
+
+  filteredLeaderboard.forEach(([player, score]) => {
+    const row = table.insertRow();
+    const playerCell = row.insertCell(0);
+    const scoreCell = row.insertCell(1);
+    playerCell.innerText = truncateString(player, 7, 7);
+    scoreCell.innerText = score.toString();
+  });
+}
+
+function populateCurrentTable(table: HTMLTableElement, current: PlayerStats) {
+  // Clear existing rows
+  while (table.rows.length > 1) {
+    table.deleteRow(1);
+  }
+
+  // Convert the current object to an array of entries, filter out entries with a score of 0, and sort by score in descending order
+  const sortedEntries = Object.entries(current)
+    .filter(([, score]) => score > 0)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 10);
+
+  sortedEntries.forEach(([player, score]) => {
+    const row = table.insertRow();
+    const playerCell = row.insertCell(0);
+    const scoreCell = row.insertCell(1);
+    playerCell.innerText = truncateString(player, 7, 7);
+    scoreCell.innerText = score.toString();
+  });
+}
+
+function updateLeaderboard(data: GameStatistics) {
+  const currentKillsTable = document.getElementById(
+    "current-kills-leaderboard"
+  ) as HTMLTableElement;
+  const currentItemsTable = document.getElementById(
+    "current-items-leaderboard"
+  ) as HTMLTableElement;
+  const currentSecretsTable = document.getElementById(
+    "current-secrets-leaderboard"
+  ) as HTMLTableElement;
+  const allKillsTable = document.getElementById(
+    "all-time-kills-leaderboard"
+  ) as HTMLTableElement;
+  const allTimeItemsTable = document.getElementById(
+    "all-time-items-leaderboard"
+  ) as HTMLTableElement;
+  const allTimeSecretsTable = document.getElementById(
+    "all-time-secrets-leaderboard"
+  ) as HTMLTableElement;
+
+  // Populate current tables with kills, items, and secrets
+  populateCurrentTable(currentKillsTable, data.kills);
+  populateCurrentTable(currentItemsTable, data.items);
+  populateCurrentTable(currentSecretsTable, data.secrets);
+
+  // Populate all-time tables with kills_leaderboard, items_leaderboard, and secrets_leaderboard
+  populateAllTimeTable(allKillsTable, data.kills_leaderboard);
+  populateAllTimeTable(allTimeItemsTable, data.items_leaderboard);
+  populateAllTimeTable(allTimeSecretsTable, data.secrets_leaderboard);
+}
+
 // Function to fetch data from the API
 async function fetchData() {
   try {
@@ -145,8 +229,9 @@ async function fetchData() {
     if (!response.ok) {
       throw new Error("Network response was not ok " + response.statusText);
     }
-    const data = await response.json();
+    const data: GameStatistics = await response.json();
     updateUI(global, data);
+    updateLeaderboard(data);
   } catch (error) {
     console.error("Fetch error: ", error);
   }
