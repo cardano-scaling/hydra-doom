@@ -187,7 +187,6 @@ export async function hydraSend(
     return;
   }
 
-  console.log(leveltime, gameData.leveltime);
   if (!level.demoplayback) {
     gameData.player = {
       ...player,
@@ -236,7 +235,7 @@ export async function hydraSend(
 
   redeemerQueue.push(cmd);
 
-  if (frameNumber % 8 !== 0 && frameNumber % 2 == 0) {
+  if (frameNumber % 4 == 0) {
     const [newUtxo, tx] = await buildTx(
       latestUTxO!,
       encodeRedeemer(redeemerQueue),
