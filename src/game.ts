@@ -271,15 +271,13 @@ export async function hydraSend(
     await hydra.submitTx(tx.toString());
     latestUTxO = newUtxo;
     redeemerQueue = [];
-    console.log(
-      `submitted ${tx.toHash()}, took ${performance.now() - hydraSendStart}ms`,
-    );
+    // console.log(`submitted ${tx.toHash()}, took ${performance.now() - hydraSendStart}ms`);
   }
   frameNumber++;
 }
 
 export function hydraRecv(): Cmd {
-  console.log("hydraRecv", cmdQueue.length);
+  // console.log("hydraRecv", cmdQueue.length);
   if (cmdQueue.length == 0) {
     return {
       forwardMove: 0,

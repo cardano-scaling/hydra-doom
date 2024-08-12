@@ -97,7 +97,7 @@ export class Hydra {
           if (this.tx_timings[txid]?.sent) {
             const seenTime = now - this.tx_timings[txid].sent;
             this.tx_timings[txid].seen = seenTime;
-            console.log(`seen ${txid} after ${seenTime}ms`);
+            // console.log(`seen ${txid} after ${seenTime}ms`);
           }
           const tx = tx_parser.fromTx(data.transaction.cborHex);
           for (const input of tx.txComplete.body().inputs().to_js_value()) {
@@ -133,11 +133,7 @@ export class Hydra {
         break;
       case "SnapshotConfirmed":
         {
-          console.log(
-            "SnapshotConfirmed",
-            data.snapshot.snapshotNumber,
-            data.snapshot.confirmedTransactions.length,
-          );
+          // console.log("SnapshotConfirmed", data.snapshot.snapshotNumber, data.snapshot.confirmedTransactions.length);
           for (const txid of data.snapshot.confirmedTransactions) {
             if (!this.tx_timings[txid]?.sent) {
               continue;
@@ -145,7 +141,7 @@ export class Hydra {
             const confirmationTime = now - this.tx_timings[txid].sent;
             this.tx_timings[txid].confirmed = confirmationTime;
             this.onTxConfirmed?.(txid);
-            console.log(`confirmed ${txid} after ${confirmationTime}ms`);
+            // console.log(`confirmed ${txid} after ${confirmationTime}ms`);
           }
         }
         break;
