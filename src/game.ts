@@ -51,6 +51,7 @@ let player_pkh: string;
 let node = window.localStorage.getItem("hydra-doom-session-node");
 let scriptRef = window.localStorage.getItem("hydra-doom-session-ref");
 let gameData: GameData;
+let stop = false;
 
 let sessionStats = {
   transactions: 0,
@@ -106,26 +107,36 @@ export async function fetchNewGame(region: string) {
         // append some representation of the tx into the UI
         appendTx(cmd);
         if (cmdQueue.length > 1000) {
-          console.warn(
-            "Command queue grows big, should cleanup",
-            cmdQueue.length,
-          );
+          console.warn("Command queue grew big, purging 100 entries");
+          cmdQueue = cmdQueue.slice(-100);
         }
       });
     };
-    hydra.onTxConfirmed = () => {
+    hydra.onTxSeen = (txId) => {
+      console.log("seen", txId);
+    };
+    hydra.onTxSeen = (txId) => {
+      console.log("seen", txId);
+    };
+    hydra.onTxConfirmed = (txId) => {
+      console.log("confirmed", txId);
+      // XXX: TPS only computed when tx confirmed -> does not go to 0 after some time
       const now = performance.now();
       let tps = 0;
       for (const txid in hydra!.tx_timings) {
-        const timing = hydra!.tx_timings[txid];
-        const confirm_time = timing.sent + (timing?.confirmed ?? 0);
-        if (hydra!.tx_timings[txid]?.confirmed && confirm_time > now - 1000) {
+        const timing = hydra!.tx_timings[txid]!;
+        if (timing.confirmed && timing.sent + timing.confirmed > now - 1000) {
           tps++;
         }
       }
+      // console.log("confirmed tps", tps);
       setLocalSpeedometerValue(tps);
     };
-    hydra.startEventLoop();
+    hydra.onTxInvalid = (txId) => {
+      console.error("invalid", txId);
+      setLocalSpeedometerValue(0);
+      stop = true;
+    };
     latestUTxO = await hydra.awaitUtxo(newGameResponse.player_utxo, 5000);
     // HACK: until hydra returns the datum bytes, all the datum bytes will be wrong
     // so we return it from the newGameResponse and set it manually here
@@ -189,12 +200,14 @@ export async function hydraSend(
   leveltime: number,
   level: LevelId,
 ) {
+  if (stop) throw new Error("stop");
+
   if (!gameData || !hydra) throw new Error("Game data not initialized");
 
   if (gameState != GameState.GS_LEVEL) {
     return;
   }
-
+  // console.log("hydraSend", cmd);
   let hydraSendStart = performance.now();
   gameData.level = level;
 
@@ -244,7 +257,7 @@ export async function hydraSend(
 
   redeemerQueue.push(cmd);
 
-  if (frameNumber % 4 == 0) {
+  if (frameNumber % 1 == 0) {
     const [newUtxo, tx] = await buildTx(
       latestUTxO!,
       encodeRedeemer(redeemerQueue),
@@ -263,7 +276,7 @@ export async function hydraSend(
     );
     updateUI(session, sessionStats);
 
-    hydra.queueTx(tx.toString(), tx.toHash());
+    await hydra.submitTx(tx.toString());
     latestUTxO = newUtxo;
     redeemerQueue = [];
     console.log(
@@ -274,6 +287,7 @@ export async function hydraSend(
 }
 
 export function hydraRecv(): Cmd {
+  console.log("hydraRecv", cmdQueue.length);
   if (cmdQueue.length == 0) {
     return {
       forwardMove: 0,

@@ -20,9 +20,13 @@ const tx_parser = await Lucid.new(undefined, "Preprod");
 const utils = new Utils(tx_parser);
 
 export interface TransactionTiming {
+  // Monotonic time when sent
   sent: number;
+  // Milliseconds after sent when seen as valid
   seen?: number;
+  // Milliseconds after sent when seen as invalid
   invalid?: number;
+  // Milliseconds after sent when confirmed
   confirmed?: number;
 }
 
@@ -80,58 +84,6 @@ export class Hydra {
     }
   }
 
-  public async startEventLoop() {
-    if (this.interval) {
-      return;
-    }
-    this.interval = setInterval(async () => await this.sendMessages());
-  }
-
-  async sendMessages() {
-    const now = performance.now();
-    while (true) {
-      if (this.outbound_transactions.length === 0) {
-        return;
-      }
-      const [next_tx, next_tx_id] = this.outbound_transactions[0];
-      if (!this.tx_timings[next_tx_id]) {
-        // If this transaction hasn't been sent, send it
-        this.tx_count++;
-        this.tx_timings[next_tx_id] = {
-          sent: now,
-        };
-        this.connection.send(
-          JSON.stringify({
-            tag: "NewTx",
-            transaction: {
-              type: "Tx BabbageEra",
-              cborHex: next_tx,
-            },
-          }),
-        );
-        // We don't want to risk sending another tx until that one is seen,
-        // so we return here and do things on the next scheduled event loop
-        return;
-      } else if (
-        this.tx_timings[next_tx_id].seen ||
-        this.tx_timings[next_tx_id].invalid
-      ) {
-        // This transaction was either invalid or seen, so we can shift it off the outbound transactions;
-        this.outbound_transactions.shift();
-        // we can try to submit the next tx, so we can continue to the next one
-        continue;
-      } else if (this.tx_timings[next_tx_id]?.seen ?? now < now - 500) {
-        // We have been waiting a half second for this tx to be seen, so log a warning
-        console.warn(`Transaction not confirmed within 500ms: ${next_tx_id}`);
-        this.outbound_transactions.shift();
-        continue;
-      } else {
-        // We haven't seen it confirmed yet, so lets exit and wait for the next event loop
-        return;
-      }
-    }
-  }
-
   async receiveMessage(message: MessageEvent) {
     const now = performance.now();
     const data = JSON.parse(message.data);
@@ -168,6 +120,7 @@ export class Hydra {
         break;
       case "TxInvalid":
         {
+          console.error("TxInvalid", data);
           const txid = data.transaction.txId;
           if (this.tx_timings[txid]?.sent) {
             const invTime = now - this.tx_timings[txid].sent;
@@ -178,6 +131,7 @@ export class Hydra {
         break;
       case "SnapshotConfirmed":
         {
+          console.log("SnapshotConfirmed", data.snapshot.number);
           for (const txid of data.snapshot.confirmedTransactions) {
             if (!this.tx_timings[txid]?.sent) {
               continue;
@@ -227,19 +181,35 @@ export class Hydra {
     };
   }
 
-  public queueTx(tx: Transaction, txId: TxHash) {
-    this.outbound_transactions.push([tx, txId]);
-    if (this.outbound_transactions.length > this.queue_length) {
-      console.warn(
-        `Outbound transaction queue (${this.outbound_transactions.length}) is above configured threshold (${this.queue_length})`,
-      );
-    }
-  }
   public async submitTx(tx: Transaction): Promise<string> {
     const txParsed = tx_parser.fromTx(tx);
     const txId = txParsed.toHash();
-    this.queueTx(tx, txId);
-    await this.awaitTx(txId);
+    this.tx_timings[txId] = { sent: performance.now() };
+    this.connection.send(
+      JSON.stringify({
+        tag: "NewTx",
+        transaction: {
+          type: "Tx BabbageEra",
+          cborHex: tx,
+        },
+      }),
+    );
+    // FIXME: As we chain transactions, at some point we start seeing errors
+    // when spent txins are not there yet. The following block can be used to
+    // work around that, but obviously reduces performance to the network
+    // roundtrip.
+    //
+    // return new Promise((res, rej) => {
+    //   const interval = setInterval(() => {
+    //     if (this.tx_timings[txId]?.invalid) {
+    //       clearInterval(interval);
+    //       rej(txId);
+    //     } else if (this.tx_timings[txId]?.seen) {
+    //       clearInterval(interval);
+    //       res(txId);
+    //     }
+    //   }, 10);
+    // });
     return txId;
   }
   public async awaitTx(txId: TxHash, checkInterval?: number): Promise<boolean> {
