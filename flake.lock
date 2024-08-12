@@ -4763,11 +4763,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1723475127,
-        "narHash": "sha256-+kJI6Owgf0KSMxW1TmBNlWL3Ic3zVzs+h9Oxg9M5WK8=",
+        "lastModified": 1723483529,
+        "narHash": "sha256-3vdAUoDUiKzF2siMDvV4R/J9RKXeLxGVbXzc+e1Hqsc=",
         "owner": "input-output-hk",
         "repo": "hydra",
-        "rev": "f9065ed717ecd770548b3b66398e13f791818608",
+        "rev": "69f4f93e3d0631b49c19119acb7e9b117963c1f8",
         "type": "github"
       },
       "original": {
