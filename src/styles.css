@@ -656,6 +656,7 @@ td.animate::after {
 
 .modal__inner-content {
   position: relative;
+  width: 100%;
 }
 
 .modal__content p {
@@ -1142,4 +1143,70 @@ td.animate::after {
   height: 10px;
   margin-right: 0.5rem;
   background-color: #ccac25;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 2px solid #ddd;
+  margin-bottom: 20px;
+}
+
+.tab-button {
+  background-color: transparent;
+  border-bottom: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  flex: 1;
+  font-family: inherit;
+  font-size: 1.8rem;
+  padding: 10px;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.tab-button:hover {
+  background-color: rgba(255, 255, 29, 0.1);
+}
+
+.tab-button.active {
+  background-color: #fffb24;
+  color: #000;
+}
+
+.tab-content {
+  display: none;
+  gap: 2rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding-top: 2rem;
+}
+
+.tab-content h3 {
+  font-size: 1.7rem;
+  margin-bottom: 20px;
+}
+
+.tab-content.active {
+  display: grid;
+}
+
+/* Leaderboard Table Styles */
+table.leaderboard {
+  border-collapse: collapse;
+  font-size: 18px;
+  text-align: left;
+  text-shadow: none;
+  width: 100%;
+}
+
+table.leaderboard th,
+table.leaderboard td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+}
+
+table.leaderboard th {
+  text-align: center;
+  background-color: #ff2f2f;
+  font-size: 1.3rem;
 }
