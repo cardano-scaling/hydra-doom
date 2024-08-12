@@ -112,12 +112,6 @@ export async function fetchNewGame(region: string) {
         }
       });
     };
-    hydra.onTxSeen = (txId) => {
-      console.log("seen", txId);
-    };
-    hydra.onTxSeen = (txId) => {
-      console.log("seen", txId);
-    };
     hydra.onTxConfirmed = (txId) => {
       console.log("confirmed", txId);
       // XXX: TPS only computed when tx confirmed -> does not go to 0 after some time
@@ -129,7 +123,7 @@ export async function fetchNewGame(region: string) {
           tps++;
         }
       }
-      // console.log("confirmed tps", tps);
+      console.log("confirmed tps", tps);
       setLocalSpeedometerValue(tps);
     };
     hydra.onTxInvalid = (txId) => {

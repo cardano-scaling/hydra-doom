@@ -185,6 +185,7 @@ export class Hydra {
     const txParsed = tx_parser.fromTx(tx);
     const txId = txParsed.toHash();
     this.tx_timings[txId] = { sent: performance.now() };
+    this.tx_count++;
     this.connection.send(
       JSON.stringify({
         tag: "NewTx",
@@ -194,22 +195,6 @@ export class Hydra {
         },
       }),
     );
-    // FIXME: As we chain transactions, at some point we start seeing errors
-    // when spent txins are not there yet. The following block can be used to
-    // work around that, but obviously reduces performance to the network
-    // roundtrip.
-    //
-    // return new Promise((res, rej) => {
-    //   const interval = setInterval(() => {
-    //     if (this.tx_timings[txId]?.invalid) {
-    //       clearInterval(interval);
-    //       rej(txId);
-    //     } else if (this.tx_timings[txId]?.seen) {
-    //       clearInterval(interval);
-    //       res(txId);
-    //     }
-    //   }, 10);
-    // });
     return txId;
   }
   public async awaitTx(txId: TxHash, checkInterval?: number): Promise<boolean> {
@@ -237,9 +222,7 @@ export class Hydra {
     }
   }
 
-  public async getUtxos(
-    address: Address
-  ): Promise<UTxO[]> {
+  public async getUtxos(address: Address): Promise<UTxO[]> {
     const ret = [];
     for (const key in this.utxos) {
       const utxo = this.utxos[key];
