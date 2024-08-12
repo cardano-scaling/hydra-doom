@@ -2,6 +2,7 @@ import * as ed25519 from "@noble/ed25519";
 import * as bech32 from "bech32-buffer";
 import { encode } from "cbor-x";
 import { Lucid } from "lucid-cardano";
+import { blake2b } from "@noble/hashes/blake2b"
 import { sha512 } from "@noble/hashes/sha512";
 
 ed25519.etc.sha512Async = (...m) =>
@@ -33,6 +34,7 @@ const decodedSessionKey = Array.from(bech32.decode(sessionKey).data)
   .map(toHex)
   .join("");
 const sessionPk = await ed25519.getPublicKeyAsync(decodedSessionKey);
+const sessionPkh = blake2b(sessionPk, { dkLen: 224/8 });
 
 function toHex(i: number) {
   return ("0" + i.toString(16)).slice(-2);
@@ -41,6 +43,7 @@ function toHex(i: number) {
 export const keys = {
   sessionKey,
   sessionPk: ed25519.etc.bytesToHex(sessionPk),
+  sessionPkh: ed25519.etc.bytesToHex(sessionPkh),
   cabinetKey,
 };
 
@@ -84,9 +87,9 @@ export async function generatePooQrUri() {
   }
 
   const cabinetPk = await ed25519.getPublicKeyAsync(cabinetKey);
-  const signature = await ed25519.signAsync(sessionPk, cabinetKey);
+  const signature = await ed25519.signAsync(sessionPkh, cabinetKey);
   const code = ed25519.etc.bytesToHex(
-    encode([sessionPk, [cabinetPk, signature]]),
+    encode([sessionPkh, [cabinetPk, signature]]),
   );
 
   const qr_code_url = `web+cardano://claim/v1?faucet_url=https%3A%2F%2Fauth.hydradoom.fun/v1&code=${code}`;

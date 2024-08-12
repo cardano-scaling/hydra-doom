@@ -28,12 +28,12 @@ const startGameButton: HTMLButtonElement | null =
 const tabButtons = document.querySelectorAll(".js-tab-button");
 
 // Stuff for POO
-const { sessionPk } = keys;
+const { sessionPk, sessionPkh } = keys;
 let qrCode = await generatePooQrUri();
 let qrShown = false;
 
-async function pollForPoo(ephemeralKey: string) {
-  const request = await fetch(`https://auth.hydradoom.fun/v1/${ephemeralKey}`);
+async function pollForPoo(ephemeralKeyHash: string) {
+  const request = await fetch(`https://auth.hydradoom.fun/v1/${ephemeralKeyHash}`);
   const status = request.status;
   if (status === 401) {
     throw new Error("Invalid Key");
@@ -43,7 +43,7 @@ async function pollForPoo(ephemeralKey: string) {
     return;
   }
 
-  setTimeout(() => pollForPoo(ephemeralKey), 5000);
+  setTimeout(() => pollForPoo(ephemeralKeyHash), 5000);
 }
 // Glue together callbacks available from doom-wasm
 (window as any).hydraSend = hydraSend;
@@ -183,7 +183,7 @@ async function showQrCode() {
   img.src = qrCode!;
   qrContainer?.appendChild(img);
   if (startButton) startButton.style.display = "none";
-  await pollForPoo(sessionPk);
+  await pollForPoo(sessionPkh);
 }
 
 async function startGame() {
