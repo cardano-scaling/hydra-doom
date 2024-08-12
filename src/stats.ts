@@ -1,3 +1,4 @@
+import { keys } from "./keys";
 import { setGlobalSpeedometerValue } from "./speedometer";
 import { GameStatistics, LeaderboardEntry, PlayerStats } from "./types";
 let global: {
@@ -46,6 +47,7 @@ if (!gameServerUrl) {
   );
 }
 
+const { sessionPkh } = keys;
 const TIC_RATE_MAGIC = 35; // 35 is the ticrate in DOOM WASM they use to calculate time.
 
 // Function to update UI with fetched data
@@ -172,7 +174,7 @@ async function fetchPlayerHandle(player: string): Promise<string> {
   }
 }
 
-function truncateString(
+export function truncateString(
   str: string,
   frontLen: number,
   backLen: number
@@ -203,6 +205,11 @@ async function populateAllTimeTable(
     const handle = await fetchPlayerHandle(player);
     playerCell.innerText = handle;
     scoreCell.innerText = score.toString();
+
+    // Highlight the row if the player matches sessionPkh
+    if (player === sessionPkh) {
+      row.classList.add("highlight");
+    }
   }
 }
 
@@ -229,6 +236,11 @@ async function populateCurrentTable(
     const handle = await fetchPlayerHandle(player);
     playerCell.innerText = handle;
     scoreCell.innerText = score.toString();
+
+    // Highlight the row if the player matches sessionPkh
+    if (player === sessionPkh) {
+      row.classList.add("highlight");
+    }
   }
 }
 
