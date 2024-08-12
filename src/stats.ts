@@ -152,7 +152,7 @@ async function fetchPlayerHandle(player: string): Promise<string> {
     const data = await response.json();
 
     if (data.handle) {
-      cache[player] = data.handle;
+      cache[player] = `\$${data.handle}`;
       return data.handle;
     } else {
       const truncatedPlayer = truncateString(player, 7, 7);
