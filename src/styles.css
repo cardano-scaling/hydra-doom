@@ -1217,3 +1217,8 @@ table.leaderboard th {
   background-color: #ff2f2f;
   font-size: 1.3rem;
 }
+
+.highlight {
+  background-color: greenyellow;
+  color: #000;
+}

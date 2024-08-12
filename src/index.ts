@@ -1,7 +1,7 @@
 import { fetchNewGame, hydraRecv, hydraSend } from "./game";
 import { generatePooQrUri, keys } from "./keys";
 import "./osano.js";
-import { startQueryingAPI } from "./stats";
+import { startQueryingAPI, truncateString } from "./stats";
 import "./styles.css";
 
 declare function callMain(args: string[]): void;
@@ -26,12 +26,19 @@ const continentForm: HTMLFormElement | null =
 const startGameButton: HTMLButtonElement | null =
   document.querySelector("#start-game-button");
 const tabButtons = document.querySelectorAll(".js-tab-button");
+const sessionPkhDisplay: HTMLElement | null = document.querySelector(
+  "#session-pkh-display"
+);
 
 // Stuff for POO
-const { sessionPk, sessionPkh } = keys;
+const { sessionPkh } = keys;
 let pollingInterval: any = undefined;
 let qrCode = await generatePooQrUri();
 let qrShown = false;
+
+if (sessionPkhDisplay) {
+  sessionPkhDisplay.textContent = `(${truncateString(sessionPkh, 7, 7)})`;
+}
 
 async function pollForPoo(ephemeralKeyHash: string) {
   const request = await fetch(`https://auth.hydradoom.fun/v1/${ephemeralKeyHash}`);
