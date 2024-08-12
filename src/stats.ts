@@ -137,6 +137,35 @@ export function appendTx(cmd: any) {
     }
   }
 }
+const cache: { [key: string]: string } = {};
+
+async function fetchPlayerHandle(player: string): Promise<string> {
+  if (cache[player]) {
+    return cache[player];
+  }
+
+  try {
+    const response = await fetch(
+      `https://auth.hydradoom.fun/v1/session/${player}`
+    );
+
+    const data = await response.json();
+
+    if (data.handle) {
+      cache[player] = data.handle;
+      return data.handle;
+    } else {
+      const truncatedPlayer = truncateString(player, 7, 7);
+      cache[player] = truncatedPlayer;
+      return truncatedPlayer;
+    }
+  } catch (error) {
+    console.error("Error fetching player handle:", player, error);
+    const truncatedPlayer = truncateString(player, 7, 7);
+    cache[player] = truncatedPlayer;
+    return truncatedPlayer;
+  }
+}
 
 function truncateString(
   str: string,
@@ -149,7 +178,7 @@ function truncateString(
   return `${str.substring(0, frontLen)}...${str.substring(str.length - backLen)}`;
 }
 
-function populateAllTimeTable(
+async function populateAllTimeTable(
   table: HTMLTableElement,
   leaderboard: LeaderboardEntry[]
 ) {
@@ -161,16 +190,21 @@ function populateAllTimeTable(
   // Filter out entries with a score of 0
   const filteredLeaderboard = leaderboard.filter(([, score]) => score > 0);
 
-  filteredLeaderboard.forEach(([player, score]) => {
+  for (const [player, score] of filteredLeaderboard) {
     const row = table.insertRow();
     const playerCell = row.insertCell(0);
     const scoreCell = row.insertCell(1);
-    playerCell.innerText = truncateString(player, 7, 7);
+
+    const handle = await fetchPlayerHandle(player);
+    playerCell.innerText = handle;
     scoreCell.innerText = score.toString();
-  });
+  }
 }
 
-function populateCurrentTable(table: HTMLTableElement, current: PlayerStats) {
+async function populateCurrentTable(
+  table: HTMLTableElement,
+  current: PlayerStats
+) {
   // Clear existing rows
   while (table.rows.length > 1) {
     table.deleteRow(1);
@@ -182,13 +216,15 @@ function populateCurrentTable(table: HTMLTableElement, current: PlayerStats) {
     .sort(([, a], [, b]) => b - a)
     .slice(0, 10);
 
-  sortedEntries.forEach(([player, score]) => {
+  for (const [player, score] of sortedEntries) {
     const row = table.insertRow();
     const playerCell = row.insertCell(0);
     const scoreCell = row.insertCell(1);
-    playerCell.innerText = truncateString(player, 7, 7);
+
+    const handle = await fetchPlayerHandle(player);
+    playerCell.innerText = handle;
     scoreCell.innerText = score.toString();
-  });
+  }
 }
 
 function updateLeaderboard(data: GameStatistics) {
