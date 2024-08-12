@@ -49,7 +49,7 @@ if (!gameServerUrl) {
 const TIC_RATE_MAGIC = 35; // 35 is the ticrate in DOOM WASM they use to calculate time.
 
 // Function to update UI with fetched data
-let last_query: any;
+let recent_queries: any[] = [];
 export function updateUI(elements: any, data: any) {
   if (elements.games && data.total_games !== undefined) {
     elements.games.innerText = new Intl.NumberFormat("en").format(
@@ -64,10 +64,13 @@ export function updateUI(elements: any, data: any) {
 
   if (elements.txs && data.transactions !== undefined) {
     if (elements === global) {
-      if (last_query && data.transactions !== undefined) {
-        setGlobalSpeedometerValue(data.transactions - last_query.transactions);
+      recent_queries.push({ timestamp: performance.now(), transactions: data.transactions });
+      if (recent_queries.length > 5) {
+        let last = recent_queries.shift();
+        let difference = data.transactions - last.transactions;
+        let time_diff = (performance.now() - last.timestamp) / 1000;
+        setGlobalSpeedometerValue(Math.round(difference / time_diff));
       }
-      last_query = data;
       elements.txs.style.setProperty("--num", data.transactions);
     } else {
       elements.txs.innerText = new Intl.NumberFormat("en").format(

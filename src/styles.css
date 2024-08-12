@@ -1106,6 +1106,13 @@ td.animate::after {
   transform: rotate(0deg); /* updated via js */
 }
 
+.global.speedometer__tick {
+    transition: transform 0.8s;
+}
+.local.speedometer__tick {
+    transition: transform 0.2s;
+}
+
 .speedometer__tick::before {
   content: "";
   position: absolute;
