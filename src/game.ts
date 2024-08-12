@@ -3,6 +3,7 @@ import {
   Constr,
   Data,
   Lucid,
+  ScriptHash,
   TxSigned,
   UTxO,
   toHex,
@@ -26,6 +27,8 @@ import { setLocalSpeedometerValue } from "./speedometer";
 import { appendTx, session, updateUI } from "./stats";
 
 import * as ed25519 from "@noble/ed25519";
+import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
+import { blake2b } from "@noble/hashes/blake2b";
 
 let gameServerUrl = process.env.SERVER_URL;
 if (!gameServerUrl) {
@@ -144,6 +147,11 @@ const scriptAddress = lucid.utils.validatorToAddress({
   script: CBOR,
   type: "PlutusV2",
 });
+const scriptHash: ScriptHash =
+  lucid.utils.getAddressDetails(scriptAddress).paymentCredential?.hash!;
+
+const COST_MODELS =
+  "a10198af1a0003236119032c01011903e819023b00011903e8195e7104011903e818201a0001ca761928eb041959d818641959d818641959d818641959d818641959d818641959d81864186418641959d81864194c5118201a0002acfa182019b551041a000363151901ff00011a00015c3518201a000797751936f404021a0002ff941a0006ea7818dc0001011903e8196ff604021a0003bd081a00034ec5183e011a00102e0f19312a011a00032e801901a5011a0002da781903e819cf06011a00013a34182019a8f118201903e818201a00013aac0119e143041903e80a1a00030219189c011a00030219189c011a0003207c1901d9011a000330001901ff0119ccf3182019fd40182019ffd5182019581e18201940b318201a00012adf18201a0002ff941a0006ea7818dc0001011a00010f92192da7000119eabb18201a0002ff941a0006ea7818dc0001011a0002ff941a0006ea7818dc0001011a0011b22c1a0005fdde00021a000c504e197712041a001d6af61a0001425b041a00040c660004001a00014fab18201a0003236119032c010119a0de18201a00033d7618201979f41820197fb8182019a95d1820197df718201995aa18201a0223accc0a1a0374f693194a1f0a1a02515e841980b30a";
 
 // Callbacks from forked doom-wasm
 
@@ -186,6 +194,8 @@ export async function hydraSend(
   if (gameState != GameState.GS_LEVEL) {
     return;
   }
+
+  let hydraSendStart = performance.now();
 
   if (!level.demoplayback) {
     gameData.player = {
@@ -257,6 +267,9 @@ export async function hydraSend(
     hydra.queueTx(tx.toString(), tx.toHash());
     latestUTxO = newUtxo;
     redeemerQueue = [];
+    console.log(
+      `submitted ${tx.toHash()}, took ${performance.now() - hydraSendStart}ms`,
+    );
   }
   frameNumber++;
 }
@@ -353,59 +366,31 @@ const buildTx = async (
   datum: string,
   collateralUtxo: UTxO,
 ): Promise<[UTxO, TxSigned]> => {
-  // HACK: hydra returns a decoded/json format of the datum, so we coerce it back here
-  let lucidUtxo = {
-    txHash: inputUtxo.txHash,
-    outputIndex: inputUtxo.outputIndex,
-    address: inputUtxo.address,
-    assets: inputUtxo.assets,
-    datum:
-      !!inputUtxo.datum && typeof inputUtxo.datum !== "string"
-        ? Data.to(hydraDatumToPlutus(inputUtxo.datum))
-        : inputUtxo.datum,
-    datumHash: inputUtxo.datumHash,
-    scriptRef: inputUtxo.scriptRef,
-  };
-
-  const tx = lucid.newTx();
-  tx.collectFrom([lucidUtxo], redeemer);
-
-  tx.payToContract(scriptAddress, { inline: datum }, { lovelace: BigInt(0) });
-  tx.readFrom([
-    {
-      txHash: scriptRef!.split("#")[0],
-      outputIndex: Number(scriptRef!.split("#")[1]),
-      address: scriptAddress,
-      assets: { lovelace: BigInt(0) },
-      scriptRef: {
-        type: "PlutusV2",
-        script: CBOR,
-      },
-    },
-  ]);
-  tx.addSigner(address);
-  let complete;
-  try {
-    complete = await tx.complete();
-  } catch (e) {
-    throw e;
-  }
-  const collateral = buildCollateralInput(
-    collateralUtxo.txHash,
-    collateralUtxo.outputIndex,
+  // Hand-roll transaction creation for more performance
+  // NOTE: Redeemer is always using max ex units
+  const redeemerBlock = `81840000${redeemer}821a00d59f801b00000002540be400`;
+  const datumBlock = ``; // No datums in the witness set, so this is empty string
+  const scriptData = `${redeemerBlock}${datumBlock}${COST_MODELS}`;
+  const scriptDataHash = bytesToHex(
+    blake2b(hexToBytes(scriptData), { dkLen: 256 / 8 }),
   );
-  const txBody = complete.txComplete.body();
-  const witnessSet = complete.txComplete.witness_set();
-  const auxData = complete.txComplete.auxiliary_data();
+  const datumLength = datum.length / 2;
+  const txBodyByHand =
+    `a7` + // Prefix
+    `0081825820${inputUtxo.txHash}0${inputUtxo.outputIndex}` + // One input
+    `0181a300581d70${scriptHash}018200a0028201d81858${datumLength.toString(16)}${datum}` + // Output to script hash with datum
+    `0200` + // No fee
+    `0b5820${scriptDataHash}` + // Script data hash, spooky
+    `0d81825820${collateralUtxo.txHash}0${collateralUtxo.outputIndex}` + // Collatteral Input
+    `0e81581c${pkh}` + // Required Signers
+    `1281825820${scriptRef!.split("#")[0]}0${scriptRef!.split("#")[1]}`; // Reference inputs
+  const witnessSetByHand = `a105${redeemerBlock}`; // a single redeemer in witness set
+  const txByHand = `84${txBodyByHand}${witnessSetByHand}f5f6`;
 
-  txBody.set_collateral(collateral);
-  const collateralTx = C.Transaction.new(txBody, witnessSet, auxData);
-  txBody.free();
-  witnessSet.free();
-  auxData?.free();
-  collateral.free();
-  complete.txComplete = collateralTx;
-  const signedTx = await complete.sign().complete();
+  // Still use lucid for signing with configured key
+  const tx = lucid.fromTx(txByHand);
+  const signedTx = await tx.sign().complete();
+
   const body = signedTx.txSigned.body();
   const outputs = body.outputs();
   body.free();
