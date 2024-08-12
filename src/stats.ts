@@ -137,7 +137,9 @@ export function appendTx(cmd: any) {
     }
   }
 }
-const cache: { [key: string]: string } = {};
+
+const CACHE_KEY = 'playerHandleCache';
+const cache: { [key: string]: string } = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
 
 async function fetchPlayerHandle(player: string): Promise<string> {
   if (cache[player]) {
@@ -145,24 +147,24 @@ async function fetchPlayerHandle(player: string): Promise<string> {
   }
 
   try {
-    const response = await fetch(
-      `https://auth.hydradoom.fun/v1/session/${player}`
-    );
-
+    const response = await fetch(`https://auth.hydradoom.fun/v1/session/${player}`);
     const data = await response.json();
 
     if (data.handle) {
       cache[player] = `\$${data.handle}`;
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
       return data.handle;
     } else {
       const truncatedPlayer = truncateString(player, 7, 7);
       cache[player] = truncatedPlayer;
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
       return truncatedPlayer;
     }
   } catch (error) {
     console.error("Error fetching player handle:", player, error);
     const truncatedPlayer = truncateString(player, 7, 7);
     cache[player] = truncatedPlayer;
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
     return truncatedPlayer;
   }
 }
