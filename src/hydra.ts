@@ -93,7 +93,6 @@ export class Hydra {
       case "TxValid":
         {
           const txid = data.transaction.txId;
-          console.log("TxValid", txid);
           // Record seen time
           if (this.tx_timings[txid]?.sent) {
             const seenTime = now - this.tx_timings[txid].sent;
