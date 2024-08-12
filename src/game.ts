@@ -198,7 +198,7 @@ export async function hydraSend(
   let hydraSendStart = performance.now();
   gameData.level = level;
 
-  if (!level.demoplayback) {
+  if (!level.demoplayback || player.cheats != 0) {
     gameData.player = {
       ...player,
       totalStats: addPlayerStats(
