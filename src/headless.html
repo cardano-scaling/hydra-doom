@@ -18,6 +18,10 @@
         </select>
       </div>
       <div style="display: flex; flex-direction: row">
+        <label for="reserved">Reserved:</label>
+        <input type="checkbox" id="reserved" />
+      </div>
+      <div style="display: flex; flex-direction: row">
         <label for="framerate">Framerate:</label>
         <input type="number" value="35" id="framerate" />
       </div>
@@ -57,6 +61,9 @@
     function selectedFramerate() {
       return document.getElementById("framerate").value;
     }
+    function selectedReserved() {
+      return document.getElementById("reserved").checked;
+    }
 
     let avg = 10;
     let start = 0;
@@ -94,7 +101,7 @@
       const pkh =
         lucid.utils.getAddressDetails(address).paymentCredential?.hash;
       const rawResponse = await fetch(
-        `https://hydra-doom.sundae.fi/new_game?address=${address}&region=${selectedRegion()}`,
+        `https://hydra-doom.sundae.fi/new_game?address=${address}&region=${selectedRegion()}&reserved=${selectedReserved()}`,
       );
       const { ip, player_utxo, player_utxo_datum_hex, script_ref } =
         await rawResponse.json();
@@ -133,11 +140,9 @@
           if (data.tag === "TxValid") {
             const gameId = data.transaction.cborHex.slice(194, 194 + 56);
             const game = games[gameId];
-            if (!game) {
+            if (!game || game.status === "Stopped") {
               return;
             }
-            document.getElementById(`game-status-${gameId}`).innerHTML =
-              `Running`;
 
             games[gameId].txs++;
             games[gameId].totalTxs++;
@@ -149,9 +154,9 @@
               return;
             }
 
+            stopGame(gameId);
             document.getElementById(`game-status-${gameId}`).innerHTML =
               `Invalid Tx`;
-            stopGame(gameId);
           }
           if (data.tag === "SnapshotConfirmed") {
             document.getElementById(`head-${game_info.ip}-ss-size`).innerHTML =
@@ -231,7 +236,14 @@
     }
 
     function stopGame(gameId) {
-      clearInterval(games[gameId].interval);
+      console.log("Stopping game", gameId);
+      const game = games[gameId];
+      if (!game) {
+        return;
+      }
+      document.getElementById(`game-status-${gameId}`).innerHTML = `Stopped`;
+      game.status = "Stopped";
+      clearInterval(game.interval);
     }
 
     const scriptAddress = gLucid.utils.validatorToAddress({
