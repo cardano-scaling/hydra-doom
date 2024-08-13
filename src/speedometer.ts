@@ -28,7 +28,7 @@ function mapRange(
 }
 
 export const MAX_SPEED = 40;
-export const GLOBAL_MAX_SPEED = 50 * 100;
+export const GLOBAL_MAX_SPEED = 30 * 100;
 local.max!.innerText = MAX_SPEED.toString();
 global.max!.innerText = GLOBAL_MAX_SPEED.toString();
 
