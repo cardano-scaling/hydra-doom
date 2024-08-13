@@ -12,6 +12,7 @@
       <div style="display: flex; flex-direction: row">
         <label for="region">Region:</label>
         <select id="region">
+            <option value="any">any</option>
           <option value="us-east-2">us-east-2</option>
           <option value="us-west-2">us-west-2</option>
           <option value="eu-central-1">eu-central-1</option>
@@ -151,6 +152,8 @@
             if (!game || game.status === "Stopped") {
               return;
             }
+            document.getElementById(`game-status-${gameId}`).innerHTML =
+              `Running`;
 
             games[gameId].txs++;
             games[gameId].totalTxs++;
