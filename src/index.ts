@@ -76,14 +76,26 @@ if (process.env.REGION) {
 tabButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const tab = button.getAttribute("data-tab");
-    document.querySelectorAll(".js-tab-content").forEach((content) => {
-      content.classList.remove("active");
-    });
-    document.querySelectorAll(".js-tab-button").forEach((content) => {
-      content.classList.remove("active");
-    });
-    if (tab) document.getElementById(tab)?.classList.add("active");
-    if (tab) document.getElementById(`tab-${tab}`)?.classList.add("active");
+    button.parentElement?.parentElement
+      ?.querySelectorAll(".js-tab-content")
+      .forEach((content) => {
+        content.classList.remove("active");
+      });
+    button.parentElement?.parentElement
+      ?.querySelectorAll(".js-tab-button")
+      .forEach((content) => {
+        content.classList.remove("active");
+      });
+    if (tab) {
+      button.parentElement?.parentElement
+        ?.querySelector(`#${tab}`)
+        ?.classList.add("active");
+    }
+    if (tab) {
+      button.parentElement
+        ?.querySelector(`#tab-${tab}`)
+        ?.classList.add("active");
+    }
   });
 });
 
