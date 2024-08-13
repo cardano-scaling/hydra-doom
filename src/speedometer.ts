@@ -10,10 +10,14 @@ const local: SpeedometerElements = {
   value: document.querySelector(".local.speedometer-value"),
 };
 
-const global: SpeedometerElements = {
-  tick: document.querySelector(".global.speedometer__tick"),
-  max: document.querySelector(".global.speedometer-max"),
-  value: document.querySelector(".global.speedometer-value"),
+const global: {
+  tick: NodeListOf<HTMLDivElement>
+  max: NodeListOf<HTMLDivElement>
+  value: NodeListOf<HTMLDivElement>
+} = {
+  tick: document.querySelectorAll(".global.speedometer__tick"),
+  max: document.querySelectorAll(".global.speedometer-max"),
+  value: document.querySelectorAll(".global.speedometer-value"),
 };
 
 // Map a value from one range to another
@@ -30,7 +34,9 @@ function mapRange(
 export const MAX_SPEED = 40;
 export const GLOBAL_MAX_SPEED = 50 * 10;
 local.max!.innerText = MAX_SPEED.toString();
-global.max!.innerText = GLOBAL_MAX_SPEED.toString();
+global.max.forEach((max) => {
+  max.innerText = GLOBAL_MAX_SPEED.toString();
+})
 
 // Set the speedometer value in the range [0, MAX_SPEED]
 export function setLocalSpeedometerValue(value: number) {
@@ -42,6 +48,10 @@ export function setLocalSpeedometerValue(value: number) {
 
 export function setGlobalSpeedometerValue(value: number) {
   const degree = mapRange(value, 0, GLOBAL_MAX_SPEED, 0, 180);
-  global.tick!.style.transform = `rotate(${degree}deg)`;
-  global.value!.innerText = value.toString();
+  global.tick.forEach((tick) => { 
+    tick.style.transform = `rotate(${degree}deg)`;
+  });
+  global.value.forEach((v) => {
+    v.innerText = value.toString();
+  });
 }

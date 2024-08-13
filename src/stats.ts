@@ -2,14 +2,14 @@ import { keys } from "./keys";
 import { setGlobalSpeedometerValue } from "./speedometer";
 import { GameStatistics, LeaderboardEntry, PlayerStats } from "./types";
 let global: {
-  games: HTMLDataListElement | null;
-  gamesActive: HTMLDataListElement | null;
-  txs: HTMLDataListElement | null;
-  bytes: HTMLDataListElement | null;
-  kills: HTMLDataListElement | null;
-  items: HTMLDataListElement | null;
-  secrets: HTMLDataListElement | null;
-  playTime: HTMLDataListElement | null;
+  games: NodeListOf<HTMLDataListElement>;
+  gamesActive: NodeListOf<HTMLDataListElement>;
+  txs: NodeListOf<HTMLDataListElement>;
+  bytes: NodeListOf<HTMLDataListElement>;
+  kills: NodeListOf<HTMLDataListElement>;
+  items: NodeListOf<HTMLDataListElement>;
+  secrets: NodeListOf<HTMLDataListElement>;
+  playTime: NodeListOf<HTMLDataListElement>;
 };
 export let session: {
   txs: HTMLDataListElement | null;
@@ -20,14 +20,14 @@ export let session: {
   playTime: HTMLDataListElement | null;
 };
 global = {
-  games: document.querySelector("#global-games"),
-  gamesActive: document.querySelector("#global-games-active"),
-  txs: document.querySelector("#global-txs"),
-  bytes: document.querySelector("#global-bytes"),
-  kills: document.querySelector("#global-kills"),
-  items: document.querySelector("#global-items"),
-  secrets: document.querySelector("#global-secrets"),
-  playTime: document.querySelector("#global-play-time"),
+  games: document.querySelectorAll(".global-games"),
+  gamesActive: document.querySelectorAll(".global-games-active"),
+  txs: document.querySelectorAll(".global-txs"),
+  bytes: document.querySelectorAll(".global-bytes"),
+  kills: document.querySelectorAll(".global-kills"),
+  items: document.querySelectorAll(".global-items"),
+  secrets: document.querySelectorAll(".global-secrets"),
+  playTime: document.querySelectorAll(".global-play-time"),
 };
 session = {
   txs: document.querySelector("#session-txs"),
@@ -65,27 +65,12 @@ export function updateUI(elements: any, data: any) {
   }
 
   if (elements.txs && data.transactions !== undefined) {
-    if (elements === global) {
-      recent_queries.push({ timestamp: performance.now(), transactions: data.transactions });
-      if (recent_queries.length > 5) {
-        let last = recent_queries.shift();
-        let difference = data.transactions - last.transactions;
-        let time_diff = (performance.now() - last.timestamp) / 1000;
-        setGlobalSpeedometerValue(Math.round(difference / time_diff));
-      }
-      elements.txs.style.setProperty("--num", data.transactions);
-    } else {
-      elements.txs.innerText = new Intl.NumberFormat("en").format(
-        data.transactions
-      );
-    }
+    elements.txs.innerText = new Intl.NumberFormat("en").format(
+      data.transactions
+    );
   }
   if (elements.bytes && data.bytes !== undefined) {
-    if (elements === global) {
-      elements.bytes.style.setProperty("--num", data.bytes);
-    } else {
-      elements.bytes.innerText = new Intl.NumberFormat("en").format(data.bytes);
-    }
+    elements.bytes.innerText = new Intl.NumberFormat("en").format(data.bytes);
   }
   if (elements.kills && data.total_kills !== undefined) {
     let kills = data.total_kills;
@@ -118,6 +103,78 @@ export function updateUI(elements: any, data: any) {
     elements.playTime.innerText = formatPlayTime(
       total_play_time / TIC_RATE_MAGIC
     );
+  }
+}
+
+export function updateGlobalsUI(data: GameStatistics) {
+  if (data.total_games !== undefined) {
+    global.games.forEach((element) => {
+      element.innerText = new Intl.NumberFormat("en").format(data.total_games);
+    });
+  }
+  if (data.active_games !== undefined) {
+    global.gamesActive.forEach((element) => {
+      element.innerText = new Intl.NumberFormat("en").format(data.active_games);
+    });
+  }
+
+  if (data.transactions !== undefined) {
+    recent_queries.push({
+      timestamp: performance.now(),
+      transactions: data.transactions,
+    });
+    if (recent_queries.length > 5) {
+      let last = recent_queries.shift();
+      let difference = data.transactions - last.transactions;
+      let time_diff = (performance.now() - last.timestamp) / 1000;
+      setGlobalSpeedometerValue(Math.round(difference / time_diff));
+    }
+    global.txs.forEach((element) => {
+      element.innerText = new Intl.NumberFormat("en").format(data.transactions);
+    });
+  }
+  if (data.bytes !== undefined) {
+    global.bytes.forEach((element) => {
+      element.innerText = new Intl.NumberFormat("en").format(data.bytes);
+    });
+  }
+  if (data.total_kills !== undefined) {
+    let kills = data.total_kills;
+    for (const player in data.kills ?? []) {
+      kills += data.kills[player];
+    }
+    global.kills.forEach((element) => {
+      element.innerText = new Intl.NumberFormat("en").format(kills);
+    });
+  }
+  if (data.total_items !== undefined) {
+    let items = data.total_items;
+    for (const player in data.items ?? []) {
+      items += data.items[player];
+    }
+    global.items.forEach((element) => {
+      element.innerText = new Intl.NumberFormat("en").format(items);
+    });
+  }
+  if (data.total_secrets !== undefined) {
+    let secrets = data.total_secrets;
+    for (const player in data.secrets ?? []) {
+      secrets += data.secrets[player];
+    }
+    global.secrets.forEach((element) => {
+      element.innerText = new Intl.NumberFormat("en").format(secrets);
+    });
+  }
+  if (data.total_play_time !== undefined) {
+    let total_play_time = data.total_play_time;
+    for (const player in data.player_play_time ?? []) {
+      for (const time of data.player_play_time[player] ?? []) {
+        total_play_time += time;
+      }
+    }
+    global.playTime.forEach((element) => {
+      element.innerText = formatPlayTime(total_play_time / TIC_RATE_MAGIC);
+    });
   }
 }
 
@@ -204,7 +261,11 @@ async function populateAllTimeTable(
 
     const handle = await fetchPlayerHandle(player);
     playerCell.innerText = handle;
-    scoreCell.innerText = score.toString();
+    scoreCell.innerText = new Intl.NumberFormat("en-US", {
+      notation: "compact",
+    })
+      .format(score)
+      .toString();
 
     // Highlight the row if the player matches sessionPkh
     if (player === sessionPkh) {
@@ -235,7 +296,11 @@ async function populateCurrentTable(
 
     const handle = await fetchPlayerHandle(player);
     playerCell.innerText = handle;
-    scoreCell.innerText = score.toString();
+    scoreCell.innerText = new Intl.NumberFormat("en-US", {
+      notation: "compact",
+    })
+      .format(score)
+      .toString();
 
     // Highlight the row if the player matches sessionPkh
     if (player === sessionPkh) {
@@ -254,15 +319,15 @@ function updateLeaderboard(data: GameStatistics) {
   const currentSecretsTable = document.getElementById(
     "current-secrets-leaderboard"
   ) as HTMLTableElement;
-  const allKillsTable = document.getElementById(
-    "all-time-kills-leaderboard"
-  ) as HTMLTableElement;
-  const allTimeItemsTable = document.getElementById(
-    "all-time-items-leaderboard"
-  ) as HTMLTableElement;
-  const allTimeSecretsTable = document.getElementById(
-    "all-time-secrets-leaderboard"
-  ) as HTMLTableElement;
+  const allKillsTable = document.querySelectorAll(
+    ".js-all-time-kills-leaderboard"
+  );
+  const allTimeItemsTable = document.querySelectorAll(
+    ".js-all-time-items-leaderboard"
+  );
+  const allTimeSecretsTable = document.querySelectorAll(
+    ".js-all-time-secrets-leaderboard"
+  );
 
   // Populate current tables with kills, items, and secrets
   populateCurrentTable(currentKillsTable, data.kills);
@@ -270,9 +335,17 @@ function updateLeaderboard(data: GameStatistics) {
   populateCurrentTable(currentSecretsTable, data.secrets);
 
   // Populate all-time tables with kills_leaderboard, items_leaderboard, and secrets_leaderboard
-  populateAllTimeTable(allKillsTable, data.kills_leaderboard);
-  populateAllTimeTable(allTimeItemsTable, data.items_leaderboard);
-  populateAllTimeTable(allTimeSecretsTable, data.secrets_leaderboard);
+  allKillsTable.forEach((table) => {
+    populateAllTimeTable(table as HTMLTableElement, data.kills_leaderboard);
+  });
+
+  allTimeItemsTable.forEach((table) => {
+    populateAllTimeTable(table as HTMLTableElement, data.items_leaderboard);
+  });
+
+  allTimeSecretsTable.forEach((table) => {
+    populateAllTimeTable(table as HTMLTableElement, data.secrets_leaderboard);
+  });
 }
 
 // Function to fetch data from the API
@@ -283,7 +356,7 @@ async function fetchData() {
       throw new Error("Network response was not ok " + response.statusText);
     }
     const data: GameStatistics = await response.json();
-    updateUI(global, data);
+    updateGlobalsUI(data);
     updateLeaderboard(data);
   } catch (error) {
     console.error("Fetch error: ", error);

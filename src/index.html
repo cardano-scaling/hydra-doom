@@ -8,7 +8,7 @@
       name="description"
       content="Experience Doom running on Blockchain powered by Cardano’s Hydra technology in this tech demo."
     />
-    <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
@@ -21,13 +21,13 @@
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://hydra.family" />
-    <meta property="og:image" content="assets/images/social-image.png" />
+    <meta property="og:image" content="/assets/images/social-image.png" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Hydra Doom" />
     <meta
       name="twitter:image"
-      content="assets/images/social-image-twitter.png"
+      content="/assets/images/social-image-twitter.png"
     />
   </head>
   <body>
@@ -87,6 +87,112 @@
           >
             <span>Play Doom On Hydra</span>
           </button>
+        </div>
+        <div class="js-hide-when-modal-opens">
+          <div class="landing-tables">
+            <div class="landing-stats">
+              <article class="block landing-tables-globals">
+                <h3>Global Totals</h3>
+                <div class="card card--stats">
+                  <table>
+                    <tr>
+                      <td>games (all-time):</td>
+                      <td class="global-games">--</td>
+                    </tr>
+                    <tr>
+                      <td>games (active):</td>
+                      <td class="global-games-active">--</td>
+                    </tr>
+                    <tr>
+                      <td>transactions:</td>
+                      <td class="global-txs" class="animate"></td>
+                    </tr>
+                    <tr>
+                      <td>bytes:</td>
+                      <td class="global-bytes" class="animate"></td>
+                    </tr>
+                    <tr>
+                      <td>kills:</td>
+                      <td class="global-kills">--</td>
+                    </tr>
+                    <tr>
+                      <td>items:</td>
+                      <td class="global-items">--</td>
+                    </tr>
+                    <tr>
+                      <td>secrets:</td>
+                      <td class="global-secrets">--</td>
+                    </tr>
+                    <tr>
+                      <td>play_time:</td>
+                      <td class="global-play-time">--</td>
+                    </tr>
+                  </table>
+                </div>
+              </article>
+              <article class="block landing-global-tps">
+                <h3>Global TPS</h3>
+                <div class="global speedometer">
+                  <div
+                    class="global speedometer__tick"
+                    data-speedometer-value="0"
+                  ></div>
+                  <div class="global speedometer-min">0</div>
+                  <div class="global speedometer-max">100</div>
+                  <div class="global speedometer-value">0</div>
+                </div>
+              </article>
+            </div>
+            <div class="all-time-tables">
+              <div class="tabs">
+                <button
+                  class="js-tab-button tab-button active"
+                  data-tab="landing-kills"
+                  id="tab-landing-kills"
+                >
+                  Kills
+                </button>
+                <button
+                  class="js-tab-button tab-button"
+                  data-tab="landing-items"
+                  id="tab-landing-items"
+                >
+                  Items
+                </button>
+                <button
+                  class="js-tab-button tab-button"
+                  data-tab="landing-secrets"
+                  id="tab-landing-secrets"
+                >
+                  Secrets
+                </button>
+              </div>
+              <div class="js-tab-content tab-content active" id="landing-kills">
+                <table class="js-all-time-kills-leaderboard leaderboard">
+                  <tr>
+                    <th>Player</th>
+                    <th>Score</th>
+                  </tr>
+                </table>
+              </div>
+              <div class="js-tab-content tab-content" id="landing-items">
+                <table class="js-all-time-items-leaderboard leaderboard">
+                  <tr>
+                    <th>Player</th>
+                    <th>Score</th>
+                  </tr>
+                </table>
+              </div>
+              <div class="js-tab-content tab-content" id="landing-secrets">
+                <table class="js-all-time-secrets-leaderboard leaderboard">
+                  <tr>
+                    <th>Player</th>
+                    <th>Score</th>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
       <div class="layer--bg">
@@ -298,35 +404,35 @@
                 <table>
                   <tr>
                     <td>games (all-time):</td>
-                    <td id="global-games">--</td>
+                    <td class="global-games">--</td>
                   </tr>
                   <tr>
                     <td>games (active):</td>
-                    <td id="global-games-active">--</td>
+                    <td class="global-games-active">--</td>
                   </tr>
                   <tr>
                     <td>transactions:</td>
-                    <td id="global-txs" class="animate"></td>
+                    <td class="global-txs" class="animate"></td>
                   </tr>
                   <tr>
                     <td>bytes:</td>
-                    <td id="global-bytes" class="animate"></td>
+                    <td class="global-bytes" class="animate"></td>
                   </tr>
                   <tr>
                     <td>kills:</td>
-                    <td id="global-kills">--</td>
+                    <td class="global-kills">--</td>
                   </tr>
                   <tr>
                     <td>items:</td>
-                    <td id="global-items">--</td>
+                    <td class="global-items">--</td>
                   </tr>
                   <tr>
                     <td>secrets:</td>
-                    <td id="global-secrets">--</td>
+                    <td class="global-secrets">--</td>
                   </tr>
                   <tr>
                     <td>play_time:</td>
-                    <td id="global-play-time">--</td>
+                    <td class="global-play-time">--</td>
                   </tr>
                 </table>
               </div>
@@ -784,7 +890,10 @@
                         All Time
                       </button>
                     </div>
-                    <div class="js-tab-content tab-content active" id="current">
+                    <div
+                      class="js-tab-content tab-content tab-three-columns active"
+                      id="current"
+                    >
                       <div>
                         <h3>Kills</h3>
                         <table
@@ -822,12 +931,14 @@
                         </table>
                       </div>
                     </div>
-                    <div class="js-tab-content tab-content" id="all-time">
+                    <div
+                      class="js-tab-content tab-content tab-three-columns"
+                      id="all-time"
+                    >
                       <div>
                         <h3>Kills</h3>
                         <table
-                          id="all-time-kills-leaderboard"
-                          class="leaderboard"
+                          class="js-all-time-kills-leaderboard leaderboard"
                         >
                           <tr>
                             <th>Player</th>
@@ -838,8 +949,7 @@
                       <div>
                         <h3>Items</h3>
                         <table
-                          id="all-time-items-leaderboard"
-                          class="leaderboard"
+                          class="js-all-time-items-leaderboard leaderboard"
                         >
                           <tr>
                             <th>Player</th>
@@ -850,8 +960,7 @@
                       <div>
                         <h3>Secrets</h3>
                         <table
-                          id="all-time-secrets-leaderboard"
-                          class="leaderboard"
+                          class="js-all-time-secrets-leaderboard leaderboard"
                         >
                           <tr>
                             <th>Player</th>
