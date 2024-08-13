@@ -53,10 +53,12 @@ export function setLocalSpeedometerValue(value: number) {
 export function setGlobalSpeedometerValue(value: number) {
   if (value > GLOBAL_MAX_SPEED) {
     GLOBAL_MAX_SPEED = value;
-    global.max!.innerText = GLOBAL_MAX_SPEED.toString();
+    global.max.forEach((max) => {
+      max.innerText = GLOBAL_MAX_SPEED.toString();
+    });
   }
   const degree = mapRange(value, 0, GLOBAL_MAX_SPEED, 0, 180);
-  global.tick.forEach((tick) => { 
+  global.tick.forEach((tick) => {
     tick.style.transform = `rotate(${degree}deg)`;
   });
   global.value.forEach((v) => {
