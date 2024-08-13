@@ -29,6 +29,9 @@ import { appendTx, session, updateUI } from "./stats";
 import * as ed25519 from "@noble/ed25519";
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
 import { blake2b } from "@noble/hashes/blake2b";
+import { sha512 } from "@noble/hashes/sha512";
+
+ed25519.etc.sha512Sync = (...m) => sha512(ed25519.etc.concatBytes(...m));
 
 let gameServerUrl = process.env.SERVER_URL;
 if (!gameServerUrl) {
@@ -38,9 +41,9 @@ if (!gameServerUrl) {
   );
 }
 let lucid = await Lucid.new(undefined, "Preprod");
-let { sessionKey: privateKey } = keys;
+let { sessionKey, privateKey, sessionPk } = keys;
 const address = await lucid
-  .selectWalletFromPrivateKey(privateKey)
+  .selectWalletFromPrivateKey(sessionKey)
   .wallet.address();
 const pkh = lucid.utils.getAddressDetails(address).paymentCredential?.hash!;
 console.log(`Using session key with address: ${address}`);
@@ -133,9 +136,6 @@ export async function fetchNewGame(region: string) {
     // HACK: until hydra returns the datum bytes, all the datum bytes will be wrong
     // so we return it from the newGameResponse and set it manually here
     latestUTxO.datum = newGameResponse.player_utxo_datum_hex;
-
-    lucid = await Lucid.new(hydra, "Preprod");
-    lucid.selectWalletFromPrivateKey(privateKey);
 
     // This is temporary, the initial game state is stored in a UTxO created by the control plane.
     // We need to add the ability to parse game state from the datum here.
@@ -250,7 +250,7 @@ export async function hydraSend(
   redeemerQueue.push(cmd);
 
   if (frameNumber % 1 == 0) {
-    const [newUtxo, tx] = await buildTx(
+    const [newUtxo, tx] = buildTx(
       latestUTxO!,
       encodeRedeemer(redeemerQueue),
       buildDatum(gameData),
@@ -258,7 +258,7 @@ export async function hydraSend(
     );
 
     sessionStats.transactions++;
-    sessionStats.bytes += tx.txSigned.to_bytes().length;
+    sessionStats.bytes += tx.length / 2;
     sessionStats.total_kills = gameData.player.totalStats.killCount;
     sessionStats.total_items = gameData.player.totalStats.itemCount;
     sessionStats.total_secrets = gameData.player.totalStats.secretCount;
@@ -268,7 +268,7 @@ export async function hydraSend(
     );
     updateUI(session, sessionStats);
 
-    await hydra.submitTx(tx.toString());
+    await hydra.submitTx(tx);
     latestUTxO = newUtxo;
     redeemerQueue = [];
     // console.log(`submitted ${tx.toHash()}, took ${performance.now() - hydraSendStart}ms`);
@@ -363,12 +363,12 @@ const decodeRedeemer = (redeemer: string): Cmd[] => {
       }) as Cmd,
   );
 };
-const buildTx = async (
+const buildTx = (
   inputUtxo: UTxO,
   redeemer: string,
   datum: string,
   collateralUtxo: UTxO,
-): Promise<[UTxO, TxSigned]> => {
+): [UTxO, string] => {
   // Hand-roll transaction creation for more performance
   // NOTE: Redeemer is always using max ex units
   const redeemerBlock = `81840000${redeemer}821a00d59f801b00000002540be400`;
@@ -387,45 +387,26 @@ const buildTx = async (
     `0d81825820${collateralUtxo.txHash}0${collateralUtxo.outputIndex}` + // Collatteral Input
     `0e81581c${pkh}` + // Required Signers
     `1281825820${scriptRef!.split("#")[0]}0${scriptRef!.split("#")[1]}`; // Reference inputs
-  const witnessSetByHand = `a105${redeemerBlock}`; // a single redeemer in witness set
+
+  const txId = bytesToHex(
+    blake2b(hexToBytes(txBodyByHand), { dkLen: 256 / 8 }),
+  );
+  const signature = bytesToHex(ed25519.sign(txId, privateKey));
+
+  const witnessSetByHand = `a20081825820${sessionPk}5840${signature}05${redeemerBlock}`; // a single redeemer in witness set
   const txByHand = `84${txBodyByHand}${witnessSetByHand}f5f6`;
 
-  // Still use lucid for signing with configured key
-  const tx = lucid.fromTx(txByHand);
-  const signedTx = await tx.sign().complete();
+  const newUtxo: UTxO = {
+    txHash: txId,
+    outputIndex: 0,
+    address: scriptAddress,
+    assets: { lovelace: 0n },
+    datumHash: null,
+    datum: datum,
+    scriptRef: null,
+  };
 
-  const body = signedTx.txSigned.body();
-  const outputs = body.outputs();
-  body.free();
-  let newUtxo: UTxO | null = null;
-  for (let i = 0; i < outputs.len(); i++) {
-    const output = outputs.get(i);
-    const address = output.address();
-    if (address.to_bech32("addr_test") === scriptAddress) {
-      const amount = output.amount();
-      const datum = output.datum()!;
-      const data = datum.as_data()!;
-
-      newUtxo = {
-        txHash: signedTx.toHash(),
-        outputIndex: i,
-        address: address.to_bech32("addr_test"),
-        assets: valueToAssets(amount),
-        datumHash: null,
-        datum: toHex(data.to_bytes()).substring(8),
-        scriptRef: null,
-      };
-      amount.free();
-      output.free();
-      data.free();
-      address.free();
-      break;
-    }
-    outputs.free();
-    body.free();
-  }
-
-  return [newUtxo!, signedTx];
+  return [newUtxo, txByHand];
 };
 
 const subtractPlayerStats = (left?: PlayerStats, right?: PlayerStats) => {

@@ -44,6 +44,8 @@
     import * as ed from "https://esm.sh/@noble/ed25519@2.1.0";
     import { blake2b } from "https://esm.sh/@noble/hashes@1.4.0/blake2b";
     import { sha512 } from "https://esm.sh/@noble/hashes@1.4.0/sha512";
+    import { bech32 } from "https://esm.sh/bech32@2.0.0";
+
     import {
       bytesToHex,
       hexToBytes,
@@ -95,6 +97,10 @@
     async function requestGame() {
       let lucid = await Lucid.new(undefined, "Preprod");
       const ephemeralKey = lucid.utils.generatePrivateKey();
+      const privateKey = new Uint8Array(
+        bech32.fromWords(bech32.decode(ephemeralKey).words),
+      );
+      const publicKey = bytesToHex(ed.getPublicKey(privateKey));
       const address = await lucid
         .selectWalletFromPrivateKey(ephemeralKey)
         .wallet.address();
@@ -107,7 +113,9 @@
         await rawResponse.json();
       return {
         lucid,
-        ephemeralKey,
+        ephemeralKey: ephemeralKey,
+        privateKey,
+        publicKey: publicKey,
         pkh,
         ip,
         player_utxo,
@@ -259,7 +267,8 @@
 
     async function buildTx(gameId) {
       const {
-        ephemeralKey,
+        privateKey,
+        publicKey,
         pkh,
         script_ref,
         player_utxo,
@@ -285,14 +294,13 @@
         `0d81825820${collateralUtxo.split("#")[0]}0${collateralUtxo.split("#")[1]}` + // Collatteral Input
         `0e81581c${pkh}` + // Required Signers
         `1281825820${script_ref.split("#")[0]}0${script_ref.split("#")[1]}`; // Reference inputs
-      const witnessSetByHand = `a105${redeemerBlock}`; // a single redeemer in witness set
+      const txIdRaw = blake2b(hexToBytes(txBodyByHand), { dkLen: 256 / 8 });
+      const txId = bytesToHex(txIdRaw);
+      const signature = bytesToHex(ed.sign(txIdRaw, privateKey));
+
+      const witnessSetByHand = `a20081825820${publicKey}5840${signature}05${redeemerBlock}`; // a single redeemer in witness set
       const txByHand = `84${txBodyByHand}${witnessSetByHand}f5f6`;
-      const txId = bytesToHex(
-        blake2b(hexToBytes(txBodyByHand), { dkLen: 256 / 8 }),
-      );
-      const tx = games[gameId].lucid.fromTx(txByHand);
-      const signedTx = await tx.sign().complete();
-      return { tx: signedTx.toString(), new_utxo: `${txId}#0` };
+      return { tx: txByHand, new_utxo: `${txId}#0` };
     }
   </script>
 </html>
