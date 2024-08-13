@@ -3,6 +3,11 @@
     <h1>Headless Doom</h1>
     <p>This is a headless version of doom for load testing</p>
 
+    <div>
+      <label for="global-txs">Global TPS</label>
+      <div id="global-txs">0</div>
+    </div>
+
     <div style="display: flex; flex-direction: column">
       <div style="display: flex; flex-direction: row">
         <label for="region">Region:</label>
@@ -21,7 +26,13 @@
         <button id="new-game-btn">New Game</button>
       </div>
     </div>
-    <h1>Games</h1>
+    <h1>Heads</h1>
+    <div style="display: flex; flex-direction: column" id="heads"></div>
+    <h1>
+      Games (
+      <span id="count">0</span>
+      )
+    </h1>
     <ul id="games"></ul>
   </body>
   <script type="module">
@@ -47,7 +58,33 @@
       return document.getElementById("framerate").value;
     }
 
-    const games = [];
+    let avg = 10;
+    let start = 0;
+    let startTxs = 0;
+    let tps = undefined;
+    setInterval(async () => {
+      const rawResp = await fetch("https://hydra-doom.sundae.fi/global");
+      const resp = await rawResp.json();
+      const now = performance.now();
+      const elapsed = now - start;
+      if (start === 0) {
+        start = now;
+        startTxs = resp.transactions;
+      }
+      if (elapsed > avg * 1000) {
+        tps = (resp.transactions - startTxs) / (elapsed / 1000);
+        start = now;
+        startTxs = resp.transactions;
+      }
+      document.getElementById("global-txs").innerHTML =
+        `${resp.transactions} Txs (${tps !== undefined ? Math.round(tps) : "..."} ${avg}s Average TPS; updating in ${Math.round(
+          (avg * 1000 - elapsed) / 1000,
+        )}s)`;
+    }, 1000);
+
+    const sockets = {};
+
+    const games = {};
     async function requestGame() {
       let lucid = await Lucid.new(undefined, "Preprod");
       const ephemeralKey = lucid.utils.generatePrivateKey();
@@ -75,75 +112,122 @@
 
     export async function newGame() {
       const gameList = document.getElementById("games");
-      const gameId = games.length;
       const game_info = await requestGame();
-      const socket = new WebSocket(`wss://${game_info.ip}?history=no`);
-      socket.onmessage = (message) => {
-        const data = JSON.parse(message.data);
-        if (data.tag === "Greetings") {
-          document.getElementById(`game-status-${gameId}`).innerHTML =
-            `Connected`;
-        }
-        if (data.tag === "TxValid") {
-          if (data.transaction.cborHex.includes(games[gameId].pkh)) {
-            games[gameId].txs++;
+      const gameId = game_info.pkh;
+      let socket = sockets[game_info.ip];
+      if (!socket) {
+        const heads = document.getElementById("heads");
+        const head = document.createElement("div");
+        head.setAttribute("id", `head-${game_info.ip}`);
+        head.innerHTML = `<div>
+          <div>${game_info.ip}</div>
+          <div id="head-${game_info.ip}-games">Games: 1</div>
+          <div id="head-${game_info.ip}-ss-size">Snapshot Size: 0</div>
+        </div>`;
+        heads.appendChild(head);
 
-            document.getElementById(`game-frame-count-${gameId}`).innerHTML =
-              `${games[gameId].txs} (${Math.round(games[gameId].txs / ((performance.now() - games[gameId].start) / 1000))} Average TPS)`;
+        socket = new WebSocket(`wss://${game_info.ip}?history=no`);
+        sockets[game_info.ip] = socket;
+        socket.onmessage = (message) => {
+          const data = JSON.parse(message.data);
+          if (data.tag === "TxValid") {
+            const gameId = data.transaction.cborHex.slice(194, 194 + 56);
+            const game = games[gameId];
+            if (!game) {
+              return;
+            }
             document.getElementById(`game-status-${gameId}`).innerHTML =
               `Running`;
+
+            games[gameId].txs++;
+            games[gameId].totalTxs++;
           }
-        }
-        if (data.tag === "TxInvalid") {
-          if (data.transaction.cborHex.includes(games[gameId].pkh)) {
+          if (data.tag === "TxInvalid") {
+            const gameId = data.transaction.cborHex.slice(194, 194 + 56);
+            const game = games[gameId];
+            if (!game) {
+              return;
+            }
+
             document.getElementById(`game-status-${gameId}`).innerHTML =
               `Invalid Tx`;
             stopGame(gameId);
           }
+          if (data.tag === "SnapshotConfirmed") {
+            document.getElementById(`head-${game_info.ip}-ss-size`).innerHTML =
+              `Snapshot Size: ${data.snapshot.confirmedTransactions.length}`;
+          }
+        };
+      } else {
+        const count = Object.values(games).filter(
+          (g) => g.ip === game_info.ip,
+        ).length;
+        const headGamesCount = document.getElementById(
+          `head-${game_info.ip}-games`,
+        );
+        headGamesCount.innerHTML = `Games: ${count + 1}`;
+      }
+      setInterval(() => {
+        const now = performance.now();
+        const elapsed = now - games[gameId].time;
+        if (elapsed > avg * 1000) {
+          games[gameId].tps = games[gameId].txs / (elapsed / 1000);
+          games[gameId].time = now;
+          games[gameId].txs = 0;
         }
-      };
-      socket.onopen = () => {
-        games.push({
-          ...game_info,
-          socket,
-          txs: 0,
-          start: performance.now(),
-          interval: setInterval(async () => {
-            if (games[gameId] === undefined) {
-              return;
-            }
-            const { tx, new_utxo } = await buildTx(gameId);
-            games[gameId].socket.send(
-              JSON.stringify({
-                tag: "NewTx",
-                transaction: {
-                  type: "Tx BabbageEra",
-                  cborHex: tx,
-                },
-              }),
-            );
-            games[gameId].player_utxo = new_utxo;
-          }, 1000 / selectedFramerate()),
-        });
-        const gameElement = document.createElement("li");
-        gameElement.setAttribute("id", `game-${gameId}`);
-        gameElement.innerHTML = `<p>Game ${gameId}</p><p>Host: ${game_info.ip}</p>`;
-        const gameStatus = document.createElement("div");
-        gameStatus.setAttribute("id", `game-status-${gameId}`);
-        gameStatus.innerHTML = `Connecting`;
-        const gameFrameCount = document.createElement("div");
-        gameFrameCount.setAttribute("id", `game-frame-count-${gameId}`);
-        gameFrameCount.innerHTML = `0`;
 
-        const stopButton = document.createElement("button");
-        stopButton.innerHTML = `Stop`;
-        stopButton.addEventListener("click", () => stopGame(gameId));
-
-        gameElement.appendChild(gameStatus);
-        gameElement.appendChild(gameFrameCount);
-        gameElement.appendChild(stopButton);
-        gameList.appendChild(gameElement);
+        document.getElementById(`game-frame-count-${gameId}`).innerHTML =
+          `${games[gameId].totalTxs} (${Math.round(games[gameId].tps) || "..."} ${avg}s Average TPS; updating in ${Math.round(
+            (avg * 1000 - elapsed) / 1000,
+          )}s)`;
+      }, 1000);
+      games[gameId] = {
+        ...game_info,
+        tps: 0,
+        totalTxs: 0,
+        txs: 0,
+        time: performance.now(),
+        interval: setInterval(async () => {
+          const game = games[gameId];
+          if (!game) {
+            return;
+          }
+          if (sockets[game.ip].readyState !== WebSocket.OPEN) {
+            return;
+          }
+          const { tx, new_utxo } = await buildTx(gameId);
+          sockets[game.ip].send(
+            JSON.stringify({
+              tag: "NewTx",
+              transaction: {
+                type: "Tx BabbageEra",
+                cborHex: tx,
+              },
+            }),
+          );
+          game.player_utxo = new_utxo;
+        }, 1000 / selectedFramerate()),
       };
+      const gameElement = document.createElement("li");
+      gameElement.setAttribute("id", `game-${gameId}`);
+      gameElement.innerHTML = `<p>Game ${gameId}</p><p>Host: ${game_info.ip}</p>`;
+      const gameStatus = document.createElement("div");
+      gameStatus.setAttribute("id", `game-status-${gameId}`);
+      gameStatus.innerHTML = `Connecting`;
+      const gameFrameCount = document.createElement("div");
+      gameFrameCount.setAttribute("id", `game-frame-count-${gameId}`);
+      gameFrameCount.innerHTML = `0`;
+
+      const stopButton = document.createElement("button");
+      stopButton.innerHTML = `Stop`;
+      stopButton.addEventListener("click", () => stopGame(gameId));
+
+      gameElement.appendChild(gameStatus);
+      gameElement.appendChild(gameFrameCount);
+      gameElement.appendChild(stopButton);
+      gameList.appendChild(gameElement);
+
+      document.getElementById("count").innerHTML = Object.keys(games).length;
     }
 
     function stopGame(gameId) {
