@@ -200,8 +200,10 @@ export function appendTx(cmd: any) {
   }
 }
 
-const CACHE_KEY = 'playerHandleCache';
-const cache: { [key: string]: string } = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
+const CACHE_KEY = "playerHandleCache";
+const cache: { [key: string]: string } = JSON.parse(
+  localStorage.getItem(CACHE_KEY) || "{}"
+);
 
 async function fetchPlayerHandle(player: string): Promise<string> {
   if (cache[player]) {
@@ -209,7 +211,9 @@ async function fetchPlayerHandle(player: string): Promise<string> {
   }
 
   try {
-    const response = await fetch(`https://auth.hydradoom.fun/v1/session/${player}`);
+    const response = await fetch(
+      `https://auth.hydradoom.fun/v1/session/${player}`
+    );
     const data = await response.json();
 
     if (data.handle) {
@@ -283,10 +287,12 @@ async function populateCurrentTable(
     table.deleteRow(1);
   }
 
-  // Convert the current object to an array of entries, filter out entries with a score of 0, and sort by score in descending order
   const sortedEntries = Object.entries(current)
     .filter(([, score]) => score > 0)
-    .sort(([, a], [, b]) => b - a)
+    .sort(([playerA, scoreA], [playerB, scoreB]) => {
+      if (scoreB !== scoreA) return scoreB - scoreA;
+      return playerA.localeCompare(playerB);
+    })
     .slice(0, 10);
 
   for (const [player, score] of sortedEntries) {
