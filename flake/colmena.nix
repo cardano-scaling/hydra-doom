@@ -117,6 +117,46 @@
         };
       };
     };
+    systemd.services = {
+      hydra-offline = {
+        environment = {
+          LOCAL_HYDRA = "1";
+        };
+        wantedBy = ["multi-user.target" "hydra-control-plane.service"];
+        startLimitIntervalSec = 0;
+        serviceConfig = {
+          ExecStart = "${self.packages.${system}.hydra-offline-wrapper}/bin/hydra-offline-wrapper";
+          Restart = "always";
+          RestartSec = "30s";
+          WorkingDirectory = "/var/lib/hydra-offline";
+          StateDirectory = "hydra-offline";
+          User = "hydra-offline";
+          Group = "hydra-offline";
+        };
+      };
+      hydra-control-plane = {
+        environment = {
+          LOCAL_HYDRA = "1";
+        };
+        wantedBy = ["multi-user.target"];
+        startLimitIntervalSec = 10;
+        serviceConfig = {
+          ExecStart = "${self.packages.${system}.hydra-control-plane-wrapper}/bin/hydra-control-plane-wrapper";
+          Restart = "always";
+          RestartSec = "30s";
+          WorkingDirectory = "/var/lib/hydra-offline";
+          User = "hydra-offline";
+          Group = "hydra-offline";
+        };
+      };
+    };
+    users.groups.hydra-offline.gid = 10016;
+    users.users.hydra-offline = {
+      description = "hydra offline user";
+      uid = 10016;
+      group = "hydra-offline";
+      isSystemUser = true;
+    };
   };
   baseConfig = { pkgs, ...}: {
     boot = {

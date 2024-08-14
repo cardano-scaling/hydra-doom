@@ -79,7 +79,7 @@
         };
         hydra-offline-wrapper = pkgs.writeShellApplication {
           name = "hydra-offline-wrapper";
-          runtimeInputs = [ config.packages.cardano-node config.packages.cardano-cli pkgs.jq ];
+          runtimeInputs = [ config.packages.cardano-node config.packages.cardano-cli pkgs.jq pkgs.curl ];
           text = ''
             export LOCAL_HYDRA="''${LOCAL_HYDRA:-0}"
             if [ "''${LOCAL_HYDRA}" -eq 0 ]; then
