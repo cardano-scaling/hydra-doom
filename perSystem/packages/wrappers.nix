@@ -92,16 +92,8 @@
             pushd ${hydraDataDir}
             ${lib.getExe' config.packages.hydra-node "hydra-node"} gen-hydra-key --output-file hydra
             curl https://raw.githubusercontent.com/cardano-scaling/hydra/0.17.0/hydra-cluster/config/protocol-parameters.json | jq '.utxoCostPerByte = 0' > protocol-parameters.json
-            cat > utxo.json << EOF
-            {
-              "0000000000000000000000000000000000000000000000000000000000000000#0": {
-                "address": "$(cardano-cli address build --verification-key-file ../admin.vk --testnet-magic 1)",
-                "value": {
-                  "lovelace": 1000000000
-                }
-              }
-            }
-            EOF
+            cp ${../../initial-utxo.json} utxo.json
+            sed -i "s/YOURADDRESSHERE/$(cardano-cli address build --verification-key-file ../admin.vk --testnet-magic 1)/g" utxo.json
             ${lib.getExe' config.packages.hydra-node "hydra-node"} offline \
               --hydra-signing-key hydra.sk \
               --ledger-protocol-parameters protocol-parameters.json \
@@ -146,6 +138,7 @@
         hydra-control-plane-wrapper = pkgs.writeShellApplication {
           name = "hydra-control-plane-wrapper";
           text = ''
+            set -x
             export LOCAL_HYDRA="''${LOCAL_HYDRA:-0}"
             export ROCKET_PROFILE=local
             if [ "''${LOCAL_HYDRA}" -eq 0 ]; then
