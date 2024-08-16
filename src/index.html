@@ -498,8 +498,8 @@
                 <div class="message" id="message">
                   <div>
                     <p>
-                      For this tech-demo we have 40 hydra heads, which can
-                      support 400 concurrent players, and we've reached that
+                      For this tech-demo we have 65 hydra heads, which can
+                      support 325 concurrent players, and we've reached that
                       limit.
                     </p>
                     <p>
@@ -991,14 +991,14 @@
             "doom1.wad",
             "doom1.wad",
             true,
-            true
+            true,
           );
           Module.FS.createPreloadedFile(
             "",
             "default.cfg",
             "default.cfg",
             true,
-            true
+            true,
           );
         },
         printErr: (text) => {
@@ -1013,7 +1013,7 @@
               alert("WebGL context lost. You will need to reload the page.");
               e.preventDefault();
             },
-            false
+            false,
           );
           return canvas;
         })(),
