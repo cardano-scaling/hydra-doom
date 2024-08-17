@@ -4763,16 +4763,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1723483529,
-        "narHash": "sha256-3vdAUoDUiKzF2siMDvV4R/J9RKXeLxGVbXzc+e1Hqsc=",
+        "lastModified": 1723908242,
+        "narHash": "sha256-huSmY2YhyUv28Mm8MQR3WY2O8JnKUsBOh/0wbrxqB2Q=",
         "owner": "input-output-hk",
         "repo": "hydra",
-        "rev": "69f4f93e3d0631b49c19119acb7e9b117963c1f8",
+        "rev": "a6408accddda587f8565eab9a5a19b0e8b625b50",
         "type": "github"
       },
       "original": {
         "owner": "input-output-hk",
-        "ref": "doom",
+        "ref": "doom-memory-hack",
         "repo": "hydra",
         "type": "github"
       }
