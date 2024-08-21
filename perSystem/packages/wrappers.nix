@@ -19,6 +19,7 @@
         { serverUrl ? controlPlaneUrl
         , wadFile ? doomWad
         , cabinetKey ? import ../../deployment/cabinet-key.nix
+        , useMouse ? "1"
         }:
         let
           src = inputs.nix-inclusive.lib.inclusive ../../. [
@@ -61,6 +62,7 @@
             ${lib.optionalString (serverUrl == "http://127.0.0.1:8000" || cabinetKey != "") "REGION=us-west-2"}
             EOF
             yarn build
+            sed -i "s/use_mouse.*/use_mouse                     ${useMouse}/" dist/default.cfg
           '';
           installPhase = ''
             cp -a dist $out
@@ -140,12 +142,14 @@
           text = ''
             set -x
             export LOCAL_HYDRA="''${LOCAL_HYDRA:-0}"
+            export RESERVED="''${RESERVED:-false}"
+            export PRESERVE_ROCKET_TOML="''${PRESERVE_ROCKET_TOML:-0}"
             export ROCKET_PROFILE=local
             if [ "''${LOCAL_HYDRA}" -eq 0 ]; then
               echo "Not starting hydra control plane because LOCAL_HYDRA is not set"
               exit 0
             fi
-            if [ ! -f Rocket.toml ]
+            if [ "$PRESERVE_ROCKET_TOML" -eq 0 ]
             then
             cat > Rocket.toml << EOF
             [default]
@@ -157,10 +161,11 @@
             local_url = "ws://${hydraHost}"
             remote_url = "ws://${hydraHost}"
             port = ${hydraPort}
-            max_players = 10
+            max_players = 100
             admin_key_file = "admin.sk"
             persisted = false
-            reserved = false
+            reserved = ''${RESERVED}
+            region = "us-west-2"
             stats-file = "local-stats"
             EOF
             fi

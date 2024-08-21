@@ -99,6 +99,7 @@
           "doom-remote.local" = {
             root = self.packages.${system}.hydra-doom-static-remote.overrideAttrs (_: {
               cabinetKey = import ../deployment/cabinet-key.nix;
+              useMouse = "0";
             });
             extraConfig = ''
               disable_symlinks off;
@@ -108,6 +109,7 @@
           "doom-offline.local" = {
             root = self.packages.${system}.hydra-doom-static-local.overrideAttrs (_: {
               cabinetKey = import ../deployment/cabinet-key.nix;
+              useMouse = "0";
             });
             extraConfig = ''
               disable_symlinks off;
@@ -121,6 +123,7 @@
       hydra-offline = {
         environment = {
           LOCAL_HYDRA = "1";
+          RESERVED = "true";
         };
         wantedBy = ["multi-user.target" "hydra-control-plane.service"];
         startLimitIntervalSec = 0;
@@ -249,6 +252,7 @@ in {
           targetPort = 22;
           targetUser = "root";
         };
+        networking.hostName = "hydra-arcade-1";
         imports = [
           inputs.sops-nix.nixosModules.sops
           baseConfig
@@ -274,6 +278,7 @@ in {
           targetPort = 22;
           targetUser = "root";
         };
+        networking.hostName = "hydra-arcade-2";
         imports = [
           inputs.sops-nix.nixosModules.sops
           baseConfig
