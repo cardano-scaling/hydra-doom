@@ -172,7 +172,6 @@ body {
   font-family: "less_perfect_dos_vgaregular", monospace;
   color: white;
   height: 100%;
-  overflow: hidden; /* Do not scroll if content too big */
 }
 
 img {
@@ -218,7 +217,6 @@ a:hover {
   inset: 0;
   width: 100%;
   height: 100%;
-  overflow: hidden;
 }
 
 .layer--bg::before {
@@ -237,7 +235,6 @@ a:hover {
 .layer--foreground {
   position: relative;
   z-index: 2;
-  overflow: hidden;
   margin-top: -85px;
   max-height: 50vh;
   min-height: 560px;
@@ -335,8 +332,8 @@ main {
 
 .doom-logo img {
   display: block;
-  margin: -4.5% auto -6.5%;
-  width: 970px;
+  margin: auto;
+  max-height: 350px;
   max-width: 70vw;
 }
 
@@ -368,7 +365,7 @@ main {
   text-align: center;
   padding: 30px;
   margin: 0 auto;
-  font-size: 2.5rem;
+  font-size: 1.5rem;
 }
 
 .card p {
@@ -382,7 +379,7 @@ main {
 .card .card__title {
   font-family: "Pixelify Sans";
   font-weight: 700;
-  font-size: 3.5rem;
+  font-size: 2.5rem;
   letter-spacing: -0.01em;
   padding: 0 0 0.3em;
   color: yellow;
