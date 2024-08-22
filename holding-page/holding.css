@@ -170,7 +170,6 @@ html {
 body {
   background: red;
   font-family: "less_perfect_dos_vgaregular", monospace;
-  text-transform: uppercase;
   color: white;
   height: 100%;
   overflow: hidden; /* Do not scroll if content too big */
@@ -365,17 +364,25 @@ main {
   background: #18181a;
   border: 1px solid #ff3030;
   box-shadow: 0px 4px 10px 6px rgba(0, 0, 0, 0.25);
-  max-width: 535px;
+  max-width: 1465px;
   text-align: center;
-  padding: 15px 15px 20px;
+  padding: 30px;
   margin: 0 auto;
-  font-size: 1.45rem;
+  font-size: 2.5rem;
 }
 
-.card__title {
+.card p {
+  margin-bottom: 1.5rem;
+}
+
+.card a {
+  color: yellow;
+}
+
+.card .card__title {
   font-family: "Pixelify Sans";
   font-weight: 700;
-  font-size: 2.5rem;
+  font-size: 3.5rem;
   letter-spacing: -0.01em;
   padding: 0 0 0.3em;
   color: yellow;
@@ -384,6 +391,7 @@ main {
     0 0 20px #f2581f,
     0 0 50px #f2581f,
     0 0 50px rgba(255, 50, 50, 0.25);
+  margin-bottom: 2rem;
 }
 
 .card__description {
