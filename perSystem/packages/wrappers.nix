@@ -99,6 +99,8 @@
             ${lib.getExe' config.packages.hydra-node "hydra-node"} offline \
               --hydra-signing-key hydra.sk \
               --ledger-protocol-parameters protocol-parameters.json \
+              --host 0.0.0.0 \
+              --api-host 0.0.0.0 \
               --initial-utxo utxo.json
             popd
           '';
