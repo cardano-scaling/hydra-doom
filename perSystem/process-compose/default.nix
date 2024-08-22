@@ -15,10 +15,17 @@
             #};
             hydra-offline = {
               command = config.packages.hydra-offline-wrapper;
+              readiness_probe = {
+                http_get = {
+                  host = "127.0.0.1";
+                  scheme = "http";
+                  port = 4001;
+                  path = "/protocol-parameters";
+                };
+              };
             };
             hydra-doom = {
               command = config.packages.hydra-doom-wrapper;
-              depends_on."hydra-offline".condition = "process_started";
               availability = {
                 restart = "on_failure";
                 backoff_seconds = 2;
@@ -26,7 +33,15 @@
             };
             hydra-control-plane = {
               command = config.packages.hydra-control-plane-wrapper;
-              depends_on."hydra-offline".condition = "process_started";
+              readiness_probe = {
+                http_get = {
+                  host = "127.0.0.1";
+                  scheme = "http";
+                  port = 8000;
+                  path = "/global";
+                };
+              };
+              depends_on."hydra-offline".condition = "process_healthy";
               availability = {
                 restart = "on_failure";
                 backoff_seconds = 2;
