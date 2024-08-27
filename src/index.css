@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: "Less Perfect DOS VGA";
+    font-style: normal;
+    font-weight: 400;
+    src:
+      url("./assets/fonts/lessperfectdosvga-webfont.woff2") format("woff2"),
+      url("./assets/fonts/lessperfectdosvga-webfont.woff") format("woff");
+  }
+
+  @font-face {
+    font-family: "Pixelify Sans";
+    font-style: normal;
+    font-weight: 400;
+    src: url("./assets/fonts/pixelifysans-regular.ttf") format("truetype");
+  }
+}
