@@ -1,50 +1,50 @@
-# Hydra Doom
+# React + TypeScript + Vite
 
-Experiment of running Doom using a [Cardano Hydra head](https://github.com/cardano-scaling/hydra).
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Manual startup
+Currently, two official plugins are available:
 
-This is using a forked version of [doom-wasm](https://github.com/cardano-scaling/doom-wasm), make sure to build it first and copy or symlink the build results:
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-``` shell
-cp ../doom-wasm/src/websockets-doom.js assets/websockets-doom.js
-cp ../doom-wasm/src/websockets-doom.wasm assets/websockets-doom.wasm
-cp ../doom-wasm/src/websockets-doom.wasm.map assets/websockets-doom.wasm.map
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+
+- Configure the top-level `parserOptions` property like this:
+
+```js
+export default tseslint.config({
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
 ```
 
-Also, you need to copy the shareware version of [doom1.wad](https://doomwiki.org/wiki/DOOM1.WAD) to `./assets`:
+- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
+- Optionally add `...tseslint.configs.stylisticTypeChecked`
+- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
 
-```shell
-curl https://distro.ibiblio.org/slitaz/sources/packages/d/doom1.wad -o assets/doom1.wad
-```
+```js
+// eslint.config.js
+import react from 'eslint-plugin-react'
 
-The application requires connection to a [hydra-control-plane](https://github.com/cardano-scaling/hydra-control-plane) which provides managed Hydra head instances provided as `SERVER_URL` in the `.env` file.
-
-Then to build & run:
-
-```shell
-npm install
-npm start
-```
-
-## Integrated startup
-
-There is a way to start all required processes using `nix` and `process-compose`:
-
-``` shell
-nix run
-```
-
-## Persistent sessions
-
-If we want to keep using the same key and remote node configuration between runs, set the `PERSISTENT_SESSION=true` variable in the `.env` file before starting the dev web server.
-
-
-
-### Local Development
-
-To run the project locally (using the POO integration), you need to set a `CABINET_KEY` in the `.env` file. For example:
-
-```sh
-CABIENT_KEY=A610911D628D5475EFFBA5E80ED09D1260B49E6935C40E4195C4D4AA17963CBF
+export default tseslint.config({
+  // Set the react version
+  settings: { react: { version: '18.3' } },
+  plugins: {
+    // Add the react plugin
+    react,
+  },
+  rules: {
+    // other rules...
+    // Enable its recommended rules
+    ...react.configs.recommended.rules,
+    ...react.configs['jsx-runtime'].rules,
+  },
+})
 ```
