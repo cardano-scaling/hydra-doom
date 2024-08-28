@@ -2,14 +2,29 @@ import { useState } from "react";
 import MainBackground from "./components/MainBackground";
 import Modal from "./components/Modal";
 import Logos from "./components/Logos";
+import hydraText from "./assets/images/hydra-text.png";
+import Button from "./components/Button";
+import GlobalTotals from "./components/GlobalTotals";
 
 export default function App() {
-  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(true);
+  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
 
   return (
     <main className="relative min-h-screen">
-      <div className="z-20 relative">
+      <div className="z-20 relative flex flex-col items-center">
         <Logos />
+        <img
+          src={hydraText}
+          alt="Hydra"
+          className="w-full max-w-5xl relative -bottom-14 -mt-14 z-10 pointer-events-none"
+        />
+        <Button className="w-96 h-16">Play Doom on Hydra</Button>
+        <div className="grid grid-cols-2 max-w-6xl w-full mt-32 gap-8">
+          <div>
+            <GlobalTotals />
+          </div>
+          <div>Column 2</div>
+        </div>
       </div>
 
       <Modal

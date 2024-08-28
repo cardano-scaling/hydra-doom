@@ -19,3 +19,7 @@
     src: url("./assets/fonts/pixelifysans-regular.ttf") format("truetype");
   }
 }
+
+body {
+  font-family: "Less Perfect DOS VGA", monospace;
+}

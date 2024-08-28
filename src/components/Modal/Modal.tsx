@@ -15,12 +15,8 @@ const Modal: FC<ModalProps> = ({ isOpen, close, children }) => {
       <div className="fixed inset-0 bg-stone-900 opacity-50 z-10" />
       <article className="bg-white rounded-lg z-20 relative font-['Pixelify_Sans'] max-w-7xl shadow-2xl text-yellow-400">
         <button
-          className="absolute right-7 top-6 p-3 z-20 text-3xl"
+          className="absolute right-7 top-6 p-3 z-20 text-3xl text-shadow-custom"
           onClick={close}
-          style={{
-            textShadow:
-              "0 0 10px #db1102, 0 0 20px #f2581f, 0 0 50px #f2581f, 0 0 50px rgba(255, 50, 50, 0.25)",
-          }}
         >
           X
         </button>
@@ -61,13 +57,7 @@ const Modal: FC<ModalProps> = ({ isOpen, close, children }) => {
                   alt="Noise"
                   className="absolute inset-0 w-full h-full object-cover z-10 opacity-20"
                 />
-                <div
-                  className="relative z-20"
-                  style={{
-                    textShadow:
-                      "0 0 10px #db1102, 0 0 20px #f2581f, 0 0 50px #f2581f, 0 0 50px rgba(255, 50, 50, 0.25)",
-                  }}
-                >
+                <div className="relative z-20 text-shadow-custom">
                   {children}
                 </div>
               </div>
