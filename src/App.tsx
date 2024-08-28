@@ -1,19 +1,21 @@
 import { useState } from "react";
 import MainBackground from "./components/MainBackground";
 import Modal from "./components/Modal";
+import Logos from "./components/Logos";
 
 export default function App() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(true);
 
   return (
     <main className="relative min-h-screen">
       <div className="z-20 relative">
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Illum repellat
-        velit omnis qui quidem odit quis ad nostrum eum quibusdam voluptas,
-        ducimus nesciunt non ipsum dolor unde magnam facilis incidunt!
+        <Logos />
       </div>
 
-      <Modal isOpen={isOpen} close={() => setIsOpen(false)}>
+      <Modal
+        isOpen={isWelcomeModalOpen}
+        close={() => setIsWelcomeModalOpen(false)}
+      >
         <div className="text-center text-4xl flex flex-col gap-8">
           <h1 className="text-5xl">Welcome to Hydra Doom</h1>
           <p>
