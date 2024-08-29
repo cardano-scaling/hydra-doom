@@ -11,7 +11,7 @@ const Card: FC<CardProps> = ({ children, className, glass }) => {
   return (
     <div
       className={cx(
-        "border border-red-600 shadow-xl py-6 px-8",
+        "border border-red-600 shadow-xl",
         {
           "bg-stone-900": !glass,
           "bg-stone-800 bg-opacity-50 backdrop-blur-sm": glass,

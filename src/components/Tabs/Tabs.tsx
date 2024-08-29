@@ -19,7 +19,7 @@ const Tabs: FC<TabsProps> = ({ tabs }) => {
   };
 
   return (
-    <div className="shadow-xl">
+    <div>
       <div className="flex">
         {tabs.map((tab) => (
           <button

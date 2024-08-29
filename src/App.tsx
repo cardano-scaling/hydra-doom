@@ -6,9 +6,10 @@ import hydraText from "./assets/images/hydra-text.png";
 import Button from "./components/Button";
 import GlobalTotals from "./components/GlobalTotals";
 import GlobalLeaderBoard from "./components/GlobalLeaderBoard";
+import GlobalTPS from "./components/GlobalTPS";
 
 export default function App() {
-  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(true);
+  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
 
   return (
     <main className="relative min-h-screen">
@@ -21,8 +22,9 @@ export default function App() {
         />
         <Button className="w-96 h-16">Play Doom on Hydra</Button>
         <div className="grid grid-cols-2 max-w-6xl w-full mt-32 gap-8">
-          <div>
+          <div className="flex flex-col gap-2">
             <GlobalTotals />
+            <GlobalTPS />
           </div>
           <div>
             <GlobalLeaderBoard />
