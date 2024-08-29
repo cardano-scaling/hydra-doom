@@ -5,9 +5,10 @@ import Logos from "./components/Logos";
 import hydraText from "./assets/images/hydra-text.png";
 import Button from "./components/Button";
 import GlobalTotals from "./components/GlobalTotals";
+import GlobalLeaderBoard from "./components/GlobalLeaderBoard";
 
 export default function App() {
-  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
+  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(true);
 
   return (
     <main className="relative min-h-screen">
@@ -23,7 +24,9 @@ export default function App() {
           <div>
             <GlobalTotals />
           </div>
-          <div>Column 2</div>
+          <div>
+            <GlobalLeaderBoard />
+          </div>
         </div>
       </div>
 

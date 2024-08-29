@@ -12,7 +12,7 @@ const Modal: FC<ModalProps> = ({ isOpen, close, children }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 p-8">
-      <div className="fixed inset-0 bg-stone-900 opacity-50 z-10" />
+      <div className="fixed inset-0 bg-stone-900 opacity-70 z-10" />
       <article className="bg-white rounded-lg z-20 relative font-['Pixelify_Sans'] max-w-7xl shadow-2xl text-yellow-400">
         <button
           className="absolute right-7 top-6 p-3 z-20 text-3xl text-shadow-custom"
