@@ -9,13 +9,22 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   withDecoration?: boolean;
 }
 
-const Button: FC<ButtonProps> = ({ children, className, tick, ...props }) => {
+const Button: FC<ButtonProps> = ({
+  children,
+  className,
+  tick,
+  withDecoration,
+  ...props
+}) => {
   return (
     <div className="relative">
-      <div
-        className="absolute -inset-[86px] bg-center bg-no-repeat bg-contain pointer-events-none"
-        style={{ backgroundImage: `url(${buttonBgDecoration})` }}
-      />
+      {withDecoration && (
+        <div
+          className="absolute -inset-[86px] bg-center bg-no-repeat bg-contain pointer-events-none"
+          style={{ backgroundImage: `url(${buttonBgDecoration})` }}
+        />
+      )}
+
       <button
         {...props}
         className={cx(
