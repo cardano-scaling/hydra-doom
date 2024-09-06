@@ -18,8 +18,21 @@
     font-weight: 400;
     src: url("./assets/fonts/pixelifysans-regular.ttf") format("truetype");
   }
-}
 
-body {
-  font-family: "Less Perfect DOS VGA", monospace;
+  html {
+    font-size: 12px;
+    scroll-behavior: smooth;
+
+    @screen xl {
+      font-size: 14px;
+    }
+
+    @screen 2xl {
+      font-size: 16px;
+    }
+  }
+
+  body {
+    font-family: "Less Perfect DOS VGA", monospace;
+  }
 }

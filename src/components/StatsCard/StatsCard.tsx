@@ -27,8 +27,8 @@ const StatsCard: FC<StatsCardProps> = ({
         <h1
           className={cx("text-white uppercase", {
             "text-lg mb-1": size === "sm",
-            "text-2xl mb-2": size === "md",
-            "text-3xl mb-4": size === "lg",
+            "text-xl mb-2": size === "md",
+            "text-2xl mb-4": size === "lg",
             "text-left": titleAlign === "left",
             "text-center": titleAlign === "center",
             "text-right": titleAlign === "right",
