@@ -8,6 +8,7 @@ export interface GameData {
   monsters: MabObject[];
   leveltime: number[];
   level: LevelId;
+  teleporting: boolean;
 }
 export interface Player {
   playerState: PlayerState;
@@ -84,6 +85,7 @@ export const initialGameData = (
     episode: -1,
     demoplayback: false,
   },
+  teleporting: false,
 });
 
 export const buildDatum = (state: GameData): string => {
@@ -96,6 +98,7 @@ export const buildDatum = (state: GameData): string => {
       state.monsters.map((monster) => encodeMapObject(monster)),
       state.leveltime.map((time) => BigInt(time)),
       encodeLevelId(state.level),
+      encodeBoolean(state.teleporting),
     ]),
   );
 };

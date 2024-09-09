@@ -191,6 +191,7 @@ export async function hydraSend(
   gameState: GameState,
   leveltime: number,
   level: LevelId,
+  newgame: boolean,
 ) {
   if (stop) throw new Error("stop");
 
