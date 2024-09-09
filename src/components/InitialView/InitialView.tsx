@@ -6,7 +6,7 @@ import hydraText from "../../assets/images/hydra-text.png";
 import Modal from "../Modal";
 import SelectContinentDialog from "../SelectContinentDialog";
 import Layout from "../Layout";
-import StatsCard from "../StatsCard";
+import GlobalTotals from "../GlobalTotals";
 
 interface InitialViewProps {
   startGame: () => void;
@@ -33,20 +33,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
       </Button>
       <div className="grid grid-cols-2 max-w-6xl w-full mt-32 gap-8 py-6">
         <div className="flex flex-col gap-2">
-          <StatsCard
-            data={[
-              { label: "Games (all-time):", value: "7,384" },
-              { label: "Games (active):", value: "0" },
-              { label: "Transactions:", value: "106,791,272" },
-              { label: "Bytes:", value: "54,502,739,168" },
-              { label: "Kills:", value: "77,808" },
-              { label: "Items:", value: "58,999" },
-              { label: "Secrets:", value: "1,408" },
-              { label: "Play time:", value: "21:08:08:25" },
-            ]}
-            size="lg"
-            title="Global Totals"
-          />
+          <GlobalTotals size="lg" />
           <GlobalTPS />
         </div>
         <div>

@@ -2,8 +2,8 @@ import { FC } from "react";
 import Card from "../Card";
 import cx from "classnames";
 
-interface StatsCardProps {
-  data: { label: string; value: string }[];
+export interface StatsCardProps {
+  data: { label: string; value: string | number }[];
   size?: "sm" | "md" | "lg";
   title?: string;
   titleAlign?: "left" | "center" | "right";
