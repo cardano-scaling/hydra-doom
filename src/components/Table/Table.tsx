@@ -4,8 +4,8 @@ interface TableColumn {
   name: string;
 }
 
-interface TableData {
-  [key: string]: string;
+export interface TableData {
+  [key: string]: string | number;
 }
 
 interface TableProps {

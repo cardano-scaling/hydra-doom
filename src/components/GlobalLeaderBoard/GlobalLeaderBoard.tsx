@@ -1,46 +1,28 @@
-import Table from "../Table";
+import { useAppContext } from "../../context/useAppContext";
+import LeaderboardTable from "../LeaderboardTable";
 import Tabs from "../Tabs";
 
 const GlobalLeaderBoard = () => {
+  const { globalQuery } = useAppContext();
+  const kills = globalQuery?.data?.kills_leaderboard;
+  const items = globalQuery?.data?.items_leaderboard;
+  const secrets = globalQuery?.data?.secrets_leaderboard;
+
   const tabs = [
     {
       id: 0,
       title: "Kills",
-      content: (
-        <Table
-          columns={[{ name: "player" }, { name: "score" }]}
-          data={[
-            { player: "Player 1", score: "1000" },
-            { player: "Player 2", score: "900" },
-            { player: "Player 3", score: "800" },
-            { player: "Player 4", score: "700" },
-            { player: "Player 5", score: "600" },
-            { player: "Player 6", score: "500" },
-            { player: "Player 7", score: "400" },
-            { player: "Player 8", score: "300" },
-            { player: "Player 9", score: "200" },
-            { player: "Player 10", score: "100" },
-          ]}
-        />
-      ),
+      content: kills && <LeaderboardTable data={kills} />,
     },
     {
       id: 1,
       title: "Items",
-      content: (
-        <div className="p-6 text-white bg-stone-900">
-          Leaderboard content for this week
-        </div>
-      ),
+      content: items && <LeaderboardTable data={items} />,
     },
     {
       id: 2,
       title: "Secret",
-      content: (
-        <div className="p-6 text-white bg-stone-900">
-          Leaderboard content for today
-        </div>
-      ),
+      content: secrets && <LeaderboardTable data={secrets} />,
     },
   ];
 
