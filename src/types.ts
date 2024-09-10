@@ -25,3 +25,8 @@ export interface GameStatistics {
   total_secrets: number;
   transactions: number;
 }
+
+export interface Region {
+  name: string;
+  value: string;
+}

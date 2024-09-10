@@ -7,6 +7,7 @@ import Modal from "../Modal";
 import SelectContinentDialog from "../SelectContinentDialog";
 import Layout from "../Layout";
 import GlobalTotals from "../GlobalTotals";
+import { REGION } from "../../constants";
 
 interface InitialViewProps {
   startGame: () => void;
@@ -17,6 +18,14 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
   const [isSelectContinentModalOpen, setIsSelectContinentModalOpen] =
     useState(false);
 
+  const handleClickPlay = () => {
+    if (REGION) {
+      startGame();
+    } else {
+      setIsSelectContinentModalOpen(true);
+    }
+  };
+
   return (
     <Layout>
       <img
@@ -24,11 +33,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
         alt="Hydra"
         className="w-full max-w-5xl relative -bottom-14 -mt-14 z-10 pointer-events-none"
       />
-      <Button
-        className="w-96 h-16"
-        onClick={() => setIsSelectContinentModalOpen(true)}
-        withDecoration
-      >
+      <Button className="w-96 h-16" onClick={handleClickPlay} withDecoration>
         Play Doom on Hydra
       </Button>
       <div className="grid grid-cols-2 max-w-6xl w-full mt-32 gap-8 py-6">

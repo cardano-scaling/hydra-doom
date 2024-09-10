@@ -1,6 +1,8 @@
-import { FC } from "react";
+import { ChangeEventHandler, FC } from "react";
 import Modal from "../Modal";
 import Button from "../Button";
+import { REGIONS } from "../../constants";
+import { useAppContext } from "../../context/useAppContext";
 
 interface SelectContinentDialogProps {
   close: () => void;
@@ -8,34 +10,32 @@ interface SelectContinentDialogProps {
   startGame: () => void;
 }
 
-const continents = [
-  { name: "Ohio, NA", value: "us-east-2" },
-  { name: "Oregon, NA", value: "us-west-2" },
-  { name: "Frankfurt, Europe", value: "eu-central-1" },
-  { name: "Cape Town, Africa", value: "af-south-1" },
-  { name: "Melbourne, Australia", value: "ap-southeast-4" },
-  { name: "Seoul, Asia", value: "ap-northeast-2" },
-  { name: "Sao Paulo, SA", value: "sa-east-1" },
-];
-
 const SelectContinentDialog: FC<SelectContinentDialogProps> = ({
   close,
   isOpen,
   startGame,
 }) => {
+  const { region, setRegion } = useAppContext();
+
+  const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+    setRegion(REGIONS.find((r) => r.value === event.target.value)!);
+  };
+
   return (
     <Modal isOpen={isOpen} close={close}>
       <h1 className="text-5xl mb-20 text-center">Select your continent</h1>
       <form>
         <ul className="grid grid-cols-2 gap-y-8 text-3xl gap-x-40 mb-20">
-          {continents.map((continent) => (
+          {REGIONS.map((continent) => (
             <li key={continent.value}>
-              <label className="flex gap-4 items-center">
+              <label className="flex gap-4 items-center cursor-pointer">
                 <input
-                  className="h-6 w-6"
+                  className="h-6 w-6 cursor-pointer"
                   name="continent"
                   type="radio"
                   value={continent.value}
+                  checked={continent.value === region.value}
+                  onChange={handleChange}
                 />
                 {continent.name}
               </label>
