@@ -3,6 +3,7 @@ import iogLogo from "../../assets/images/iog-logo.png";
 import onboardLogo from "../../assets/images/onboard-logo.png";
 import popupLogo from "../../assets/images/popup-logo.png";
 import sundaeLogo from "../../assets/images/sundae-labs-logo.svg";
+import { CABINET_KEY } from "../../constants";
 
 const Logos = () => {
   return (
@@ -20,12 +21,16 @@ const Logos = () => {
       >
         <img className="w-14" src={iogLogo} alt="IOG" />
       </a>
-      <a target="_blank" href="http://onboard.ninja">
-        <img className="w-14" src={onboardLogo} alt="Onboard" />
-      </a>
-      <a target="_blank" href="https://x.com/PopupVirtualEnt">
-        <img className="w-24" src={popupLogo} alt="Popup" />
-      </a>
+      {CABINET_KEY && (
+        <>
+          <a target="_blank" href="http://onboard.ninja">
+            <img className="w-14" src={onboardLogo} alt="Onboard" />
+          </a>
+          <a target="_blank" href="https://x.com/PopupVirtualEnt">
+            <img className="w-24" src={popupLogo} alt="Popup" />
+          </a>
+        </>
+      )}
     </div>
   );
 };

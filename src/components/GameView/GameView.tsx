@@ -1,5 +1,6 @@
 import Card from "../Card";
 import GlobalTotals from "../GlobalTotals";
+import GlobalTPS from "../GlobalTPS";
 import HydraHeadLiveTxs from "../HydraHeadLiveTxs";
 import Layout from "../Layout";
 import RestartButton from "../RestartButton";
@@ -30,7 +31,13 @@ const GameView = () => {
           <HydraHeadLiveTxs />
         </div>
         <Card className="h-[40rem]">dsad</Card>
-        <div className="w-80">dsad</div>
+        <div className="w-80 flex flex-col gap-4">
+          <GlobalTPS size="sm" titleAlign="left" />
+          <Card className="text-white py-3 px-4 text-sm leading-3">
+            A comparison between the throughput from your game session (bottom)
+            and all the Hydra heads in aggregate (top).
+          </Card>
+        </div>
       </div>
     </Layout>
   );

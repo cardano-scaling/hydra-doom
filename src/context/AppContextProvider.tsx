@@ -11,6 +11,7 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
       const response = await fetch(`${SERVER_URL}/global`);
       return response.json();
     },
+    // refetchInterval: 1000,
   });
 
   const value = useMemo(() => ({ globalQuery }), [globalQuery]);

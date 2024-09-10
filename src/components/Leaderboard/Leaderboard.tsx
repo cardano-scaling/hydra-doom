@@ -1,6 +1,6 @@
 import { useAppContext } from "../../context/useAppContext";
 import LeaderboardTable from "../LeaderboardTable";
-import Table from "../Table";
+import RecentStatsTable from "../RecentStatsTable";
 import Tabs from "../Tabs";
 
 const Leaderboard = () => {
@@ -9,10 +9,20 @@ const Leaderboard = () => {
   const items = globalQuery?.data?.items_leaderboard;
   const secrets = globalQuery?.data?.secrets_leaderboard;
 
+  const recentKills = globalQuery?.data?.kills;
+  const recentItems = globalQuery?.data?.items;
+  const recentSecrets = globalQuery?.data?.secrets;
+
   const allTimeData = [
     { title: "Kills", data: kills },
     { title: "Items", data: items },
     { title: "Secrets", data: secrets },
+  ];
+
+  const recentData = [
+    { title: "Kills", data: recentKills },
+    { title: "Items", data: recentItems },
+    { title: "Secrets", data: recentSecrets },
   ];
 
   const tabs = [
@@ -21,24 +31,10 @@ const Leaderboard = () => {
       title: "Recent",
       content: (
         <div className="grid grid-cols-3 gap-6 pt-6">
-          {[1, 2, 3].map((i) => (
-            <div key={i}>
-              <h2 className="text-2xl text-center mb-6">Kills</h2>
-              <Table
-                columns={[{ name: "player" }, { name: "score" }]}
-                data={[
-                  { player: "Player 1", score: "1000" },
-                  { player: "Player 2", score: "900" },
-                  { player: "Player 3", score: "800" },
-                  { player: "Player 4", score: "700" },
-                  { player: "Player 5", score: "600" },
-                  { player: "Player 6", score: "500" },
-                  { player: "Player 7", score: "400" },
-                  { player: "Player 8", score: "300" },
-                  { player: "Player 9", score: "200" },
-                  { player: "Player 10", score: "100" },
-                ]}
-              />
+          {recentData.map(({ title, data }) => (
+            <div key={title}>
+              <h2 className="text-2xl text-center mb-6">{title}</h2>
+              {data && <RecentStatsTable data={data} />}
             </div>
           ))}
         </div>
@@ -61,7 +57,7 @@ const Leaderboard = () => {
   ];
 
   return (
-    <div className="text-center flex flex-col gap-10">
+    <div className="text-center flex flex-col gap-10 min-w-[64rem]">
       <h1 className="text-5xl">Leaderboard</h1>
       <Tabs tabs={tabs} />
     </div>

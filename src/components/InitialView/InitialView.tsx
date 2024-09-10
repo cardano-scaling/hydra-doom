@@ -32,9 +32,9 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
         Play Doom on Hydra
       </Button>
       <div className="grid grid-cols-2 max-w-6xl w-full mt-32 gap-8 py-6">
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-4">
           <GlobalTotals size="lg" />
-          <GlobalTPS />
+          <GlobalTPS size="lg" />
         </div>
         <div>
           <GlobalLeaderBoard />

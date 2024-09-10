@@ -67,7 +67,7 @@ const TopLinks = () => {
 
   return (
     <div>
-      <ul className="py-16 text-xl text-white font-['Pixelify_Sans'] uppercase flex gap-20">
+      <ul className="py-16 text-xl text-white font-['Pixelify_Sans'] uppercase flex gap-20 mb-20">
         {links.map(({ title, content }) => (
           <li key={title}>
             <button

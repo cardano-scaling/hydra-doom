@@ -10,7 +10,7 @@ export const getMap = (items?: LeaderboardEntry[]) => {
 };
 
 export const getTableData = (
-  map: ReturnType<typeof getMap>,
+  map: { [key: string]: number } | undefined,
   handles: { [key: string]: string },
 ): TableData[] => {
   if (!map) return [];
@@ -26,5 +26,5 @@ export const getTableData = (
     })),
     "score",
     "desc",
-  );
+  ).slice(0, 10);
 };
