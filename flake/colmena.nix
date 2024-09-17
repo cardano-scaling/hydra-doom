@@ -43,6 +43,25 @@
       pkgs.polychromatic
     ];
   };
+  miniHardware = { config, pkgs, lib, ... }: {
+    boot.extraModprobeConfig = ''
+      options kvm_intel nested=1
+      options kvm_intel emulate_invalid_guest_state=0
+      options kvm ignore_msrs=1
+    '';
+    networking.networkmanager.enable = lib.mkForce false;
+    nixpkgs.config.pulseaudio = true;
+    hardware = {
+      opengl.enable = true;
+      opengl.driSupport32Bit = true;
+      opengl.extraPackages = [ pkgs.vaapiIntel ];
+      pulseaudio.enable = true;
+    };
+    sound.enable = true;
+
+    environment.systemPackages = [
+    ];
+  };
   adminGui = { config, pkgs, ... }: {
     services.xserver = {
       enable = true;
@@ -50,20 +69,38 @@
       desktopManager.gnome.enable = true;
     };
   };
-  hydraCageLocal = { config, pkgs, ... }: {
+  hydraCageLocal = { config, pkgs, ... }: let
+    system = "x86_64-linux";
+    chrome-kiosk-wrapper = pkgs.writeShellApplication {
+      name = "chrome-kiosk-wrapper";
+      text = ''
+        rm -f ~/.config/google-chrome/Singleton
+        ${pkgs.google-chrome}/bin/google-chrome-stable --app=http://doom-offline.local
+      '';
+    };
+  in {
     services = {
       cage = {
         enable = true;
-        program = "${pkgs.google-chrome}/bin/google-chrome-stable --app=http://doom-offline.local";
+        program = "${chrome-kiosk-wrapper}/bin/chrome-kiosk-wrapper";
         user = "doom";
       };
     };
   };
-  hydraCageRemote = { config, pkgs, ... }: {
+  hydraCageRemote = { config, pkgs, ... }: let
+    system = "x86_64-linux";
+    chrome-kiosk-wrapper = pkgs.writeShellApplication {
+      name = "chrome-kiosk-wrapper";
+      text = ''
+        rm -f ~/.config/google-chrome/Singleton
+        ${pkgs.google-chrome}/bin/google-chrome-stable --app=http://doom-offline.local
+      '';
+    };
+  in {
     services = {
       cage = {
         enable = true;
-        program = "${pkgs.google-chrome}/bin/google-chrome-stable --app=http://doom-remote.local";
+        program = "${chrome-kiosk-wrapper}/bin/chrome-kiosk-wrapper";
         user = "doom";
       };
     };
@@ -140,11 +177,13 @@
       hydra-control-plane = {
         environment = {
           LOCAL_HYDRA = "1";
+          RESERVED = "true";
         };
         wantedBy = ["multi-user.target"];
         startLimitIntervalSec = 10;
         serviceConfig = {
           ExecStart = "${self.packages.${system}.hydra-control-plane-wrapper}/bin/hydra-control-plane-wrapper";
+          ExecStartPre="${pkgs.bash}/bin/bash -c '(while ! ${pkgs.netcat}/bin/nc -z -v -w1 localhost 4001 2>/dev/null; do echo \"Waiting for port 4001 to open...\"; sleep 2; done); sleep 2'";
           Restart = "always";
           RestartSec = "30s";
           WorkingDirectory = "/var/lib/hydra-offline";
@@ -292,6 +331,32 @@ in {
         networking.hostId = "0904bbe4"; # required for zfs use
         sops = {
          defaultSopsFile = ../deployment/hydra-arcade-2/secrets.yaml;
+         age = {
+           sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
+         };
+         secrets.wg0PrivateKey = {};
+         };
+      };
+      hydra-doom-mini = { config, pkgs, ... }: {
+        deployment = {
+          targetHost = "hydra-doom-mini";
+          targetPort = 22;
+          targetUser = "root";
+        };
+        networking.hostName = "hydra-doom-mini";
+        imports = [
+          inputs.sops-nix.nixosModules.sops
+          baseConfig
+          miniHardware
+          hydraBase
+          hydraCageLocal
+          #adminGui
+          ../deployment/hydra-doom-mini/hardware-configuration.nix
+          (mkWireGuardTunnel [ "10.40.9.9/24" "fd00::9" ] config.sops.secrets.wg0PrivateKey.path)
+        ];
+        networking.hostId = "37f9660d"; # required for zfs use
+        sops = {
+         defaultSopsFile = ../deployment/hydra-doom-mini/secrets.yaml;
          age = {
            sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
          };

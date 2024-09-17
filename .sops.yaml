@@ -8,6 +8,7 @@ keys:
   - &hydra-arcade-test age1kyrzwkuss4shyqlckausvyyed47jte75ahdmzl439xwuan2uzghsxfahp2
   - &hydra-arcade-1 age1ffacux409u4t76n43qngqdruuxtcndwheee8mzxen55a3ad4uqnqmqckaa
   - &hydra-arcade-2 age1jmjgnr89j7prfr2cxwpj7mw25hmg2hjq2veg03z0wrtpufqevpssghlcsk
+  - &hydra-doom-mini age1zsdtk85m7k8cpl6jmra0hz7u3rt7p8vt7644aegvxdd85g695yrqkxwz78
 creation_rules:
   - path_regex: secrets.yaml$
     key_groups:
@@ -17,3 +18,4 @@ creation_rules:
       - *hydra-arcade-test
       - *hydra-arcade-1
       - *hydra-arcade-2
+      - *hydra-doom-mini
