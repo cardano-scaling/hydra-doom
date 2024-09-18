@@ -12,7 +12,7 @@
       <div style="display: flex; flex-direction: row">
         <label for="region">Region:</label>
         <select id="region">
-            <option value="any">any</option>
+          <option value="any">any</option>
           <option value="us-east-2">us-east-2</option>
           <option value="us-west-2">us-west-2</option>
           <option value="eu-central-1">eu-central-1</option>
@@ -73,7 +73,7 @@
     let startTxs = 0;
     let tps = undefined;
     setInterval(async () => {
-      const rawResp = await fetch("https://hydra-doom.sundae.fi/global");
+      const rawResp = await fetch("http://localhost:8000/global");
       const resp = await rawResp.json();
       const now = performance.now();
       const elapsed = now - start;
@@ -108,7 +108,7 @@
       const pkh =
         lucid.utils.getAddressDetails(address).paymentCredential?.hash;
       const rawResponse = await fetch(
-        `https://hydra-doom.sundae.fi/new_game?address=${address}&region=${selectedRegion()}&reserved=${selectedReserved()}`,
+        `http://localhost:8000/new_game?address=${address}&region=${selectedRegion()}&reserved=${selectedReserved()}`,
       );
       const { ip, player_utxo, player_utxo_datum_hex, script_ref } =
         await rawResponse.json();
@@ -142,7 +142,7 @@
         </div>`;
         heads.appendChild(head);
 
-        socket = new WebSocket(`wss://${game_info.ip}?history=no`);
+        socket = new WebSocket(`ws://${game_info.ip}?history=no`);
         sockets[game_info.ip] = socket;
         socket.onmessage = (message) => {
           const data = JSON.parse(message.data);
