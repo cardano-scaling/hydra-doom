@@ -19,7 +19,7 @@
         { serverUrl ? controlPlaneUrl
         , wadFile ? doomWad
         , cabinetKey ? import ../../deployment/cabinet-key.nix
-        , useMouse ? "0"
+        , useMouse ? "1"
         }:
         let
           src = inputs.nix-inclusive.lib.inclusive ../../. [
@@ -105,7 +105,7 @@
             popd
           '';
         };
-        hydra-doom-static-local = mkHydraDoomStatic { useMouse = "0"; };
+        hydra-doom-static-local = mkHydraDoomStatic { useMouse = "1"; };
         hydra-doom-static-remote = mkHydraDoomStatic { serverUrl = "https://hydra-doom.sundae.fi"; };
         hydra-doom-wrapper = pkgs.writeShellApplication {
           name = "hydra-doom-wrapper";
