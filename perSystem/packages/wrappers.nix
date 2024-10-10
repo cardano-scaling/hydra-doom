@@ -6,10 +6,10 @@
       hydraDataDir = "state-hydra";
       # edit these to override defaults for serverUrl and doom wad file
       controlPlaneListenAddr = "0.0.0.0";
-      controlPlaneHost = "127.0.0.1";
+      controlPlaneHost = "offline.doom.lan";
       controlPlanePort = "8000";
       controlPlaneUrl = "http://${controlPlaneHost}:${controlPlanePort}";
-      hydraHost = "127.0.0.1";
+      hydraHost = "offline.doom.lan";
       hydraPort = "4001";
       doomWad = pkgs.fetchurl {
         url = "https://distro.ibiblio.org/slitaz/sources/packages/d/doom1.wad";
@@ -105,7 +105,7 @@
             popd
           '';
         };
-        hydra-doom-static-local = mkHydraDoomStatic { useMouse = "1"; };
+        hydra-doom-static-local = mkHydraDoomStatic { useMouse = "1"; serverUrl = "http://offline.doom.lan:8000"; };
         hydra-doom-static-remote = mkHydraDoomStatic { serverUrl = "https://hydra-doom.sundae.fi"; };
         hydra-doom-wrapper = pkgs.writeShellApplication {
           name = "hydra-doom-wrapper";

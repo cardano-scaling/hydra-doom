@@ -35,7 +35,11 @@
         open = false;
         nvidiaSettings = true;
       };
-      pulseaudio.enable = true;
+      pulseaudio = {
+        enable = true;
+        package = pkgs.pulseaudioFull;
+        extraConfig = "load-module module-switch-on-connect";
+      };
     };
     sound.enable = true;
 
@@ -43,7 +47,240 @@
       pkgs.polychromatic
     ];
   };
-  miniHardware = { config, pkgs, lib, ... }: {
+  miniHardware = { config, pkgs, lib, ... }: let
+      inherit (builtins) map;
+      externalInterface = "enp2s0";
+      internalInterfaces = [
+        "enp3s0"
+        "wg0"
+      ];
+    in {
+      boot.kernel.sysctl = {
+        "net.ipv4.conf.all.forwarding" = 1;
+        "net.ipv4.conf.default.forwarding" = 1;
+      };
+      networking = {
+        nameservers = [ "10.15.0.1" "8.8.8.8" ];
+        interfaces = {
+          ${externalInterface} = {
+            useDHCP = true;
+          };
+          enp3s0 = {
+            ipv4.addresses = [{
+              address = "10.15.0.1";
+              prefixLength = 24;
+            }];
+          };
+        };
+        nat = {
+          enable = true;
+          externalInterface = "${externalInterface}";
+          internalIPs = [ "10.15.0.0/24" ];
+          internalInterfaces = [ "enp2s0" ];
+        };
+        dhcpcd.persistent = true;
+        firewall = {
+          enable = true;
+          allowPing = true;
+          extraCommands = let
+            dropPortNoLog = port:
+              ''
+                ip46tables -A nixos-fw -p tcp \
+                  --dport ${toString port} -j nixos-fw-refuse
+                ip46tables -A nixos-fw -p udp \
+                  --dport ${toString port} -j nixos-fw-refuse
+              '';
+
+            dropPortIcmpLog =
+              ''
+                iptables -A nixos-fw -p icmp \
+                  -j LOG --log-prefix "iptables[icmp]: "
+                ip6tables -A nixos-fw -p ipv6-icmp \
+                  -j LOG --log-prefix "iptables[icmp-v6]: "
+              '';
+
+            refusePortOnInterface = port: interface:
+              ''
+                ip46tables -A nixos-fw -i ${interface} -p tcp \
+                  --dport ${toString port} -j nixos-fw-log-refuse
+                ip46tables -A nixos-fw -i ${interface} -p udp \
+                  --dport ${toString port} -j nixos-fw-log-refuse
+              '';
+            acceptPortOnInterface = port: interface:
+              ''
+                ip46tables -A nixos-fw -i ${interface} -p tcp \
+                  --dport ${toString port} -j nixos-fw-accept
+                ip46tables -A nixos-fw -i ${interface} -p udp \
+                  --dport ${toString port} -j nixos-fw-accept
+              '';
+            privatelyAcceptPort = port:
+              lib.concatMapStrings
+                (interface: acceptPortOnInterface port interface)
+                internalInterfaces;
+
+            publiclyRejectPort = port:
+              refusePortOnInterface port externalInterface;
+
+            allowPortOnlyPrivately = port:
+              ''
+                ${privatelyAcceptPort port}
+                ${publiclyRejectPort port}
+              '';
+          in lib.concatStrings [
+            (lib.concatMapStrings allowPortOnlyPrivately
+              ([
+                67    # DHCP
+                53    # DNS
+                80    # nginx
+                4001  # hydra api
+                8000  # hydra control plane
+              ]))
+            (lib.concatMapStrings dropPortNoLog
+              [
+                23   # Common from public internet
+                143  # Common from public internet
+                139  # From RT AP
+                515  # From RT AP
+                9100 # From RT AP
+              ])
+            (dropPortIcmpLog)
+            ''
+              # allow from trusted interfaces
+              ip46tables -A FORWARD -m state --state NEW -i br0 -o ${externalInterface} -j ACCEPT
+              ip46tables -A FORWARD -m state --state NEW -i wg0 -o ${externalInterface} -j ACCEPT
+              # allow traffic with existing state
+              ip46tables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+              # block forwarding from external interface
+              ip6tables -A FORWARD -i ${externalInterface} -j DROP
+            ''
+          ];
+          allowedTCPPorts = [ 32400 22 ];
+          allowedUDPPorts = [ 51820 ];
+        };
+      };
+
+      nixpkgs = {
+        config = {
+          allowUnfree = true;
+        };
+        overlays = [
+          #(import ../overlays/plex.nix)
+        ];
+      };
+
+      i18n = {
+        consoleFont = "Lat2-Terminus16";
+        consoleKeyMap = "us";
+        defaultLocale = "en_US.UTF-8";
+      };
+
+      # List packages installed in system profile. To search, run:
+      # $ nix search wget
+      environment.systemPackages = with pkgs; [
+        dmenu
+        pavucontrol
+        wezterm
+        wget
+        vim
+        tmux
+        screen
+      ];
+
+      # Some programs need SUID wrappers, can be configured further or are
+      # started in user sessions.
+      # programs.mtr.enable = true;
+      # programs.gnupg.agent = { enable = true; enableSSHSupport = true; };
+
+      # List services that you want to enable:
+
+      # Enable the OpenSSH daemon.
+      services = {
+        openssh = {
+          enable = true;
+          settings = {
+            PasswordAuthentication = false;
+            PermitRootLogin = "without-password";
+          };
+        };
+        dnsmasq = {
+          enable = true;
+          settings.address = let
+            cnames = [
+              "router"
+              "offline"
+            ];
+            ipv4 = "10.15.0.1";
+            createAddress = domain: ipv4: name: "/${name}.${domain}/${ipv4}";
+          in map (createAddress "doom.lan" ipv4) cnames;
+        };
+        kea = {
+          dhcp4 = {
+            enable = true;
+            settings = {
+              interfaces-config = {
+                interfaces = [ "enp3s0" ];
+              };
+              lease-database = {
+                name = "/var/lib/kea/dhcp4.leases";
+                persist = true;
+                type = "memfile";
+              };
+              option-data = [
+                {
+                  name = "domain-name-servers";
+                  data = "10.15.0.1";
+                  always-send = true;
+                }
+                {
+                  name = "routers";
+                  data = "10.15.0.1";
+                }
+                {
+                  name = "domain-name";
+                  data = "doom.lan";
+                }
+              ];
+
+              rebind-timer = 2000;
+              renew-timer = 1000;
+              valid-lifetime = 4000;
+
+              subnet4 = [
+                {
+                  pools = [
+                    {
+                      pool = "10.15.0.100 - 10.15.0.200";
+                    }
+                  ];
+                  option-data = [
+                    {
+                      name = "routers";
+                      data = "10.15.0.1";
+                    }
+                  ];
+                  subnet = "10.15.0.0/24";
+                }
+              ];
+            };
+          };
+        };
+      };
+
+      users.extraUsers.sam = {
+        isNormalUser = true;
+        description = "Sam Leathers";
+        extraGroups = [ "wheel" ];
+        openssh.authorizedKeys.keys = [
+          "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDEPOLnk4+mWNGOXd309PPxal8wgMzKXHnn7Jbu/SpSUYEc1EmjgnrVBcR0eDxgDmGD9zJ69wEH/zLQLPWjaTusiuF+bqAM/x7z7wwy1nZ48SYJw3Q+Xsgzeb0nvmNsPzb0mfnpI6av8MTHNt+xOqDnpC5B82h/voQ4m5DGMQz60ok2hMeh+sy4VIvX5zOVTOFPQqFR6BGDwtALiP5PwMfyScYXlebWHhDRdX9B0j9t+cqiy5utBUsl4cIUInE0KW7Z8Kf6gIsmQnfSZadqI857kdozU3IbaLoJc1C6LyVjzPFyC4+KUC11BmemTGdCjwcoqEZ0k5XtJaKFXacYYXi1l5MS7VdfHldFDZmMEMvfJG/PwvXN4prfOIjpy1521MJHGBNXRktvWhlNBgI1NUQlx7rGmPZmtrYdeclVnnY9Y4HIpkhm0iEt/XUZTMQpXhedd1BozpMp0h135an4uorIEUQnotkaGDwZIV3mSL8x4n6V02Qe2CYvqf4DcCSBv7D91N3JplJJKt7vV4ltwrseDPxDtCxXrQfSIQd0VGmwu1D9FzzDOuk/MGCiCMFCKIKngxZLzajjgfc9+rGLZ94iDz90jfk6GF4hgF78oFNfPEwoGl0soyZM7960QdBcHgB5QF9+9Yd6QhCb/6+ENM9sz6VLdAY7f/9hj/3Aq0Lm4Q== samuel.leathers@iohk.io"
+        ];
+      };
+      users.extraUsers.root = {
+        openssh.authorizedKeys.keys = [
+          "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDEPOLnk4+mWNGOXd309PPxal8wgMzKXHnn7Jbu/SpSUYEc1EmjgnrVBcR0eDxgDmGD9zJ69wEH/zLQLPWjaTusiuF+bqAM/x7z7wwy1nZ48SYJw3Q+Xsgzeb0nvmNsPzb0mfnpI6av8MTHNt+xOqDnpC5B82h/voQ4m5DGMQz60ok2hMeh+sy4VIvX5zOVTOFPQqFR6BGDwtALiP5PwMfyScYXlebWHhDRdX9B0j9t+cqiy5utBUsl4cIUInE0KW7Z8Kf6gIsmQnfSZadqI857kdozU3IbaLoJc1C6LyVjzPFyC4+KUC11BmemTGdCjwcoqEZ0k5XtJaKFXacYYXi1l5MS7VdfHldFDZmMEMvfJG/PwvXN4prfOIjpy1521MJHGBNXRktvWhlNBgI1NUQlx7rGmPZmtrYdeclVnnY9Y4HIpkhm0iEt/XUZTMQpXhedd1BozpMp0h135an4uorIEUQnotkaGDwZIV3mSL8x4n6V02Qe2CYvqf4DcCSBv7D91N3JplJJKt7vV4ltwrseDPxDtCxXrQfSIQd0VGmwu1D9FzzDOuk/MGCiCMFCKIKngxZLzajjgfc9+rGLZ94iDz90jfk6GF4hgF78oFNfPEwoGl0soyZM7960QdBcHgB5QF9+9Yd6QhCb/6+ENM9sz6VLdAY7f/9hj/3Aq0Lm4Q== samuel.leathers@iohk.io"
+          "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDLXWTrZ1bFD+mz+PUQfbHPsOKbsUVY46ZqQWh+PInNZgoxLt2LZRma9nb4kF529PgWg3amWiIrLKFUa5ro7pHo53uGmIDLY3vgs1Bj0mMKvBS68rcyBwb/Q0MBx51yjlUFc0VPtUMlT9HgmGjF7owosuwyNRVGN7cp2Fn5j2VwAmvagqUi1VQl1onpIKmkPEzseR9SbY5E/5I9avdOuJimw5MKRYTZeI525xiFWtCx1812E9cfgeFFXGKEngaAd1Lw/m6P3Oapumll6dp0oVjfRrT1lPO0Vk9LWMfho5mE0zUm4qVKwqk8kfe0UPDRyErY0OGZRrSGufgdgp06AUjt carloslopezdelara@iMacCLR-9.local"
+        ];
+      };
+
     boot.extraModprobeConfig = ''
       options kvm_intel nested=1
       options kvm_intel emulate_invalid_guest_state=0
@@ -59,15 +296,16 @@
     };
     sound.enable = true;
 
-    environment.systemPackages = [
-    ];
   };
   adminGui = { config, pkgs, ... }: {
-    services.xserver = {
-      enable = true;
-      displayManager.gdm.enable = true;
-      desktopManager.gnome.enable = true;
-    };
+    environment.systemPackages = [
+      pkgs.sway
+    ];
+    #services.xserver = {
+    #  enable = true;
+    #  #displayManager.gdm.enable = true;
+    #  #desktopManager.gnome.enable = true;
+    #};
   };
   hydraCageLocal = { config, pkgs, ... }: let
     system = "x86_64-linux";
@@ -133,17 +371,7 @@
       nginx = {
         enable = true;
         virtualHosts = {
-          "doom-remote.local" = {
-            root = self.packages.${system}.hydra-doom-static-remote.overrideAttrs (_: {
-              cabinetKey = import ../deployment/cabinet-key.nix;
-              useMouse = "0";
-            });
-            extraConfig = ''
-              disable_symlinks off;
-              try_files $uri $uri /index.html;
-            '';
-          };
-          "doom-offline.local" = {
+          "offline.doom.lan" = {
             root = self.packages.${system}.hydra-doom-static-local.overrideAttrs (_: {
               cabinetKey = import ../deployment/cabinet-key.nix;
               useMouse = "0";
@@ -239,13 +467,6 @@
     ];
 
 
-    services.openssh = {
-      enable = true;
-      settings = {
-        PasswordAuthentication = false;
-        PermitRootLogin = "without-password";
-      };
-    };
     systemd.services.sshd.wantedBy = lib.mkForce [ "multi-user.target" ];
     users.users.root.openssh.authorizedKeys.keys = [
       # we hard-code this because it runs on the system itself
@@ -349,8 +570,8 @@ in {
           baseConfig
           miniHardware
           hydraBase
-          hydraCageLocal
-          #adminGui
+          #hydraCageLocal
+          adminGui
           ../deployment/hydra-doom-mini/hardware-configuration.nix
           (mkWireGuardTunnel [ "10.40.9.9/24" "fd00::9" ] config.sops.secrets.wg0PrivateKey.path)
         ];
