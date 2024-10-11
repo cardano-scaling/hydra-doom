@@ -1,5 +1,3 @@
-# TODO: replace with nixosModules
-
 { inputs, ... }: {
   perSystem = {config, system, pkgs, lib, ...}:
     let
@@ -83,11 +81,6 @@
           name = "hydra-offline-wrapper";
           runtimeInputs = [ config.packages.cardano-node config.packages.cardano-cli pkgs.jq pkgs.curl ];
           text = ''
-            export LOCAL_HYDRA="''${LOCAL_HYDRA:-0}"
-            if [ "''${LOCAL_HYDRA}" -eq 0 ]; then
-              echo "Not starting hydra control plane because LOCAL_HYDRA is not set"
-              exit 0
-            fi
             rm -rf "${hydraDataDir}"
             mkdir -p "${hydraDataDir}"
             cardano-cli address key-gen --normal-key --verification-key-file admin.vk --signing-key-file admin.sk
@@ -105,14 +98,12 @@
             popd
           '';
         };
-        hydra-doom-static-local = mkHydraDoomStatic { useMouse = "1"; serverUrl = "http://offline.doom.lan:8000"; };
-        hydra-doom-static-remote = mkHydraDoomStatic { serverUrl = "https://hydra-doom.sundae.fi"; };
+        hydra-doom-static-local = mkHydraDoomStatic { useMouse = "1"; serverUrl = controlPlaneUrl; };
         hydra-doom-wrapper = pkgs.writeShellApplication {
           name = "hydra-doom-wrapper";
           runtimeInputs = [ config.packages.bech32 pkgs.jq pkgs.git pkgs.nodejs pkgs.python3 ];
           text = ''
             export STATIC="''${STATIC:-1}"
-            export LOCAL_HYDRA="''${LOCAL_HYDRA:-0}"
             if [ "''${STATIC}" -eq 0 ]; then
               echo "running npm..."
               [ -f assets/doom1.wad ] || ln -s ${doomWad} assets/doom1.wad
@@ -121,10 +112,6 @@
               ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
               npm install
               npm start
-            elif [ "''${LOCAL_HYDRA}" -eq 0 ]; then
-              echo "running http webserver for remote play..."
-              pushd ${config.packages.hydra-doom-static-remote}
-              python3 -m http.server 3000
             else
               echo "running http webserver for local play..."
               pushd ${config.packages.hydra-doom-static-local}
@@ -142,14 +129,9 @@
         hydra-control-plane-wrapper = pkgs.writeShellApplication {
           name = "hydra-control-plane-wrapper";
           text = ''
-            export LOCAL_HYDRA="''${LOCAL_HYDRA:-0}"
             export RESERVED="''${RESERVED:-false}"
             export PRESERVE_ROCKET_TOML="''${PRESERVE_ROCKET_TOML:-0}"
             export ROCKET_PROFILE=local
-            if [ "''${LOCAL_HYDRA}" -eq 0 ]; then
-              echo "Not starting hydra control plane because LOCAL_HYDRA is not set"
-              exit 0
-            fi
             if [ "$PRESERVE_ROCKET_TOML" -eq 0 ]
             then
             cat > Rocket.toml << EOF
@@ -166,7 +148,7 @@
             admin_key_file = "admin.sk"
             persisted = false
             reserved = ''${RESERVED}
-            region = "us-west-2"
+            region = "local"
             stats-file = "local-stats"
             EOF
             fi
