@@ -6,10 +6,10 @@
       hydraDataDir = "state-hydra";
       # edit these to override defaults for serverUrl and doom wad file
       controlPlaneListenAddr = "0.0.0.0";
-      controlPlaneHost = "offline.doom.lan";
+      controlPlaneHost = "localhost";
       controlPlanePort = "8000";
       controlPlaneUrl = "http://${controlPlaneHost}:${controlPlanePort}";
-      hydraHost = "offline.doom.lan";
+      hydraHost = "localhost";
       hydraPort = "4001";
       doomWad = pkgs.fetchurl {
         url = "https://distro.ibiblio.org/slitaz/sources/packages/d/doom1.wad";
@@ -59,7 +59,7 @@
             cat > .env << EOF
             SERVER_URL=${serverUrl}
             ${lib.optionalString (cabinetKey != "") "CABINET_KEY=${cabinetKey}"}
-            ${lib.optionalString (serverUrl == "http://127.0.0.1:8000" || cabinetKey != "") "REGION=us-west-2"}
+            ${lib.optionalString (serverUrl == "http://127.0.0.1:8000" || cabinetKey != "") "REGION=local"}
             EOF
             yarn build
             sed -i "s/use_mouse.*/use_mouse                     ${useMouse}/" dist/default.cfg

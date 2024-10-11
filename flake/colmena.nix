@@ -5,6 +5,7 @@
   lib,
   ...
 }: let
+  inherit (config.flake) nixosModules;
   mkWireGuardTunnel = ips: privateKeyFile: {
     networking.wireguard.interfaces.wg0 = {
       inherit ips privateKeyFile;
@@ -346,13 +347,16 @@
   hydraBase = {inputs, config, pkgs,  ...}: let
     system = "x86_64-linux";
   in {
+
+    imports = [
+      nixosModules.hydra-node
+      nixosModules.hydra-control-plane
+    ];
     networking.hosts = lib.mkForce {
       "127.0.0.1" = [ "localhost" "doom-remote.local" "doom-offline.local" ];
       "::1" = [ "localhost" "doom-remote.local" "doom-offline.local" ];
     };
     environment.systemPackages = with self.packages.${system}; [
-      hydra-offline-wrapper
-      hydra-control-plane-wrapper
       hydra-tui-wrapper
     ];
     users = {
@@ -368,6 +372,13 @@
       groups.plugdev = {};
     };
     services = {
+      hydra-node = {
+        enable = true;
+      };
+      hydra-control-plane = {
+        enable = true;
+        reserved = true;
+      };
       nginx = {
         enable = true;
         virtualHosts = {
@@ -383,49 +394,6 @@
           };
         };
       };
-    };
-    systemd.services = {
-      hydra-offline = {
-        environment = {
-          LOCAL_HYDRA = "1";
-          RESERVED = "true";
-        };
-        wantedBy = ["multi-user.target" "hydra-control-plane.service"];
-        startLimitIntervalSec = 0;
-        serviceConfig = {
-          ExecStart = "${self.packages.${system}.hydra-offline-wrapper}/bin/hydra-offline-wrapper";
-          Restart = "always";
-          RestartSec = "30s";
-          WorkingDirectory = "/var/lib/hydra-offline";
-          StateDirectory = "hydra-offline";
-          User = "hydra-offline";
-          Group = "hydra-offline";
-        };
-      };
-      hydra-control-plane = {
-        environment = {
-          LOCAL_HYDRA = "1";
-          RESERVED = "true";
-        };
-        wantedBy = ["multi-user.target"];
-        startLimitIntervalSec = 10;
-        serviceConfig = {
-          ExecStart = "${self.packages.${system}.hydra-control-plane-wrapper}/bin/hydra-control-plane-wrapper";
-          ExecStartPre="${pkgs.bash}/bin/bash -c '(while ! ${pkgs.netcat}/bin/nc -z -v -w1 localhost 4001 2>/dev/null; do echo \"Waiting for port 4001 to open...\"; sleep 2; done); sleep 2'";
-          Restart = "always";
-          RestartSec = "30s";
-          WorkingDirectory = "/var/lib/hydra-offline";
-          User = "hydra-offline";
-          Group = "hydra-offline";
-        };
-      };
-    };
-    users.groups.hydra-offline.gid = 10016;
-    users.users.hydra-offline = {
-      description = "hydra offline user";
-      uid = 10016;
-      group = "hydra-offline";
-      isSystemUser = true;
     };
   };
   baseConfig = { pkgs, ...}: {
