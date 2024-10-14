@@ -47,7 +47,7 @@
             pkgs.yarn
             nodeModules
           ];
-          buildPhase = __trace finalAttrs.passthru ''
+          buildPhase = ''
             ln -s ${nodeModules}/libexec/hydra-doom/node_modules node_modules
             ln -sf ${finalAttrs.passthru.wadFile} assets/doom1.wad
             ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
