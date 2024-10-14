@@ -13,59 +13,59 @@
         url = "https://distro.ibiblio.org/slitaz/sources/packages/d/doom1.wad";
         sha256 = "sha256-HX1DvlAeZ9kn5BXguPPinDvzMHXoWXIYFvZSpSbKx3E=";
       };
-      mkHydraDoomStatic =
-        { serverUrl ? controlPlaneUrl
-        , wadFile ? doomWad
-        , cabinetKey ? import ../../deployment/cabinet-key.nix
-        , useMouse ? "1"
-        }:
-        let
-          src = inputs.nix-inclusive.lib.inclusive ../../. [
-            ../../src
-            ../../assets
-            ../../package.json
-            ../../yarn.lock
-            ../../tsconfig.json
-            ../../webpack.config.js
-          ];
+      hydra-doom-static = let
+        serverUrl = controlPlaneUrl;
+        wadFile = doomWad;
+        cabinetKey = null;
+        region = "local";
+        useMouse = "1";
+        src = inputs.nix-inclusive.lib.inclusive ../../. [
+          ../../src
+          ../../assets
+          ../../package.json
+          ../../yarn.lock
+          ../../tsconfig.json
+          ../../webpack.config.js
+        ];
 
-          nodeModules = pkgs.mkYarnPackage {
-            name = "hydra-doom-node-modules";
-            inherit src;
-            packageJSON = ../../package.json;
-            yarnLock = ../../yarn.lock;
-            nodejs = pkgs.nodejs;
-           };
+        nodeModules = pkgs.mkYarnPackage {
+          name = "hydra-doom-node-modules";
+          inherit src;
+          packageJSON = ../../package.json;
+          yarnLock = ../../yarn.lock;
+          nodejs = pkgs.nodejs;
+         };
 
         in
-        pkgs.stdenv.mkDerivation {
+        pkgs.stdenv.mkDerivation (finalAttrs: {
           name = "hydra-doom-static";
           phases = [ "unpackPhase" "buildPhase" "installPhase" ];
           inherit src;
+          passthru = { inherit serverUrl wadFile cabinetKey useMouse region; };
           buildInputs = [
             pkgs.nodejs
             pkgs.yarn
             nodeModules
           ];
-          buildPhase = ''
+          buildPhase = __trace finalAttrs.passthru ''
             ln -s ${nodeModules}/libexec/hydra-doom/node_modules node_modules
-            ln -sf ${wadFile} assets/doom1.wad
+            ln -sf ${finalAttrs.passthru.wadFile} assets/doom1.wad
             ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
             ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm assets/websockets-doom.wasm
             ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
 
             cat > .env << EOF
-            SERVER_URL=${serverUrl}
-            ${lib.optionalString (cabinetKey != "") "CABINET_KEY=${cabinetKey}"}
-            ${lib.optionalString (serverUrl == "http://127.0.0.1:8000" || cabinetKey != "") "REGION=local"}
+            SERVER_URL=${finalAttrs.passthru.serverUrl}
+            ${lib.optionalString (finalAttrs.passthru.cabinetKey != null) "CABINET_KEY=${finalAttrs.passthru.cabinetKey}"}
+            REGION=${finalAttrs.passthru.region}
             EOF
             yarn build
-            sed -i "s/use_mouse.*/use_mouse                     ${useMouse}/" dist/default.cfg
+            sed -i "s/use_mouse.*/use_mouse                     ${finalAttrs.passthru.useMouse}/" dist/default.cfg
           '';
           installPhase = ''
             cp -a dist $out
           '';
-        };
+        });
     in
     {
       packages = {
@@ -98,7 +98,7 @@
             popd
           '';
         };
-        hydra-doom-static-local = mkHydraDoomStatic { useMouse = "1"; serverUrl = controlPlaneUrl; };
+        inherit hydra-doom-static;
         hydra-doom-wrapper = pkgs.writeShellApplication {
           name = "hydra-doom-wrapper";
           runtimeInputs = [ config.packages.bech32 pkgs.jq pkgs.git pkgs.nodejs pkgs.python3 ];
@@ -114,7 +114,7 @@
               npm start
             else
               echo "running http webserver for local play..."
-              pushd ${config.packages.hydra-doom-static-local}
+              pushd ${config.packages.hydra-doom-static}
               python3 -m http.server 3000
             fi
           '';

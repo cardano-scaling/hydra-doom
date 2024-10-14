@@ -383,9 +383,12 @@
         enable = true;
         virtualHosts = {
           "offline.doom.lan" = {
-            root = self.packages.${system}.hydra-doom-static-local.overrideAttrs (_: {
-              cabinetKey = import ../deployment/cabinet-key.nix;
-              useMouse = "0";
+            root = self.packages.${system}.hydra-doom-static.overrideAttrs (finalAttrs: prevAttrs: {
+              passthru = prevAttrs.passthru // {
+                serverUrl = "http://offline.doom.lan:8000";
+                useMouse = "1";
+                cabinetKey = import ../deployment/cabinet-key.nix;
+              };
             });
             extraConfig = ''
               disable_symlinks off;

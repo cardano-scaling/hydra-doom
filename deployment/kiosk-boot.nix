@@ -155,7 +155,7 @@ in {
           '';
         };
         "doom-offline.local" = {
-          root = self.packages.${system}.hydra-doom-static-local;
+          root = self.packages.${system}.hydra-doom-static;
           extraConfig = ''
             disable_symlinks off;
             try_files $uri $uri /index.html;
