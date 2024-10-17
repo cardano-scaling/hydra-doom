@@ -3,8 +3,13 @@ import { EmscriptenModule } from "../../types";
 
 const DoomCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isEffectRan = useRef(false);
 
   useEffect(() => {
+    // Prevent effect from running twice
+    if (isEffectRan.current) return;
+    isEffectRan.current = true;
+
     const canvas = canvasRef.current;
 
     if (!canvas) {

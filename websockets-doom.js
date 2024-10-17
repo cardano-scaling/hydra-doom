@@ -5040,14 +5040,14 @@ var readEmAsmArgs = (sigPtr, buf) => {
 
 var runEmAsmFunction = (code, sigPtr, argbuf) => {
  var args = readEmAsmArgs(sigPtr, argbuf);
- return ASM_CONSTS[code].apply(null, args);
+ return ASM_CONSTS[code]?.apply(null, args);
 };
 
 var _emscripten_asm_const_int = (code, sigPtr, argbuf) => runEmAsmFunction(code, sigPtr, argbuf);
 
 var runMainThreadEmAsm = (code, sigPtr, argbuf, sync) => {
  var args = readEmAsmArgs(sigPtr, argbuf);
- return ASM_CONSTS[code].apply(null, args);
+ return ASM_CONSTS[code]?.apply(null, args);
 };
 
 var _emscripten_asm_const_int_sync_on_main_thread = (code, sigPtr, argbuf) => runMainThreadEmAsm(code, sigPtr, argbuf, 1);
@@ -7838,7 +7838,7 @@ var stringToAscii = (str, buffer) => {
  SAFE_HEAP_STORE(((buffer) >> 0), 0, 1);
 };
 
-var _environ_get = (__environ, environ_buf) => {
+var _environ_get = (__environ, environ_buf) => {  
  var bufSize = 0;
  getEnvStrings().forEach((string, i) => {
   var ptr = environ_buf + bufSize;
