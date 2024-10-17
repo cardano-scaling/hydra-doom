@@ -17,7 +17,8 @@ const GameContextProvider: FC<PropsWithChildren> = ({ children }) => {
       );
       return response.json();
     },
-    enabled: !!address,
+    // enabled: !!address,
+    enabled: false,
   });
 
   const value = useMemo(() => ({ newGameQuery }), [newGameQuery]);

@@ -1,4 +1,5 @@
 import Card from "../Card";
+import DoomCanvas from "../DoomCanvas";
 import GlobalTotals from "../GlobalTotals";
 import GlobalTPS from "../GlobalTPS";
 import HydraHeadLiveTxs from "../HydraHeadLiveTxs";
@@ -30,7 +31,9 @@ const GameView = () => {
           />
           <HydraHeadLiveTxs />
         </div>
-        <Card className="h-[40rem]">dsad</Card>
+        <Card className="h-[40rem]">
+          <DoomCanvas />
+        </Card>
         <div className="w-80 flex flex-col gap-4">
           <GlobalTPS size="sm" titleAlign="left" />
           <Card className="text-white py-3 px-4 text-sm leading-3">

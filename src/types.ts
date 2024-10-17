@@ -30,3 +30,30 @@ export interface Region {
   name: string;
   value: string;
 }
+
+interface FileSystem {
+  createPreloadedFile(
+    parent: string,
+    name: string,
+    url: string,
+    canRead: boolean,
+    canWrite: boolean,
+  ): void;
+}
+
+export interface EmscriptenModule {
+  noInitialRun?: boolean;
+  preRun?: () => void;
+  postRun?: () => void;
+  print?: (text: string) => void;
+  printErr?: (text: string) => void;
+  setStatus?: (text: string) => void;
+  canvas?: HTMLCanvasElement;
+  FS?: FileSystem;
+}
+
+declare global {
+  interface Window {
+    Module: EmscriptenModule;
+  }
+}
