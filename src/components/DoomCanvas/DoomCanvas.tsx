@@ -3,8 +3,13 @@ import { EmscriptenModule } from "../../types";
 
 const DoomCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isEffectRan = useRef(false);
 
   useEffect(() => {
+    // Prevent effect from running twice
+    if (isEffectRan.current) return;
+    isEffectRan.current = true;
+
     const canvas = canvasRef.current;
 
     if (!canvas) {
@@ -41,6 +46,19 @@ const DoomCanvas: React.FC = () => {
       },
       setStatus: (text: string) => {
         console.log("setStatus:", text);
+      },
+      onRuntimeInitialized: function () {
+        window.callMain([
+          "-iwad",
+          "freedoom2.wad",
+          "-file",
+          "Cardano.wad",
+          "-window",
+          "-nogui",
+          "-nomusic",
+          "-config",
+          "default.cfg",
+        ]);
       },
     };
 

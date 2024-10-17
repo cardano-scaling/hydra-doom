@@ -8,7 +8,7 @@ import GameContextProvider from "./context/GameContextProvider";
 const queryClient = new QueryClient();
 
 export default function App() {
-  const [isGameStarted, setIsGameStarted] = useState(true);
+  const [isGameStarted, setIsGameStarted] = useState(false);
 
   return (
     <QueryClientProvider client={queryClient}>

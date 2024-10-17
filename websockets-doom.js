@@ -491,7 +491,7 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 448950: $0 => {
+ 449322: $0 => {
   var str = UTF8ToString($0) + "\n\n" + "Abort/Retry/Ignore/AlwaysIgnore? [ariA] :";
   var reply = window.prompt(str, "i");
   if (reply === null) {
@@ -499,7 +499,7 @@ var ASM_CONSTS = {
   }
   return allocate(intArrayFromString(reply), "i8", ALLOC_NORMAL);
  },
- 449175: () => {
+ 449547: () => {
   if (typeof (AudioContext) !== "undefined") {
    return true;
   } else if (typeof (webkitAudioContext) !== "undefined") {
@@ -507,7 +507,7 @@ var ASM_CONSTS = {
   }
   return false;
  },
- 449322: () => {
+ 449694: () => {
   if ((typeof (navigator.mediaDevices) !== "undefined") && (typeof (navigator.mediaDevices.getUserMedia) !== "undefined")) {
    return true;
   } else if (typeof (navigator.webkitGetUserMedia) !== "undefined") {
@@ -515,7 +515,7 @@ var ASM_CONSTS = {
   }
   return false;
  },
- 449556: $0 => {
+ 449928: $0 => {
   if (typeof (Module["SDL2"]) === "undefined") {
    Module["SDL2"] = {};
   }
@@ -537,11 +537,11 @@ var ASM_CONSTS = {
   }
   return SDL2.audioContext === undefined ? -1 : 0;
  },
- 450049: () => {
+ 450421: () => {
   var SDL2 = Module["SDL2"];
   return SDL2.audioContext.sampleRate;
  },
- 450117: ($0, $1, $2, $3) => {
+ 450489: ($0, $1, $2, $3) => {
   var SDL2 = Module["SDL2"];
   var have_microphone = function(stream) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -582,7 +582,7 @@ var ASM_CONSTS = {
    }, have_microphone, no_microphone);
   }
  },
- 451769: ($0, $1, $2, $3) => {
+ 452141: ($0, $1, $2, $3) => {
   var SDL2 = Module["SDL2"];
   SDL2.audio.scriptProcessorNode = SDL2.audioContext["createScriptProcessor"]($1, 0, $0);
   SDL2.audio.scriptProcessorNode["onaudioprocess"] = function(e) {
@@ -594,7 +594,7 @@ var ASM_CONSTS = {
   };
   SDL2.audio.scriptProcessorNode["connect"](SDL2.audioContext["destination"]);
  },
- 452179: ($0, $1) => {
+ 452551: ($0, $1) => {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.capture.currentCaptureBuffer.numberOfChannels;
   for (var c = 0; c < numChannels; ++c) {
@@ -613,7 +613,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 452784: ($0, $1) => {
+ 453156: ($0, $1) => {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.audio.currentOutputBuffer["numberOfChannels"];
   for (var c = 0; c < numChannels; ++c) {
@@ -626,7 +626,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 453264: $0 => {
+ 453636: $0 => {
   var SDL2 = Module["SDL2"];
   if ($0) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -664,7 +664,7 @@ var ASM_CONSTS = {
    SDL2.audioContext = undefined;
   }
  },
- 454436: ($0, $1, $2) => {
+ 454808: ($0, $1, $2) => {
   var w = $0;
   var h = $1;
   var pixels = $2;
@@ -735,7 +735,7 @@ var ASM_CONSTS = {
   }
   SDL2.ctx.putImageData(SDL2.image, 0, 0);
  },
- 455905: ($0, $1, $2, $3, $4) => {
+ 456277: ($0, $1, $2, $3, $4) => {
   var w = $0;
   var h = $1;
   var hot_x = $2;
@@ -772,50 +772,69 @@ var ASM_CONSTS = {
   stringToUTF8(url, urlBuf, url.length + 1);
   return urlBuf;
  },
- 456894: $0 => {
+ 457266: $0 => {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = UTF8ToString($0);
   }
  },
- 456977: () => {
+ 457349: () => {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = "none";
   }
  },
- 457046: () => window.innerWidth,
- 457076: () => window.innerHeight,
- 457107: ($0, $1) => {
+ 457418: () => window.innerWidth,
+ 457448: () => window.innerHeight,
+ 457479: ($0, $1) => {
   alert(UTF8ToString($0) + "\n\n" + UTF8ToString($1));
  }
 };
 
-function __asyncjs__hydra_send(cmd, playerstate, killcount, health, floorz, momx, momy, momz, z, angle, gamestate) {
+function __asyncjs__hydra_send(forwardmove, sidemove, angleturn, chatchar, buttons, consistency, buttons2, inventory, lookfly, artyi, player_state, kill_count, secret_count, item_count, cheats, health, x, y, z, gamestate, leveltics, gamemap, gameskill, gameepisode, demoplayback) {
  return Asyncify.handleAsync(async () => {
   await hydraSend({
-   forwardMove: SAFE_HEAP_LOAD(cmd, 1, 0),
-   sideMove: SAFE_HEAP_LOAD(cmd + 1, 1, 0)
+   forwardMove: forwardmove,
+   sideMove: sidemove,
+   angleTurn: angleturn,
+   chatChar: chatchar,
+   buttons: buttons,
+   consistancy: consistency,
+   buttons2: buttons2,
+   inventory: inventory,
+   lookFly: lookfly,
+   arti: artyi
   }, {
    mapObject: {
     position: {
-     floorZ: floorz,
-     momentumX: momx,
-     momentumY: momy,
-     momentumZ: momz,
-     z: z,
-     angle: angle
+     x: x,
+     y: y,
+     z: z
     },
     health: health
    },
-   playerState: playerstate,
-   killCount: killcount
-  }, gamestate);
+   playerState: player_state,
+   totalStats: {
+    killCount: -1,
+    secretCount: -1,
+    itemCount: -1
+   },
+   levelStats: {
+    killCount: kill_count,
+    secretCount: secret_count,
+    itemCount: item_count
+   },
+   cheats: cheats
+  }, gamestate, leveltics, {
+   map: gamemap,
+   skill: gameskill,
+   episode: gameepisode,
+   demoplayback: demoplayback === 1
+  });
  });
 }
 
 function __asyncjs__hydra_recv(cmd) {
  return Asyncify.handleAsync(async () => {
   const res = await hydraRecv();
-  console.log("hydra_recv", res);
   if (res == null) {
    return;
   }
@@ -8762,9 +8781,9 @@ var _asyncify_start_rewind = a0 => (_asyncify_start_rewind = wasmExports["asynci
 
 var _asyncify_stop_rewind = () => (_asyncify_stop_rewind = wasmExports["asyncify_stop_rewind"])();
 
-var ___start_em_js = Module["___start_em_js"] = 448256;
+var ___start_em_js = Module["___start_em_js"] = 448096;
 
-var ___stop_em_js = Module["___stop_em_js"] = 448950;
+var ___stop_em_js = Module["___stop_em_js"] = 449322;
 
 function intArrayFromBase64(s) {
  if (typeof ENVIRONMENT_IS_NODE != "undefined" && ENVIRONMENT_IS_NODE) {

@@ -42,18 +42,20 @@ interface FileSystem {
 }
 
 export interface EmscriptenModule {
+  canvas?: HTMLCanvasElement;
+  FS?: FileSystem;
   noInitialRun?: boolean;
-  preRun?: () => void;
+  onRuntimeInitialized?: () => void;
   postRun?: () => void;
+  preRun?: () => void;
   print?: (text: string) => void;
   printErr?: (text: string) => void;
   setStatus?: (text: string) => void;
-  canvas?: HTMLCanvasElement;
-  FS?: FileSystem;
 }
 
 declare global {
   interface Window {
+    callMain: (args: string[]) => void;
     Module: EmscriptenModule;
   }
 }
