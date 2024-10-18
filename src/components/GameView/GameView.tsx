@@ -4,6 +4,7 @@ import GlobalTotals from "../GlobalTotals";
 import GlobalTPS from "../GlobalTPS";
 import HydraHeadLiveTxs from "../HydraHeadLiveTxs";
 import Layout from "../Layout";
+import MusicPlayer from "../MusicPlayer";
 import RestartButton from "../RestartButton";
 import StatsCard from "../StatsCard";
 import TopLinks from "../TopLinks";
@@ -12,6 +13,7 @@ const GameView = () => {
   return (
     <Layout>
       <TopLinks />
+      <MusicPlayer />
       <RestartButton />
       <div className="grid grid-cols-[max-content_1fr_max-content] container gap-16 items-center">
         <div className="w-80 flex flex-col gap-4">
