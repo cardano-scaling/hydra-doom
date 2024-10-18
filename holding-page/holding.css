@@ -421,6 +421,10 @@ div.hbspt-form .hs-form-field, div.hbspt-form .actions {
   margin: 1rem;
 }
 
+div.hbspt-form .hs-richtext {
+  margin: 1rem;
+}
+
 div.hbspt-form input[type="email"] {
   font-family: "VT323";
   width: 100%;
