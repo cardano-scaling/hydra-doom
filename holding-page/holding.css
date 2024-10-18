@@ -398,7 +398,7 @@ a {
   margin-bottom: 2rem;
 }
 
-.card .card__title sup {
+.card .card__title small {
   font-family: "less_perfect_dos_vgaregular", monospace;
   font-size: 0.9em;
   font-weight: normal;
