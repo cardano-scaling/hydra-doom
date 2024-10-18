@@ -364,6 +364,10 @@ main {
     padding-top: 45px;
     padding-bottom: 20px;
   }
+  sup {
+    font-size: 30% !important;
+    top: -1.2em !important;
+  }
 }
 
 .card {
