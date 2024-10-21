@@ -18,7 +18,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
   const [isSelectContinentModalOpen, setIsSelectContinentModalOpen] =
     useState(false);
 
-  const handleClickPlay = () => {
+  const handleClickPlaySolo = () => {
     if (REGION) {
       startGame();
     } else {
@@ -33,9 +33,17 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
         alt="Hydra"
         className="w-full max-w-5xl relative -bottom-14 -mt-14 z-10 pointer-events-none"
       />
-      <Button className="w-96 h-16" onClick={handleClickPlay} withDecoration>
-        Play Doom on Hydra
-      </Button>
+      <div className="flex flex-col gap-6">
+        <Button className="w-96 h-16" onClick={handleClickPlaySolo}>
+          Play Solo
+        </Button>
+        <Button className="w-96 h-16" onClick={handleClickPlaySolo}>
+          Start Multiplayer
+        </Button>
+        <Button className="w-96 h-16" onClick={handleClickPlaySolo}>
+          Join Multiplayer
+        </Button>
+      </div>
       <div className="grid grid-cols-2 max-w-6xl w-full mt-32 gap-8 py-6">
         <div className="flex flex-col gap-4">
           <GlobalTotals size="lg" />
