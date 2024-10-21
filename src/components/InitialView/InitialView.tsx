@@ -7,23 +7,41 @@ import Modal from "../Modal";
 import SelectContinentDialog from "../SelectContinentDialog";
 import Layout from "../Layout";
 import GlobalTotals from "../GlobalTotals";
-import { REGION } from "../../constants";
+import SetNameModal from "../SetNameModal";
 
 interface InitialViewProps {
   startGame: () => void;
 }
 
 const InitialView: FC<InitialViewProps> = ({ startGame }) => {
+  const [modalData, setModalData] = useState({ title: "", submit: () => {} });
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
+  const [isNameModalOpen, setIsNameModalOpen] = useState(false);
   const [isSelectContinentModalOpen, setIsSelectContinentModalOpen] =
     useState(false);
 
   const handleClickPlaySolo = () => {
-    if (REGION) {
-      startGame();
-    } else {
-      setIsSelectContinentModalOpen(true);
-    }
+    startGame();
+  };
+
+  const handleClickStartMultiplayer = () => {
+    setModalData({
+      title: "New Game",
+      submit: () => {
+        startGame();
+      },
+    });
+    setIsNameModalOpen(true);
+  };
+
+  const handleClickJoinMultiplayer = () => {
+    setModalData({
+      title: "Join Multiplayer",
+      submit: () => {
+        startGame();
+      },
+    });
+    setIsNameModalOpen(true);
   };
 
   return (
@@ -37,10 +55,10 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
         <Button className="w-96 h-16" onClick={handleClickPlaySolo}>
           Play Solo
         </Button>
-        <Button className="w-96 h-16" onClick={handleClickPlaySolo}>
+        <Button className="w-96 h-16" onClick={handleClickStartMultiplayer}>
           Start Multiplayer
         </Button>
-        <Button className="w-96 h-16" onClick={handleClickPlaySolo}>
+        <Button className="w-96 h-16" onClick={handleClickJoinMultiplayer}>
           Join Multiplayer
         </Button>
       </div>
@@ -83,6 +101,12 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
         close={() => setIsSelectContinentModalOpen(false)}
         isOpen={isSelectContinentModalOpen}
         startGame={startGame}
+      />
+      <SetNameModal
+        close={() => setIsNameModalOpen(false)}
+        isOpen={isNameModalOpen}
+        submit={modalData.submit}
+        title={modalData.title}
       />
     </Layout>
   );

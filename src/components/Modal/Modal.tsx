@@ -1,7 +1,7 @@
 import { FC, ReactNode } from "react";
 import noise from "../../assets/images/noise.png";
 
-type ModalProps = {
+export type ModalProps = {
   isOpen: boolean;
   close: () => void;
   children: ReactNode;
