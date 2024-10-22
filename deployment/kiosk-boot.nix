@@ -3,13 +3,20 @@
   modulesPath,
   pkgs,
   self,
+  config,
   system,
   ...
 }: let
   # change to false when running in qemu
-  prodImage = true;
+  prodImage = false;
+  inherit (self) nixosModules;
 in {
-  imports = [(modulesPath + "/installer/cd-dvd/installation-cd-graphical-gnome.nix")];
+  imports = [
+    (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix")
+    nixosModules.hydra-node
+    nixosModules.hydra-control-plane
+
+  ];
 
   boot = {
     initrd.availableKernelModules = [
@@ -35,14 +42,50 @@ in {
     # To address build time warn
     swraid.enable = lib.mkForce false;
   };
+  console.keyMap = "us";
+  console.packages = with pkgs; [ terminus_font ];
+  console.font = "ter-i32b";
+  i18n = {
+    defaultLocale = "en_US.UTF-8";
+  };
+  fonts.fontDir.enable = true;
+  fonts.enableGhostscriptFonts = true;
+  fonts.packages = with pkgs; [
+    # Used by starship for fonts
+    (nerdfonts.override { fonts = [ "FiraCode" ]; })
+    corefonts
+    fira # monospaced
+    fira-code
+    powerline-fonts
+    inconsolata
+    liberation_ttf
+    dejavu_fonts
+    bakoma_ttf
+    gentium
+    ubuntu_font_family
+    terminus_font
+    unifont # some international languages
+  ];
+  nixpkgs.config.pulseaudio = true;
+  hardware = {
+    pulseaudio.enable = true;
+  };
+  sound.enable = true;
 
   documentation.info.enable = false;
 
   environment = {
+    etc = {
+      "sway/config".source = ./sway/config;
+    };
+    loginShellInit = ''
+      [[ "$(tty)" == /dev/tty1 ]] && sway --config /etc/sway/config
+    '';
     systemPackages = with self.packages.${system};
       [
         hydra-node
         hydra-tui
+        hydra-tui-wrapper
         hydra-control-plane
         hydra-offline-wrapper
         hydra-doom-wrapper
@@ -60,14 +103,14 @@ in {
         usbutils
         util-linux
         google-chrome
+        pavucontrol
+        vim
+        tmux
+        wezterm
+        sway
       ]);
 
   };
-
-  # Used by starship for fonts
-  fonts.packages = with pkgs; [
-    (nerdfonts.override {fonts = ["FiraCode"];})
-  ];
 
   # Disable squashfs for testing only
   # Set the flake.nix `imageParameters.prodImage = true;` when ready to build the distribution image to use image compression
@@ -92,70 +135,47 @@ in {
       enableCompletion = true;
     };
 
-    fzf = {
-      fuzzyCompletion = true;
-      keybindings = true;
-    };
-
-    starship = {
-      enable = true;
-      settings = {
-        git_commit = {
-          tag_disabled = false;
-          only_detached = false;
-        };
-        git_metrics = {
-          disabled = false;
-        };
-        memory_usage = {
-          disabled = false;
-          format = "via $symbol[\${ram_pct}]($style) ";
-          threshold = -1;
-        };
-        shlvl = {
-          disabled = false;
-          symbol = "↕";
-          threshold = -1;
-        };
-        status = {
-          disabled = false;
-          map_symbol = true;
-          pipestatus = true;
-        };
-        time = {
-          disabled = false;
-          format = "[\\[ $time \\]]($style) ";
-        };
-      };
-    };
-
     dconf.enable = true;
     gnupg.agent.enable = true;
+    sway = {
+      enable = true;
+      extraPackages = with pkgs; [
+        swaylock
+        swayidle
+        xwayland
+        waybar
+        mako
+        kanshi
+      ];
+    };
+    waybar.enable = true;
   };
 
   networking.hosts = lib.mkForce {
-    "127.0.0.1" = [ "localhost" "doom-remote.local" "doom-offline.local" ];
-    "::1" = [ "localhost" "doom-remote.local" "doom-offline.local" ];
+    "127.0.0.1" = [ "localhost" "offline.doom.local" ];
+    "::1" = [ "localhost" "offline.doom.local" ];
   };
   services = {
-    #cage = {
-    #  enable = true;
-    #  program = "${pkgs.google-chrome}/bin/google-chrome-stable --app=http://doom-remote.local";
-    #  #program = "${pkgs.google-chrome}/bin/google-chrome-stable";
-    #  user = "nixos";
-    #};
+    hydra-node = {
+      enable = true;
+    };
+    hydra-control-plane = {
+      enable = true;
+      reserved = true;
+    };
+    getty.autologinUser = "nixos";
     nginx = {
       enable = true;
       virtualHosts = {
-        "doom-remote.local" = {
-          root = self.packages.${system}.hydra-doom-static-remote;
-          extraConfig = ''
-            disable_symlinks off;
-            try_files $uri $uri /index.html;
-          '';
-        };
-        "doom-offline.local" = {
-          root = self.packages.${system}.hydra-doom-static;
+        "offline.doom.local" = {
+          root = self.packages.${system}.hydra-doom-static.overrideAttrs (finalAttrs: prevAttrs: {
+            passthru = prevAttrs.passthru // {
+              serverUrl = "http://offline.doom.local:8000";
+              useMouse = "1";
+              # uncomment below if you have a cabinet key for POO distribution
+              #cabinetKey = import ../deployment/cabinet-key.nix;
+            };
+          });
           extraConfig = ''
             disable_symlinks off;
             try_files $uri $uri /index.html;
