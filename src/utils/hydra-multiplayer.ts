@@ -17,7 +17,10 @@ export class HydraMultiplayer {
     constructor(keys: Keys, url: string) {
         this.keys = keys;
         this.hydra = new Hydra(url, 100);
-        this.hydra.onTxSeen = this.onTxSeen;
+        this.hydra.onTxSeen = this.onTxSeen.bind(this);
+
+        this.SendPacket = this.SendPacket.bind(this);
+        this.setIP = this.setIP.bind(this);
     }
 
     public setIP(ip: number) {
@@ -28,11 +31,17 @@ export class HydraMultiplayer {
         if (!!this.latestUTxO) {
             return;
         }
+        await this.hydra.populateUTxO();
         let utxos = await this.hydra.getUtxos(this.keys.address!);
-        this.latestUTxO = utxos[0];
+        // TODO: robust
+        if (this.myIP === 1) {
+          this.latestUTxO = utxos.find(u => u.outputIndex === 1)!;
+        } else {
+          this.latestUTxO = utxos.find(u => u.outputIndex === 0)!;
+        }
     }
 
-    public async sendPacket(to: number, from: number, data: Uint8Array): Promise<void> {
+    public async SendPacket(to: number, from: number, data: Uint8Array): Promise<void> {
         this.packetQueue.push({ to, from, data });
         await this.sendPacketQueue();
     }
@@ -108,7 +117,6 @@ const buildTx = (
     datumLengthHex = "0" + datumLengthHex;
   }
   const lengthLengthTag = 57 + datumLengthHex.length / 2;
-  console.log(datumLengthHex);
   const txBodyByHand =
     `a3` + // Prefix
     `0081825820${inputUtxo.txHash}0${inputUtxo.outputIndex}` + // One input

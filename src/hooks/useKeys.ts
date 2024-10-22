@@ -64,8 +64,6 @@ const useKeys = () => {
     initKeys();
   }, [keys.sessionKeyBech32, sessionKeyBech32, generateKeys]);
 
-  console.log("keys", keys);
-
   return keys;
 };
 

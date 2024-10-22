@@ -10,8 +10,6 @@ const DoomCanvas: React.FC = () => {
   const { gameData } = useAppContext();
   const keys = useKeys();
 
-  console.log("keys", keys);
-
   useEffect(() => {
     // Prevent effect from running twice
 

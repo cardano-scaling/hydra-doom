@@ -491,7 +491,7 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 449322: $0 => {
+ 448325: $0 => {
   var str = UTF8ToString($0) + "\n\n" + "Abort/Retry/Ignore/AlwaysIgnore? [ariA] :";
   var reply = window.prompt(str, "i");
   if (reply === null) {
@@ -499,7 +499,7 @@ var ASM_CONSTS = {
   }
   return allocate(intArrayFromString(reply), "i8", ALLOC_NORMAL);
  },
- 449547: () => {
+ 448550: () => {
   if (typeof (AudioContext) !== "undefined") {
    return true;
   } else if (typeof (webkitAudioContext) !== "undefined") {
@@ -507,7 +507,7 @@ var ASM_CONSTS = {
   }
   return false;
  },
- 449694: () => {
+ 448697: () => {
   if ((typeof (navigator.mediaDevices) !== "undefined") && (typeof (navigator.mediaDevices.getUserMedia) !== "undefined")) {
    return true;
   } else if (typeof (navigator.webkitGetUserMedia) !== "undefined") {
@@ -515,7 +515,7 @@ var ASM_CONSTS = {
   }
   return false;
  },
- 449928: $0 => {
+ 448931: $0 => {
   if (typeof (Module["SDL2"]) === "undefined") {
    Module["SDL2"] = {};
   }
@@ -537,11 +537,11 @@ var ASM_CONSTS = {
   }
   return SDL2.audioContext === undefined ? -1 : 0;
  },
- 450421: () => {
+ 449424: () => {
   var SDL2 = Module["SDL2"];
   return SDL2.audioContext.sampleRate;
  },
- 450489: ($0, $1, $2, $3) => {
+ 449492: ($0, $1, $2, $3) => {
   var SDL2 = Module["SDL2"];
   var have_microphone = function(stream) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -582,7 +582,7 @@ var ASM_CONSTS = {
    }, have_microphone, no_microphone);
   }
  },
- 452141: ($0, $1, $2, $3) => {
+ 451144: ($0, $1, $2, $3) => {
   var SDL2 = Module["SDL2"];
   SDL2.audio.scriptProcessorNode = SDL2.audioContext["createScriptProcessor"]($1, 0, $0);
   SDL2.audio.scriptProcessorNode["onaudioprocess"] = function(e) {
@@ -594,7 +594,7 @@ var ASM_CONSTS = {
   };
   SDL2.audio.scriptProcessorNode["connect"](SDL2.audioContext["destination"]);
  },
- 452551: ($0, $1) => {
+ 451554: ($0, $1) => {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.capture.currentCaptureBuffer.numberOfChannels;
   for (var c = 0; c < numChannels; ++c) {
@@ -613,7 +613,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 453156: ($0, $1) => {
+ 452159: ($0, $1) => {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.audio.currentOutputBuffer["numberOfChannels"];
   for (var c = 0; c < numChannels; ++c) {
@@ -626,7 +626,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 453636: $0 => {
+ 452639: $0 => {
   var SDL2 = Module["SDL2"];
   if ($0) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -664,7 +664,7 @@ var ASM_CONSTS = {
    SDL2.audioContext = undefined;
   }
  },
- 454808: ($0, $1, $2) => {
+ 453811: ($0, $1, $2) => {
   var w = $0;
   var h = $1;
   var pixels = $2;
@@ -735,7 +735,7 @@ var ASM_CONSTS = {
   }
   SDL2.ctx.putImageData(SDL2.image, 0, 0);
  },
- 456277: ($0, $1, $2, $3, $4) => {
+ 455280: ($0, $1, $2, $3, $4) => {
   var w = $0;
   var h = $1;
   var hot_x = $2;
@@ -772,74 +772,33 @@ var ASM_CONSTS = {
   stringToUTF8(url, urlBuf, url.length + 1);
   return urlBuf;
  },
- 457266: $0 => {
+ 456269: $0 => {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = UTF8ToString($0);
   }
  },
- 457349: () => {
+ 456352: () => {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = "none";
   }
  },
- 457418: () => window.innerWidth,
- 457448: () => window.innerHeight,
- 457479: ($0, $1) => {
+ 456421: () => window.innerWidth,
+ 456451: () => window.innerHeight,
+ 456482: ($0, $1) => {
   alert(UTF8ToString($0) + "\n\n" + UTF8ToString($1));
  }
 };
 
-function __asyncjs__hydra_send(forwardmove, sidemove, angleturn, chatchar, buttons, consistency, buttons2, inventory, lookfly, artyi, player_state, kill_count, secret_count, item_count, cheats, health, x, y, z, gamestate, leveltics, gamemap, gameskill, gameepisode, demoplayback) {
- return Asyncify.handleAsync(async () => {
-  await hydraSend({
-   forwardMove: forwardmove,
-   sideMove: sidemove,
-   angleTurn: angleturn,
-   chatChar: chatchar,
-   buttons: buttons,
-   consistancy: consistency,
-   buttons2: buttons2,
-   inventory: inventory,
-   lookFly: lookfly,
-   arti: artyi
-  }, {
-   mapObject: {
-    position: {
-     x: x,
-     y: y,
-     z: z
-    },
-    health: health
-   },
-   playerState: player_state,
-   totalStats: {
-    killCount: -1,
-    secretCount: -1,
-    itemCount: -1
-   },
-   levelStats: {
-    killCount: kill_count,
-    secretCount: secret_count,
-    itemCount: item_count
-   },
-   cheats: cheats
-  }, gamestate, leveltics, {
-   map: gamemap,
-   skill: gameskill,
-   episode: gameepisode,
-   demoplayback: demoplayback === 1
-  });
- });
+function hydra_set_ip(ip) {
+ console.log("Setting IP", ip);
+ console.log(window.HydraMultiplayer);
+ window.HydraMultiplayer.setIP(ip);
 }
 
-function __asyncjs__hydra_recv(cmd) {
+function __asyncjs__hydra_send_packet(to, from, packet, len) {
  return Asyncify.handleAsync(async () => {
-  const res = await hydraRecv();
-  if (res == null) {
-   return;
-  }
-  SAFE_HEAP_STORE(cmd, res.forwardMove, 1);
-  SAFE_HEAP_STORE(cmd + 1, res.sideMove, 1);
+  let data = HEAPU8.subarray(packet, packet + len);
+  await window.HydraMultiplayer.SendPacket(to, from, data);
  });
 }
 
@@ -7714,114 +7673,6 @@ var _emscripten_sleep = ms => Asyncify.handleSleep(wakeUp => safeSetTimeout(wake
 
 _emscripten_sleep.isAsync = true;
 
-var WS = {
- sockets: [ null ],
- socketEvent: null
-};
-
-var _emscripten_websocket_get_ready_state = (socketId, readyState) => {
- var socket = WS.sockets[socketId];
- if (!socket) {
-  return -3;
- }
- SAFE_HEAP_STORE(((readyState) >> 1) * 2, socket.readyState, 2);
- return 0;
-};
-
-var _emscripten_websocket_new = createAttributes => {
- if (typeof WebSocket == "undefined") {
-  return -1;
- }
- if (!createAttributes) {
-  return -5;
- }
- var createAttrs = createAttributes >> 2;
- var url = UTF8ToString(SAFE_HEAP_LOAD(createAttrs * 4, 4, 0));
- var protocols = SAFE_HEAP_LOAD((createAttrs + 1) * 4, 4, 0);
- var socket = protocols ? new WebSocket(url, UTF8ToString(protocols).split(",")) : new WebSocket(url);
- socket.binaryType = "arraybuffer";
- var socketId = WS.sockets.length;
- WS.sockets[socketId] = socket;
- return socketId;
-};
-
-var _emscripten_websocket_send_binary = (socketId, binaryData, dataLength) => {
- var socket = WS.sockets[socketId];
- if (!socket) {
-  return -3;
- }
- socket.send(HEAPU8.subarray((binaryData), (binaryData + dataLength)));
- return 0;
-};
-
-var _emscripten_websocket_set_onclose_callback_on_thread = (socketId, userData, callbackFunc, thread) => {
- if (!WS.socketEvent) WS.socketEvent = _malloc(1024);
- var socket = WS.sockets[socketId];
- if (!socket) {
-  return -3;
- }
- socket.onclose = function(e) {
-  SAFE_HEAP_STORE((WS.socketEvent >> 2) * 4, socketId, 4);
-  SAFE_HEAP_STORE(((WS.socketEvent + 4) >> 2) * 4, e.wasClean, 4);
-  SAFE_HEAP_STORE(((WS.socketEvent + 8) >> 2) * 4, e.code, 4);
-  stringToUTF8(e.reason, WS.socketEvent + 10, 512);
-  ((a1, a2, a3) => dynCall_iiii.apply(null, [ callbackFunc, a1, a2, a3 ]))(0, /*TODO*/ WS.socketEvent, userData);
- };
- return 0;
-};
-
-var _emscripten_websocket_set_onerror_callback_on_thread = (socketId, userData, callbackFunc, thread) => {
- if (!WS.socketEvent) WS.socketEvent = _malloc(1024);
- var socket = WS.sockets[socketId];
- if (!socket) {
-  return -3;
- }
- socket.onerror = function(e) {
-  SAFE_HEAP_STORE((WS.socketEvent >> 2) * 4, socketId, 4);
-  ((a1, a2, a3) => dynCall_iiii.apply(null, [ callbackFunc, a1, a2, a3 ]))(0, /*TODO*/ WS.socketEvent, userData);
- };
- return 0;
-};
-
-var _emscripten_websocket_set_onmessage_callback_on_thread = (socketId, userData, callbackFunc, thread) => {
- if (!WS.socketEvent) WS.socketEvent = _malloc(1024);
- var socket = WS.sockets[socketId];
- if (!socket) {
-  return -3;
- }
- socket.onmessage = function(e) {
-  SAFE_HEAP_STORE((WS.socketEvent >> 2) * 4, socketId, 4);
-  if (typeof e.data == "string") {
-   var buf = stringToNewUTF8(e.data);
-   var len = lengthBytesUTF8(e.data) + 1;
-   SAFE_HEAP_STORE(((WS.socketEvent + 12) >> 2) * 4, 1, 4);
-  } else  {
-   var len = e.data.byteLength;
-   var buf = _malloc(len);
-   HEAP8.set(new Uint8Array(e.data), buf);
-   SAFE_HEAP_STORE(((WS.socketEvent + 12) >> 2) * 4, 0, 4);
-  }
-  SAFE_HEAP_STORE(((WS.socketEvent + 4) >> 2) * 4, buf, 4);
-  SAFE_HEAP_STORE(((WS.socketEvent + 8) >> 2) * 4, len, 4);
-  ((a1, a2, a3) => dynCall_iiii.apply(null, [ callbackFunc, a1, a2, a3 ]))(0, /*TODO*/ WS.socketEvent, userData);
-  _free(buf);
- };
- return 0;
-};
-
-var _emscripten_websocket_set_onopen_callback_on_thread = (socketId, userData, callbackFunc, thread) => {
- if (!WS.socketEvent) WS.socketEvent = _malloc(1024);
- var socket = WS.sockets[socketId];
- if (!socket) {
-  return -3;
- }
- socket.onopen = function(e) {
-  SAFE_HEAP_STORE((WS.socketEvent >> 2) * 4, socketId, 4);
-  ((a1, a2, a3) => dynCall_iiii.apply(null, [ callbackFunc, a1, a2, a3 ]))(0, /*TODO*/ WS.socketEvent, userData);
- };
- return 0;
-};
-
 var ENV = {};
 
 var getExecutableName = () => thisProgram || "./this.program";
@@ -8398,8 +8249,7 @@ for (/**@suppress{duplicate}*/ var i = 0; i < 288; ++i) {
 
 var wasmImports = {
  /** @export */ __assert_fail: ___assert_fail,
- /** @export */ __asyncjs__hydra_recv: __asyncjs__hydra_recv,
- /** @export */ __asyncjs__hydra_send: __asyncjs__hydra_send,
+ /** @export */ __asyncjs__hydra_send_packet: __asyncjs__hydra_send_packet,
  /** @export */ __syscall_fcntl64: ___syscall_fcntl64,
  /** @export */ __syscall_fstat64: ___syscall_fstat64,
  /** @export */ __syscall_getdents64: ___syscall_getdents64,
@@ -8642,13 +8492,6 @@ var wasmImports = {
  /** @export */ emscripten_set_wheel_callback_on_thread: _emscripten_set_wheel_callback_on_thread,
  /** @export */ emscripten_set_window_title: _emscripten_set_window_title,
  /** @export */ emscripten_sleep: _emscripten_sleep,
- /** @export */ emscripten_websocket_get_ready_state: _emscripten_websocket_get_ready_state,
- /** @export */ emscripten_websocket_new: _emscripten_websocket_new,
- /** @export */ emscripten_websocket_send_binary: _emscripten_websocket_send_binary,
- /** @export */ emscripten_websocket_set_onclose_callback_on_thread: _emscripten_websocket_set_onclose_callback_on_thread,
- /** @export */ emscripten_websocket_set_onerror_callback_on_thread: _emscripten_websocket_set_onerror_callback_on_thread,
- /** @export */ emscripten_websocket_set_onmessage_callback_on_thread: _emscripten_websocket_set_onmessage_callback_on_thread,
- /** @export */ emscripten_websocket_set_onopen_callback_on_thread: _emscripten_websocket_set_onopen_callback_on_thread,
  /** @export */ environ_get: _environ_get,
  /** @export */ environ_sizes_get: _environ_sizes_get,
  /** @export */ exit: _exit,
@@ -8657,6 +8500,7 @@ var wasmImports = {
  /** @export */ fd_read: _fd_read,
  /** @export */ fd_seek: _fd_seek,
  /** @export */ fd_write: _fd_write,
+ /** @export */ hydra_set_ip: hydra_set_ip,
  /** @export */ segfault: segfault,
  /** @export */ system: _system
 };
@@ -8667,13 +8511,15 @@ var ___wasm_call_ctors = () => (___wasm_call_ctors = wasmExports["__wasm_call_ct
 
 var _main = Module["_main"] = (a0, a1) => (_main = Module["_main"] = wasmExports["__main_argc_argv"])(a0, a1);
 
-var _malloc = a0 => (_malloc = wasmExports["malloc"])(a0);
+var _malloc = Module["_malloc"] = a0 => (_malloc = Module["_malloc"] = wasmExports["malloc"])(a0);
 
 var _fflush = Module["_fflush"] = a0 => (_fflush = Module["_fflush"] = wasmExports["fflush"])(a0);
 
-var _free = a0 => (_free = wasmExports["free"])(a0);
+var _free = Module["_free"] = a0 => (_free = Module["_free"] = wasmExports["free"])(a0);
 
 var ___errno_location = () => (___errno_location = wasmExports["__errno_location"])();
+
+var _ReceivePacket = Module["_ReceivePacket"] = (a0, a1, a2) => (_ReceivePacket = Module["_ReceivePacket"] = wasmExports["ReceivePacket"])(a0, a1, a2);
 
 var ___funcs_on_exit = () => (___funcs_on_exit = wasmExports["__funcs_on_exit"])();
 
@@ -8717,9 +8563,9 @@ var dynCall_viii = Module["dynCall_viii"] = (a0, a1, a2, a3) => (dynCall_viii = 
 
 var dynCall_iiiiii = Module["dynCall_iiiiii"] = (a0, a1, a2, a3, a4, a5) => (dynCall_iiiiii = Module["dynCall_iiiiii"] = wasmExports["dynCall_iiiiii"])(a0, a1, a2, a3, a4, a5);
 
-var dynCall_iiii = Module["dynCall_iiii"] = (a0, a1, a2, a3) => (dynCall_iiii = Module["dynCall_iiii"] = wasmExports["dynCall_iiii"])(a0, a1, a2, a3);
-
 var dynCall_iiiii = Module["dynCall_iiiii"] = (a0, a1, a2, a3, a4) => (dynCall_iiiii = Module["dynCall_iiiii"] = wasmExports["dynCall_iiiii"])(a0, a1, a2, a3, a4);
+
+var dynCall_iiii = Module["dynCall_iiii"] = (a0, a1, a2, a3) => (dynCall_iiii = Module["dynCall_iiii"] = wasmExports["dynCall_iiii"])(a0, a1, a2, a3);
 
 var dynCall_vjii = Module["dynCall_vjii"] = (a0, a1, a2, a3, a4) => (dynCall_vjii = Module["dynCall_vjii"] = wasmExports["dynCall_vjii"])(a0, a1, a2, a3, a4);
 
@@ -8781,9 +8627,9 @@ var _asyncify_start_rewind = a0 => (_asyncify_start_rewind = wasmExports["asynci
 
 var _asyncify_stop_rewind = () => (_asyncify_stop_rewind = wasmExports["asyncify_stop_rewind"])();
 
-var ___start_em_js = Module["___start_em_js"] = 448096;
+var ___start_em_js = Module["___start_em_js"] = 447984;
 
-var ___stop_em_js = Module["___stop_em_js"] = 449322;
+var ___stop_em_js = Module["___stop_em_js"] = 448325;
 
 function intArrayFromBase64(s) {
  if (typeof ENVIRONMENT_IS_NODE != "undefined" && ENVIRONMENT_IS_NODE) {
