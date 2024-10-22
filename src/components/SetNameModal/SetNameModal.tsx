@@ -39,7 +39,7 @@ const SetNameModal: FC<SetNameModalProps> = ({
     <Modal isOpen={isOpen} close={close}>
       <div className="text-center text-4xl flex flex-col gap-12">
         <h1 className="text-5xl">{title}</h1>
-        <p className="text-white">Name your pet here</p>
+        <p className="text-white">Enter your display name</p>
         {title === "Join Multiplayer" && (
           <div className="flex items-center gap-5">
             <label htmlFor="code">Code:</label>
