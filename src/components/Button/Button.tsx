@@ -30,6 +30,7 @@ const Button: FC<ButtonProps> = ({
         className={cx(
           "text-yellow-400 font-['Pixelify_Sans'] bg-cover bg-center bg-no-repeat flex justify-center items-center shadow-lg",
           "text-shadow-custom hover:scale-[1.017] hover:shadow-xl transition-all duration-300 uppercase text-3xl",
+          "disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100",
           className,
         )}
         style={{ backgroundImage: `url(${tick ? buttonBgTick : buttonBg})` }}

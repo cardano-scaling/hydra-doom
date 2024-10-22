@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import Button from "../Button";
 import GlobalLeaderBoard from "../GlobalLeaderBoard";
 import GlobalTPS from "../GlobalTPS";
@@ -8,20 +8,43 @@ import SelectContinentDialog from "../SelectContinentDialog";
 import Layout from "../Layout";
 import GlobalTotals from "../GlobalTotals";
 import SetNameModal from "../SetNameModal";
+import { useAppContext } from "../../context/useAppContext";
 
 interface InitialViewProps {
   startGame: () => void;
 }
 
 const InitialView: FC<InitialViewProps> = ({ startGame }) => {
-  const [modalData, setModalData] = useState({ title: "", submit: () => {} });
+  const { setGameData } = useAppContext();
+  const pathSegments = window.location.pathname.split("/").filter(Boolean);
+  const [modalData, setModalData] = useState({
+    title: "Join Multiplayer",
+    submit: () => {
+      startGame();
+    },
+  });
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
-  const [isNameModalOpen, setIsNameModalOpen] = useState(false);
+  const [isNameModalOpen, setIsNameModalOpen] = useState(
+    pathSegments[0] === "join",
+  );
   const [isSelectContinentModalOpen, setIsSelectContinentModalOpen] =
     useState(false);
+  const code = pathSegments[1];
+
+  useEffect(() => {
+    if (code) {
+      setGameData((prev) => ({ ...prev, code: code, type: "join" }));
+    }
+  }, [code, setGameData]);
 
   const handleClickPlaySolo = () => {
     startGame();
+    setGameData((prev) => ({
+      ...prev,
+      code: "",
+      petName: "",
+      type: undefined,
+    }));
   };
 
   const handleClickStartMultiplayer = () => {
@@ -32,6 +55,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
       },
     });
     setIsNameModalOpen(true);
+    setGameData((prev) => ({ ...prev, type: "new" }));
   };
 
   const handleClickJoinMultiplayer = () => {
@@ -41,6 +65,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
         startGame();
       },
     });
+    setGameData((prev) => ({ ...prev, type: "join" }));
     setIsNameModalOpen(true);
   };
 

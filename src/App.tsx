@@ -10,6 +10,11 @@ const queryClient = new QueryClient();
 export default function App() {
   const [isGameStarted, setIsGameStarted] = useState(false);
 
+  const startGame = () => {
+    setIsGameStarted(true);
+    window.history.replaceState({}, document.title, "/");
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <AppContextProvider>
@@ -18,7 +23,7 @@ export default function App() {
             <GameView />
           </GameContextProvider>
         ) : (
-          <InitialView startGame={() => setIsGameStarted(true)} />
+          <InitialView startGame={startGame} />
         )}
       </AppContextProvider>
     </QueryClientProvider>

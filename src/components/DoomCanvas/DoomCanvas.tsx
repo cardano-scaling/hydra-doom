@@ -11,10 +11,9 @@ const DoomCanvas: React.FC = () => {
   const keys = useKeys();
 
   useEffect(() => {
-    // Prevent effect from running twice
-
     if (!keys.address) return;
 
+    // Prevent effect from running twice
     if (isEffectRan.current) return;
     isEffectRan.current = true;
 
@@ -32,6 +31,7 @@ const DoomCanvas: React.FC = () => {
 
     canvas.addEventListener("webglcontextlost", handleContextLost, false);
 
+    // Initialize HydraMultiplayer
     window.HydraMultiplayer = new HydraMultiplayer(
       keys,
       "http://localhost:4001",
@@ -71,18 +71,10 @@ const DoomCanvas: React.FC = () => {
           "-nomusic",
           "-config",
           "default.cfg",
+          ...(gameData.code ? ["-connect", "1"] : ["-server", "-deathmatch"]),
+          ...(gameData.petName ? ["-pet", gameData.petName] : []),
         ];
-        if (gameData.code) {
-          args.push("-connect");
-          args.push("1");
-        } else {
-          args.push("-server");
-          args.push("-deathmatch");
-        }
-        if (gameData.petName) {
-          args.push("-pet");
-          args.push(gameData.petName);
-        }
+
         window.callMain(args);
       },
     };

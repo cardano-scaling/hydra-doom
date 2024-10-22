@@ -4,8 +4,9 @@ import { UseQueryResult } from "@tanstack/react-query";
 import { REGIONS } from "../constants";
 
 interface GameData {
-  petName: string;
   code: string;
+  petName: string;
+  type?: "new" | "join";
 }
 
 interface AppContextInterface {

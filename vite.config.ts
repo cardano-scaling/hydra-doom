@@ -16,9 +16,11 @@ export default defineConfig({
     target: "ES2022",
   },
   define: {
-    'import.meta.env.SERVER_URL': JSON.stringify(process.env.SERVER_URL),
-    'import.meta.env.REGION': JSON.stringify(process.env.REGION),
-    'import.meta.env.CABINET_KEY': JSON.stringify(process.env.CABINET_KEY),
-    'import.meta.env.PERSISTENT_SESSION': JSON.stringify(process.env.PERSISTENT_SESSION),
-  }
+    "import.meta.env.SERVER_URL": JSON.stringify(process.env.SERVER_URL),
+    "import.meta.env.REGION": JSON.stringify(process.env.REGION),
+    "import.meta.env.CABINET_KEY": JSON.stringify(process.env.CABINET_KEY),
+    "import.meta.env.PERSISTENT_SESSION": JSON.stringify(
+      process.env.PERSISTENT_SESSION,
+    ),
+  },
 });
