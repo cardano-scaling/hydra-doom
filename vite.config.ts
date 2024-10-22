@@ -23,4 +23,10 @@ export default defineConfig({
       process.env.PERSISTENT_SESSION,
     ),
   },
+  resolve: {
+        alias: {
+          'node-fetch': 'node-fetch-polyfill',
+          buffer: 'rollup-plugin-node-polyfills/polyfills/buffer-es6',
+        },
+    },
 });
