@@ -1,9 +1,13 @@
 import React, { useEffect, useRef } from "react";
 import { EmscriptenModule } from "../../types";
+import { useAppContext } from "../../context/useAppContext";
 
 const DoomCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isEffectRan = useRef(false);
+  const { gameData } = useAppContext();
+
+  console.log("gameData", gameData);
 
   useEffect(() => {
     // Prevent effect from running twice

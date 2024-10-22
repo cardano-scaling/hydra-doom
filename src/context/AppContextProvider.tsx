@@ -5,6 +5,11 @@ import { GameStatistics, Region } from "../types";
 import { REGIONS, SERVER_URL } from "../constants";
 
 const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
+  const [gameData, setGameData] = useState({
+    petName: "",
+    code: "",
+  });
+
   const [region, setRegion] = useState<Region>(REGIONS[0]);
   const globalQuery = useQuery<GameStatistics>({
     queryKey: ["global"],
@@ -16,8 +21,8 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
   });
 
   const value = useMemo(
-    () => ({ globalQuery, region, setRegion }),
-    [globalQuery, region],
+    () => ({ globalQuery, region, setRegion, gameData, setGameData }),
+    [gameData, globalQuery, region],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

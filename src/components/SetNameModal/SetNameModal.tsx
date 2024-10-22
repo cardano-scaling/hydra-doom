@@ -1,9 +1,10 @@
-import { ChangeEventHandler, FC, useEffect, useState } from "react";
+import { ChangeEventHandler, FC, useEffect } from "react";
 import Modal from "../Modal";
 import { ModalProps } from "../Modal/Modal";
 import { FaArrowRotateRight } from "react-icons/fa6";
 import Button from "../Button";
 import { generateRandomName } from "./petNameWords";
+import { useAppContext } from "../../context/useAppContext";
 
 interface SetNameModalProps extends Omit<ModalProps, "children"> {
   submit: () => void;
@@ -16,23 +17,22 @@ const SetNameModal: FC<SetNameModalProps> = ({
   submit,
   title,
 }) => {
-  const [petName, setPetName] = useState("");
-  const [code, setCode] = useState("");
+  const { setGameData, gameData } = useAppContext();
 
   useEffect(() => {
-    setPetName(generateRandomName());
-  }, []);
+    setGameData((prev) => ({ ...prev, petName: generateRandomName() }));
+  }, [setGameData]);
 
   const handleChangeName: ChangeEventHandler<HTMLInputElement> = (e) => {
-    setPetName(e.target.value);
+    setGameData((prev) => ({ ...prev, petName: e.target.value }));
   };
 
   const handleChangeCode: ChangeEventHandler<HTMLInputElement> = (e) => {
-    setCode(e.target.value);
+    setGameData((prev) => ({ ...prev, code: e.target.value }));
   };
 
   const handleGenerateName = () => {
-    setPetName(generateRandomName());
+    setGameData((prev) => ({ ...prev, petName: generateRandomName() }));
   };
 
   return (
@@ -48,7 +48,7 @@ const SetNameModal: FC<SetNameModalProps> = ({
               id="code"
               onChange={handleChangeCode}
               type="text"
-              value={code}
+              value={gameData.code}
             />
           </div>
         )}
@@ -65,7 +65,7 @@ const SetNameModal: FC<SetNameModalProps> = ({
             id="petName"
             onChange={handleChangeName}
             type="text"
-            value={petName}
+            value={gameData.petName}
           />
           <Button tick className="text-2xl w-40 h-12" onClick={submit}>
             Go
