@@ -1,3 +1,5 @@
+import { HydraMultiplayer } from "./utils/hydra-multiplayer";
+
 export type LeaderboardEntry = [string, number];
 
 export interface PlayerStats {
@@ -41,21 +43,33 @@ interface FileSystem {
   ): void;
 }
 
+export interface HEAPU8 extends Uint8Array {
+  [key: number]: number;
+}
+
 export interface EmscriptenModule {
   canvas?: HTMLCanvasElement;
   FS?: FileSystem;
   noInitialRun?: boolean;
+  HEAPU8?: HEAPU8;
   onRuntimeInitialized?: () => void;
   postRun?: () => void;
   preRun?: () => void;
   print?: (text: string) => void;
   printErr?: (text: string) => void;
   setStatus?: (text: string) => void;
+
+  _malloc?: (size: number) => number;
+  _free?: (ptr: number) => void;
+
+  _ReceivePacket?: (from: number, buf: number, len: number) => void;
 }
 
 declare global {
   interface Window {
+    // Start the doom game with some set of arguments
     callMain: (args: string[]) => void;
     Module: EmscriptenModule;
+    HydraMultiplayer: HydraMultiplayer;
   }
 }

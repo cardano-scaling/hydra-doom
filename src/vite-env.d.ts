@@ -1,9 +1,10 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_SERVER_URL: string;
-  readonly VITE_CABINET_KEY: string;
-  readonly VITE_REGION: string;
+  readonly SERVER_URL: string;
+  readonly CABINET_KEY: string;
+  readonly REGION: string;
+  readonly PERSISTENT_SESSION: string;
 }
 
 interface ImportMeta {

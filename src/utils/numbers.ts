@@ -15,7 +15,3 @@ export const formatPlayTime = (time: number) => {
 
   return `${String(days).padStart(2, "0")}:${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(Math.trunc(playTimeSeconds)).padStart(2, "0")}`;
 };
-
-export const toHex = (i: number) => {
-  return ("0" + i.toString(16)).slice(-2);
-};

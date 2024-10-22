@@ -3,12 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { GameContext } from "./useGameContext";
 import { GameStatistics } from "../types";
 import { CABINET_KEY, REGION, SERVER_URL } from "../constants";
-import useAddress from "../hooks/useAddress";
+import useKeys from "../hooks/useKeys";
 import { useAppContext } from "./useAppContext";
 
 const GameContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const { region } = useAppContext();
-  const address = useAddress();
+  const { address } = useKeys();
   const newGameQuery = useQuery<GameStatistics>({
     queryKey: ["newGame", address, region.value],
     queryFn: async () => {
