@@ -13,6 +13,7 @@
             config.packages.cardano-node
             config.packages.cardano-cli
             config.packages.bech32
+            config.packages.qemu-run-iso
             pkgs.nodejs
             pkgs.yarn
             pkgs.jq

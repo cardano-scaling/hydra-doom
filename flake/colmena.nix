@@ -205,14 +205,18 @@
         };
         dnsmasq = {
           enable = true;
-          settings.address = let
-            cnames = [
-              "router"
-              "offline"
-            ];
-            ipv4 = "10.15.0.1";
-            createAddress = domain: ipv4: name: "/${name}.${domain}/${ipv4}";
-          in map (createAddress "doom.lan" ipv4) cnames;
+          settings = {
+            bind-interfaces = true;
+            address = let
+              cnames = [
+                "router"
+                "offline"
+              ];
+              ipv4 = "10.15.0.1";
+              createAddress = domain: ipv4: name: "/${name}.${domain}/${ipv4}";
+            in map (createAddress "doom.lan" ipv4) cnames;
+          };
+
         };
         kea = {
           dhcp4 = {
