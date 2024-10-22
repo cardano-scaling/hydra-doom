@@ -10,11 +10,13 @@ const DoomCanvas: React.FC = () => {
   const { gameData } = useAppContext();
   const keys = useKeys();
 
-  console.log("gameData", gameData);
+  console.log("keys", keys);
 
   useEffect(() => {
     // Prevent effect from running twice
+
     if (!keys.address) return;
+
     if (isEffectRan.current) return;
     isEffectRan.current = true;
 
@@ -32,7 +34,6 @@ const DoomCanvas: React.FC = () => {
 
     canvas.addEventListener("webglcontextlost", handleContextLost, false);
 
-    debugger;
     window.HydraMultiplayer = new HydraMultiplayer(
       keys,
       "http://localhost:4001",
@@ -100,7 +101,7 @@ const DoomCanvas: React.FC = () => {
       canvas.removeEventListener("webglcontextlost", handleContextLost);
       document.body.removeChild(script);
     };
-  }, [keys.address]);
+  }, [gameData.code, gameData.petName, keys]);
 
   return <canvas id="canvas" ref={canvasRef} className="w-full h-full" />;
 };
