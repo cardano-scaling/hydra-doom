@@ -20,5 +20,11 @@ export default defineConfig({
     'import.meta.env.REGION': JSON.stringify(process.env.REGION),
     'import.meta.env.CABINET_KEY': JSON.stringify(process.env.CABINET_KEY),
     'import.meta.env.PERSISTENT_SESSION': JSON.stringify(process.env.PERSISTENT_SESSION),
-  }
+  },
+  resolve: {
+        alias: {
+          'node-fetch': 'node-fetch-polyfill',
+          buffer: 'rollup-plugin-node-polyfills/polyfills/buffer-es6',
+        },
+    },
 });
