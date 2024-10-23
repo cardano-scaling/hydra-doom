@@ -54,7 +54,7 @@ const GameView = () => {
           <Card className="h-[40rem]">
             <DoomCanvas />
           </Card>
-          {gameData.type === "new" && (
+          {gameData.type === "host" && (
             <Card className="px-4 py-2 text-center text-xl text-white flex items-center gap-2 justify-center">
               Share this URL with friends{" "}
               <a

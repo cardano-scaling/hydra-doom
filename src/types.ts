@@ -65,9 +65,14 @@ export interface EmscriptenModule {
   _ReceivePacket?: (from: number, buf: number, len: number) => void;
 }
 
+export interface GameData {
+  code: string;
+  petName: string;
+  type: "host" | "join" | "solo";
+}
+
 declare global {
   interface Window {
-    // Start the doom game with some set of arguments
     callMain: (args: string[]) => void;
     Module: EmscriptenModule;
     HydraMultiplayer: HydraMultiplayer;

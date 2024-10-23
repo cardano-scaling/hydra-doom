@@ -3,11 +3,14 @@ import { EmscriptenModule } from "../../types";
 import { useAppContext } from "../../context/useAppContext";
 import { HydraMultiplayer } from "../../utils/hydra-multiplayer";
 import useKeys from "../../hooks/useKeys";
+import { getArgs } from "../../utils/game";
 
 const DoomCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isEffectRan = useRef(false);
-  const { gameData } = useAppContext();
+  const {
+    gameData: { code, petName, type },
+  } = useAppContext();
   const keys = useKeys();
 
   useEffect(() => {
@@ -61,20 +64,7 @@ const DoomCanvas: React.FC = () => {
         console.log("setStatus:", text);
       },
       onRuntimeInitialized: function () {
-        const args = [
-          "-iwad",
-          "freedoom2.wad",
-          "-file",
-          "Cardano.wad",
-          "-window",
-          "-nogui",
-          "-nomusic",
-          "-config",
-          "default.cfg",
-          ...(gameData.code ? ["-connect", "1"] : ["-server", "-deathmatch"]),
-          ...(gameData.petName ? ["-pet", gameData.petName] : []),
-        ];
-
+        const args = getArgs({ code, petName, type });
         window.callMain(args);
       },
     };
@@ -91,7 +81,7 @@ const DoomCanvas: React.FC = () => {
       canvas.removeEventListener("webglcontextlost", handleContextLost);
       document.body.removeChild(script);
     };
-  }, [gameData.code, gameData.petName, keys]);
+  }, [code, petName, keys, type]);
 
   return <canvas id="canvas" ref={canvasRef} className="w-full h-full" />;
 };

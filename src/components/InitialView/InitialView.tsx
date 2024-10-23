@@ -43,7 +43,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
       ...prev,
       code: "",
       petName: "",
-      type: undefined,
+      type: "solo",
     }));
   };
 
@@ -55,7 +55,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
       },
     });
     setIsNameModalOpen(true);
-    setGameData((prev) => ({ ...prev, type: "new" }));
+    setGameData((prev) => ({ ...prev, type: "host" }));
   };
 
   const handleClickJoinMultiplayer = () => {

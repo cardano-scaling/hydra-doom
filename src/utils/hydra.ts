@@ -56,7 +56,7 @@ export class Hydra {
     this.utxos = {};
     this.tombstones = {};
 
-    let websocketUrl = new URL(url);
+    const websocketUrl = new URL(url);
     websocketUrl.protocol = websocketUrl.protocol.replace("http", "ws");
     this.connection = new WebSocket(websocketUrl + "?history=no");
     this.connection.onopen = () => {
@@ -217,7 +217,7 @@ export class Hydra {
       if (this.utxos[txRef]) {
         return this.utxos[txRef];
       }
-      let start = performance.now();
+      const start = performance.now();
       await this.populateUTxO();
       timeout -= performance.now() - start;
       if (timeout <= 0) {
@@ -241,7 +241,12 @@ export class Hydra {
     unit: Unit,
   ): Promise<UTxO[]> {
     // we only support address for now
-    if (!(typeof addressOrCredential === 'string' || addressOrCredential instanceof String)) {
+    if (
+      !(
+        typeof addressOrCredential === "string" ||
+        addressOrCredential instanceof String
+      )
+    ) {
       throw new Error("not implemented");
     }
     const ret = [];
@@ -263,7 +268,7 @@ export class Hydra {
     throw new Error("UTxO not found");
   }
   public async getUtxosByOutRef(outRefs: Array<OutRef>): Promise<UTxO[]> {
-    let ret = [];
+    const ret = [];
     for (const outRef of outRefs) {
       const utxo = this.utxos[`${outRef.txHash}#${outRef.outputIndex}`];
       if (utxo) {

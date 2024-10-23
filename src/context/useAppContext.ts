@@ -1,13 +1,7 @@
 import { createContext, Dispatch, useContext } from "react";
-import { GameStatistics, Region } from "../types";
+import { GameData, GameStatistics, Region } from "../types";
 import { UseQueryResult } from "@tanstack/react-query";
 import { REGIONS } from "../constants";
-
-interface GameData {
-  code: string;
-  petName: string;
-  type?: "new" | "join";
-}
 
 interface AppContextInterface {
   gameData: GameData;
@@ -18,7 +12,7 @@ interface AppContextInterface {
 }
 
 export const AppContext = createContext<AppContextInterface>({
-  gameData: { petName: "", code: "" },
+  gameData: { petName: "", code: "", type: "solo" },
   globalQuery: undefined,
   region: REGIONS[0],
   setGameData: () => {},
