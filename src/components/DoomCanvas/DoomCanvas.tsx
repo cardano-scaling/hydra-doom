@@ -1,9 +1,11 @@
 import React, { useEffect, useRef } from "react";
-import { EmscriptenModule } from "../../types";
+import { EmscriptenModule, NewGameResponse } from "../../types";
 import { useAppContext } from "../../context/useAppContext";
 import { HydraMultiplayer } from "../../utils/hydra-multiplayer";
 import useKeys from "../../hooks/useKeys";
 import { getArgs } from "../../utils/game";
+import { useQuery } from "@tanstack/react-query";
+import { SERVER_URL } from "../../constants";
 
 const DoomCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -12,9 +14,24 @@ const DoomCanvas: React.FC = () => {
     gameData: { code, petName, type },
   } = useAppContext();
   const keys = useKeys();
+  const url =
+    type === "host"
+      ? `${SERVER_URL}new_game?address=${keys.address}`
+      : `${SERVER_URL}add_player?address=${keys.address}&id=${code}`;
+  const newGameQuery = useQuery<NewGameResponse>({
+    queryKey: ["game", url],
+    queryFn: async () => {
+      const response = await fetch(url);
+      return response.json();
+    },
+    enabled: !!keys.address,
+  });
+
+  const { data } = newGameQuery;
+  const ip = data?.ip;
 
   useEffect(() => {
-    if (!keys.address) return;
+    if (!keys.address || !ip) return;
 
     // Prevent effect from running twice
     if (isEffectRan.current) return;
@@ -67,11 +84,7 @@ const DoomCanvas: React.FC = () => {
     window.Module = Module;
 
     // Initialize HydraMultiplayer
-    window.HydraMultiplayer = new HydraMultiplayer(
-      keys,
-      "http://localhost:4001",
-      Module,
-    );
+    window.HydraMultiplayer = new HydraMultiplayer(keys, ip, Module);
 
     // Dynamically load websockets-doom.js
     const script = document.createElement("script");
@@ -82,7 +95,7 @@ const DoomCanvas: React.FC = () => {
       canvas.removeEventListener("webglcontextlost", handleContextLost);
       document.body.removeChild(script);
     };
-  }, [code, petName, keys, type]);
+  }, [code, petName, keys, type, ip]);
 
   return <canvas id="canvas" ref={canvasRef} className="w-full h-full" />;
 };

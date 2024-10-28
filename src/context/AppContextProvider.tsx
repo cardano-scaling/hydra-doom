@@ -2,7 +2,7 @@ import { FC, PropsWithChildren, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AppContext } from "./useAppContext";
 import { GameStatistics, Region } from "../types";
-import { REGIONS, SERVER_URL } from "../constants";
+import { REGIONS } from "../constants";
 
 const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const [gameData, setGameData] = useState({
@@ -14,14 +14,21 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const globalQuery = useQuery<GameStatistics>({
     queryKey: ["global"],
     queryFn: async () => {
-      const response = await fetch(`${SERVER_URL}global`);
-      return response.json();
+      return Promise.resolve(undefined as unknown as GameStatistics);
     },
     refetchInterval: 1000,
   });
 
   const value = useMemo(
-    () => ({ globalQuery, region, setRegion, gameData, setGameData }),
+    () => ({
+      globalQuery,
+      // newGameQuery,
+      // joinGameQuery,
+      region,
+      setRegion,
+      gameData,
+      setGameData,
+    }),
     [gameData, globalQuery, region],
   );
 

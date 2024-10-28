@@ -12,17 +12,20 @@ const GlobalLeaderBoard = () => {
     {
       id: 0,
       title: "Kills",
-      content: kills && <LeaderboardTable data={kills} />,
+      // content: kills && <LeaderboardTable data={kills} />,
+      content: null,
     },
     {
       id: 1,
       title: "Items",
-      content: items && <LeaderboardTable data={items} />,
+      // content: items && <LeaderboardTable data={items} />,
+      content: null,
     },
     {
       id: 2,
       title: "Secret",
-      content: secrets && <LeaderboardTable data={secrets} />,
+      // content: secrets && <LeaderboardTable data={secrets} />,
+      content: null,
     },
   ];
 

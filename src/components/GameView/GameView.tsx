@@ -34,7 +34,7 @@ const GameView = () => {
       <RestartButton />
       <div className="grid grid-cols-[max-content_1fr_max-content] container gap-16 items-center">
         <div className="w-80 flex flex-col gap-4">
-          <GlobalTotals size="sm" titleAlign="left" />
+          {/* <GlobalTotals size="sm" titleAlign="left" /> */}
           <StatsCard
             data={[
               { label: "Transactions:", value: "106,791,272" },

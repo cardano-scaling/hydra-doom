@@ -89,12 +89,10 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
       </div>
       <div className="grid grid-cols-2 max-w-6xl w-full mt-32 gap-8 py-6">
         <div className="flex flex-col gap-4">
-          <GlobalTotals size="lg" />
-          <GlobalTPS size="lg" />
+          {/* <GlobalTotals size="lg" /> */}
+          {/* <GlobalTPS size="lg" /> */}
         </div>
-        <div>
-          <GlobalLeaderBoard />
-        </div>
+        <div>{/* <GlobalLeaderBoard /> */}</div>
       </div>
 
       <Modal

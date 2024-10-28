@@ -28,6 +28,11 @@ export interface GameStatistics {
   transactions: number;
 }
 
+export interface NewGameResponse {
+  ip: string;
+  player_state: string;
+}
+
 export interface Region {
   name: string;
   value: string;

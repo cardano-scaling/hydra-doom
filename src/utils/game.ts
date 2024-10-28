@@ -1,26 +1,14 @@
 import { GameData } from "../types";
 
 export const getArgs = ({ type, code, petName }: GameData) => {
-  const args = [
-    "-window",
-    "-nogui",
-    "-nomusic",
-    "-config",
-    "default.cfg",
-  ];
+  const args = ["-window", "-nogui", "-nomusic", "-config", "default.cfg"];
 
   if (type !== "solo") {
+    args.push("-iwad", "freedoom2.wad", "-file", "Cardano.wad", "-deathmatch");
     if (code) {
       args.push("-connect", "1");
-      args.push(
-        "-iwad",
-        "freedoom2.wad",
-        "-file",
-        "Cardano.wad",
-        "-deathmatch",
-      );
     } else {
-      args.push("-server",  "-dedicated");
+      args.push("-server");
     }
   }
 
