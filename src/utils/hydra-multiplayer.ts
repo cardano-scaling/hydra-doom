@@ -13,6 +13,7 @@ import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
 import { sha512 } from "@noble/hashes/sha512";
 import { Keys } from "../hooks/useKeys";
+import { EmscriptenModule } from "../types";
 ed25519.etc.sha512Sync = (...m) => sha512(ed25519.etc.concatBytes(...m));
 
 export class HydraMultiplayer {
@@ -21,8 +22,10 @@ export class HydraMultiplayer {
   myIP: number = 0;
   latestUTxO: UTxO | null = null;
   packetQueue: Packet[] = [];
+  module: EmscriptenModule;
 
-  constructor(keys: Keys, url: string) {
+  constructor(keys: Keys, url: string, module: EmscriptenModule) {
+    this.module = module;
     this.keys = keys;
     this.hydra = new Hydra(url, 100);
     this.hydra.onTxSeen = this.onTxSeen.bind(this);
@@ -42,11 +45,7 @@ export class HydraMultiplayer {
     await this.hydra.populateUTxO();
     const utxos = await this.hydra.getUtxos(this.keys.address!);
     // TODO: robust
-    if (this.myIP === 1) {
-      this.latestUTxO = utxos.find((u) => u.outputIndex === 1)!;
-    } else {
-      this.latestUTxO = utxos.find((u) => u.outputIndex === 0)!;
-    }
+    this.latestUTxO = utxos.find((u) => !u.datumHash)!;
   }
 
   public async SendPacket(
@@ -59,7 +58,7 @@ export class HydraMultiplayer {
   }
 
   public async sendPacketQueue(): Promise<void> {
-    if (this.packetQueue.length == 0) {
+    if (this.packetQueue.length == 0 || !this.hydra.isConnected()) {
       return;
     }
     await this.selectUTxO();
@@ -81,10 +80,10 @@ export class HydraMultiplayer {
     const packets = decodePackets(packetsRaw);
     for (const packet of packets) {
       if (packet.to == this.myIP) {
-        const buf = window.Module._malloc!(packet.data.length);
-        window.Module.HEAPU8!.set(packet.data, buf);
-        window.Module._ReceivePacket!(packet.from, buf, packet.data.length);
-        window.Module._free!(buf);
+        const buf = this.module._malloc!(packet.data.length);
+        this.module.HEAPU8!.set(packet.data, buf);
+        this.module._ReceivePacket!(packet.from, buf, packet.data.length);
+        this.module._free!(buf);
       }
     }
   }

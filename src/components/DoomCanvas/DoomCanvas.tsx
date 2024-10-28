@@ -34,12 +34,6 @@ const DoomCanvas: React.FC = () => {
 
     canvas.addEventListener("webglcontextlost", handleContextLost, false);
 
-    // Initialize HydraMultiplayer
-    window.HydraMultiplayer = new HydraMultiplayer(
-      keys,
-      "http://localhost:4001",
-    );
-
     // Setup configuration for doom-wasm
     const Module: EmscriptenModule = {
       noInitialRun: true,
@@ -71,6 +65,12 @@ const DoomCanvas: React.FC = () => {
 
     // Attach Module to the window object to make it globally accessible
     window.Module = Module;
+    // Initialize HydraMultiplayer
+    window.HydraMultiplayer = new HydraMultiplayer(
+      keys,
+      "http://localhost:4001",
+      Module,
+    );
 
     // Dynamically load websockets-doom.js
     const script = document.createElement("script");

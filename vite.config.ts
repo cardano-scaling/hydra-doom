@@ -12,6 +12,9 @@ export default defineConfig({
     },
     exclude: ["lucid-cardano"],
   },
+  server: {
+    port: 3000,
+  },
   build: {
     target: "ES2022",
   },

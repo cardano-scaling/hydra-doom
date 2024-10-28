@@ -54,7 +54,7 @@ export interface EmscriptenModule {
   HEAPU8?: HEAPU8;
   onRuntimeInitialized?: () => void;
   postRun?: () => void;
-  preRun?: () => void;
+  preRun?: (module: EmscriptenModule) => void;
   print?: (text: string) => void;
   printErr?: (text: string) => void;
   setStatus?: (text: string) => void;

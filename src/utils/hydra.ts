@@ -71,6 +71,10 @@ export class Hydra {
     this.connection.onmessage = this.receiveMessage.bind(this);
   }
 
+  public isConnected(): boolean {
+    return this.connection.readyState === WebSocket.OPEN;
+  }
+
   public async populateUTxO() {
     const resp = await fetch(`${this.url}/snapshot/utxo`);
     const rawUtxo = await resp.json();
@@ -313,6 +317,7 @@ function hydraUtxoToLucidUtxo(txHash: TxHash, idx: number, output: any): UTxO {
     txHash: txHash,
     outputIndex: idx,
     datum: datumBytes,
+    datumHash: output.inlineDatumhash,
     assets: assets,
   };
 }
