@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: "Less Perfect DOS VGA";
+    font-style: normal;
+    font-weight: 400;
+    src:
+      url("./assets/fonts/lessperfectdosvga-webfont.woff2") format("woff2"),
+      url("./assets/fonts/lessperfectdosvga-webfont.woff") format("woff");
+  }
+
+  @font-face {
+    font-family: "Pixelify Sans";
+    font-style: normal;
+    font-weight: 400;
+    src: url("./assets/fonts/pixelifysans-regular.ttf") format("truetype");
+  }
+
+  html {
+    font-size: 12px;
+    scroll-behavior: smooth;
+
+    @screen xl {
+      font-size: 14px;
+    }
+
+    @screen 2xl {
+      font-size: 16px;
+    }
+  }
+
+  body {
+    font-family: "Less Perfect DOS VGA", monospace;
+  }
+}
