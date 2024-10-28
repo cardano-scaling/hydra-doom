@@ -65,6 +65,7 @@ const DoomCanvas: React.FC = () => {
 
     // Attach Module to the window object to make it globally accessible
     window.Module = Module;
+
     // Initialize HydraMultiplayer
     window.HydraMultiplayer = new HydraMultiplayer(
       keys,
