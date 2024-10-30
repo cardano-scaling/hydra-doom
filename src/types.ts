@@ -63,17 +63,21 @@ export interface EmscriptenModule {
   print?: (text: string) => void;
   printErr?: (text: string) => void;
   setStatus?: (text: string) => void;
-
   _malloc?: (size: number) => number;
   _free?: (ptr: number) => void;
-
   _ReceivePacket?: (from: number, buf: number, len: number) => void;
+}
+
+export enum EGameType {
+  SOLO = "solo",
+  HOST = "host",
+  JOIN = "join",
 }
 
 export interface GameData {
   code: string;
   petName: string;
-  type: "host" | "join" | "solo";
+  type: EGameType;
 }
 
 declare global {

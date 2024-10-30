@@ -1,14 +1,12 @@
 import { FC, useEffect, useState } from "react";
 import Button from "../Button";
-import GlobalLeaderBoard from "../GlobalLeaderBoard";
-import GlobalTPS from "../GlobalTPS";
 import hydraText from "../../assets/images/hydra-text.png";
 import Modal from "../Modal";
 import SelectContinentDialog from "../SelectContinentDialog";
 import Layout from "../Layout";
-import GlobalTotals from "../GlobalTotals";
 import SetNameModal from "../SetNameModal";
 import { useAppContext } from "../../context/useAppContext";
+import { EGameType } from "../../types";
 
 interface InitialViewProps {
   startGame: () => void;
@@ -25,7 +23,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
   });
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
   const [isNameModalOpen, setIsNameModalOpen] = useState(
-    pathSegments[0] === "join",
+    pathSegments[0] === EGameType.JOIN,
   );
   const [isSelectContinentModalOpen, setIsSelectContinentModalOpen] =
     useState(false);
@@ -33,7 +31,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
 
   useEffect(() => {
     if (code) {
-      setGameData((prev) => ({ ...prev, code: code, type: "join" }));
+      setGameData((prev) => ({ ...prev, code: code, type: EGameType.JOIN }));
     }
   }, [code, setGameData]);
 
@@ -43,7 +41,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
       ...prev,
       code: "",
       petName: "",
-      type: "solo",
+      type: EGameType.SOLO,
     }));
   };
 
@@ -55,7 +53,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
       },
     });
     setIsNameModalOpen(true);
-    setGameData((prev) => ({ ...prev, type: "host" }));
+    setGameData((prev) => ({ ...prev, type: EGameType.HOST }));
   };
 
   const handleClickJoinMultiplayer = () => {
@@ -65,7 +63,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
         startGame();
       },
     });
-    setGameData((prev) => ({ ...prev, type: "join" }));
+    setGameData((prev) => ({ ...prev, type: EGameType.JOIN }));
     setIsNameModalOpen(true);
   };
 
@@ -86,13 +84,6 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
         <Button className="w-96 h-16" onClick={handleClickJoinMultiplayer}>
           Join Multiplayer
         </Button>
-      </div>
-      <div className="grid grid-cols-2 max-w-6xl w-full mt-32 gap-8 py-6">
-        <div className="flex flex-col gap-4">
-          {/* <GlobalTotals size="lg" /> */}
-          {/* <GlobalTPS size="lg" /> */}
-        </div>
-        <div>{/* <GlobalLeaderBoard /> */}</div>
       </div>
 
       <Modal

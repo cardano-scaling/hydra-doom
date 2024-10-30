@@ -2,7 +2,6 @@ import { MdContentCopy } from "react-icons/md";
 import { ClipboardAPI, useClipboard } from "use-clipboard-copy";
 import Card from "../Card";
 import DoomCanvas from "../DoomCanvas";
-import GlobalTotals from "../GlobalTotals";
 import GlobalTPS from "../GlobalTPS";
 import HydraHeadLiveTxs from "../HydraHeadLiveTxs";
 import Layout from "../Layout";
@@ -13,6 +12,7 @@ import TopLinks from "../TopLinks";
 import { useCallback } from "react";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { useAppContext } from "../../context/useAppContext";
+import { EGameType } from "../../types";
 
 const GameView = () => {
   const { gameData } = useAppContext();
@@ -34,7 +34,6 @@ const GameView = () => {
       <RestartButton />
       <div className="grid grid-cols-[max-content_1fr_max-content] container gap-16 items-center">
         <div className="w-80 flex flex-col gap-4">
-          {/* <GlobalTotals size="sm" titleAlign="left" /> */}
           <StatsCard
             data={[
               { label: "Transactions:", value: "106,791,272" },
@@ -54,7 +53,7 @@ const GameView = () => {
           <Card className="h-[40rem]">
             <DoomCanvas />
           </Card>
-          {gameData.type === "host" && (
+          {gameData.type === EGameType.HOST && (
             <Card className="px-4 py-2 text-center text-xl text-white flex items-center gap-2 justify-center">
               Share this URL with friends{" "}
               <a

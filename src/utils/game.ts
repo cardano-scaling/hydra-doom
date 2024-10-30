@@ -1,9 +1,9 @@
-import { GameData } from "../types";
+import { EGameType, GameData } from "../types";
 
 export const getArgs = ({ type, code, petName }: GameData) => {
   const args = ["-window", "-nogui", "-nomusic", "-config", "default.cfg"];
 
-  if (type !== "solo") {
+  if (type !== EGameType.SOLO) {
     args.push("-iwad", "freedoom2.wad", "-file", "Cardano.wad", "-deathmatch");
     if (code) {
       args.push("-connect", "1");

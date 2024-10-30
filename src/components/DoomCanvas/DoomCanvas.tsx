@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { EmscriptenModule, NewGameResponse } from "../../types";
+import { EGameType, EmscriptenModule, NewGameResponse } from "../../types";
 import { useAppContext } from "../../context/useAppContext";
 import { HydraMultiplayer } from "../../utils/hydra-multiplayer";
 import useKeys from "../../hooks/useKeys";
@@ -15,7 +15,7 @@ const DoomCanvas: React.FC = () => {
   } = useAppContext();
   const keys = useKeys();
   const url =
-    type === "host"
+    type === EGameType.HOST
       ? `${SERVER_URL}new_game?address=${keys.address}`
       : `${SERVER_URL}add_player?address=${keys.address}&id=${code}`;
   const newGameQuery = useQuery<NewGameResponse>({
