@@ -4,7 +4,7 @@ import { useAppContext } from "../../context/useAppContext";
 import { HydraMultiplayer } from "../../utils/hydra-multiplayer";
 import useKeys from "../../hooks/useKeys";
 import { getArgs } from "../../utils/game";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { SERVER_URL } from "../../constants";
 
 const DoomCanvas: React.FC = () => {
@@ -14,24 +14,27 @@ const DoomCanvas: React.FC = () => {
     gameData: { code, petName, type },
   } = useAppContext();
   const keys = useKeys();
-  const url =
-    type === EGameType.HOST
-      ? `${SERVER_URL}new_game?address=${keys.address}`
-      : `${SERVER_URL}add_player?address=${keys.address}&id=${code}`;
-  const newGameQuery = useQuery<NewGameResponse>({
-    queryKey: ["game", url],
-    queryFn: async () => {
+
+  const { mutate: fetchGameData, data } = useMutation<NewGameResponse>({
+    mutationKey: ["fetchGameData", keys.address, code, type],
+    mutationFn: async () => {
+      const url =
+        type === EGameType.HOST
+          ? `${SERVER_URL}new_game?address=${keys.address}`
+          : `${SERVER_URL}add_player?address=${keys.address}&id=${code}`;
       const response = await fetch(url);
       return response.json();
     },
-    enabled: !!keys.address,
   });
 
-  const { data } = newGameQuery;
-  const ip = data?.ip;
+  useEffect(() => {
+    if (!keys.address) return;
+
+    fetchGameData();
+  }, [fetchGameData, keys.address]);
 
   useEffect(() => {
-    if (!keys.address || !ip) return;
+    if (!keys.address || !data?.ip) return;
 
     // Prevent effect from running twice
     if (isEffectRan.current) return;
@@ -84,7 +87,7 @@ const DoomCanvas: React.FC = () => {
     window.Module = Module;
 
     // Initialize HydraMultiplayer
-    window.HydraMultiplayer = new HydraMultiplayer(keys, ip, Module);
+    window.HydraMultiplayer = new HydraMultiplayer(keys, data.ip, Module);
 
     // Dynamically load websockets-doom.js
     const script = document.createElement("script");
@@ -95,7 +98,7 @@ const DoomCanvas: React.FC = () => {
       canvas.removeEventListener("webglcontextlost", handleContextLost);
       document.body.removeChild(script);
     };
-  }, [code, petName, keys, type, ip]);
+  }, [code, data?.ip, keys, petName, type]);
 
   return <canvas id="canvas" ref={canvasRef} className="w-full h-full" />;
 };
