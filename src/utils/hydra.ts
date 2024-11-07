@@ -31,6 +31,7 @@ export interface TransactionTiming {
 }
 
 export class Hydra {
+  url: URL;
   connection: WebSocket;
   outbound_transactions: Array<[Transaction, TxHash]>;
   interval?: ReturnType<typeof setInterval>;
@@ -47,7 +48,7 @@ export class Hydra {
   };
 
   constructor(
-    public url: string | URL,
+    url: string | URL,
     public queue_length: number = 10,
   ) {
     this.tx_count = 0;
@@ -56,6 +57,8 @@ export class Hydra {
     this.utxos = {};
     this.tombstones = {};
 
+    this.url = new URL(url);
+    this.url.protocol = this.url.protocol.replace("ws", "http");
     const websocketUrl = new URL(url);
     websocketUrl.protocol = websocketUrl.protocol.replace("http", "ws");
     this.connection = new WebSocket(websocketUrl + "?history=no");
