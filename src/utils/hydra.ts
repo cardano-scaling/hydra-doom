@@ -79,7 +79,7 @@ export class Hydra {
   }
 
   public async populateUTxO() {
-    const resp = await fetch(`${this.url}/snapshot/utxo`);
+    const resp = await fetch(`${this.url}snapshot/utxo`);
     const rawUtxo = await resp.json();
     for (const key in rawUtxo) {
       const [txHash, idx] = key.split("#");
