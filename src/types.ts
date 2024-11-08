@@ -29,6 +29,7 @@ export interface GameStatistics {
 }
 
 export interface NewGameResponse {
+  game_id: string;
   ip: string;
   player_state: string;
 }

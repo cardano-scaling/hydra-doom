@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { EGameType, EmscriptenModule, NewGameResponse } from "../../types";
 import { useAppContext } from "../../context/useAppContext";
 import { HydraMultiplayer } from "../../utils/hydra-multiplayer";
@@ -6,6 +6,10 @@ import useKeys from "../../hooks/useKeys";
 import { getArgs } from "../../utils/game";
 import { useMutation } from "@tanstack/react-query";
 import { SERVER_URL } from "../../constants";
+import Card from "../Card";
+import { FaRegCircleCheck } from "react-icons/fa6";
+import { MdContentCopy } from "react-icons/md";
+import { ClipboardAPI, useClipboard } from "use-clipboard-copy";
 
 const DoomCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -14,6 +18,7 @@ const DoomCanvas: React.FC = () => {
     gameData: { code, petName, type },
   } = useAppContext();
   const keys = useKeys();
+  const urlClipboard = useClipboard({ copiedTimeout: 1500 });
 
   const { mutate: fetchGameData, data } = useMutation<NewGameResponse>({
     mutationKey: ["fetchGameData", keys.address, code, type],
@@ -26,6 +31,15 @@ const DoomCanvas: React.FC = () => {
       return response.json();
     },
   });
+
+  const gameUrl = `${window.location.origin}/join/${data?.game_id}`;
+
+  const urlClipboardCopy = useCallback(
+    (clipboard: ClipboardAPI, value: string) => {
+      clipboard.copy(value);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!keys.address) return;
@@ -100,7 +114,33 @@ const DoomCanvas: React.FC = () => {
     };
   }, [code, data?.ip, keys, petName, type]);
 
-  return <canvas id="canvas" ref={canvasRef} className="w-full h-full" />;
+  return (
+    <>
+      <Card className="h-[40rem]">
+        <canvas id="canvas" ref={canvasRef} className="w-full h-full" />
+      </Card>
+      {type === EGameType.HOST && (
+        <Card className="px-4 py-2 text-center text-xl text-white flex items-center gap-2 justify-center">
+          Share this URL with friends{" "}
+          <a
+            className="text-yellow-400 underline"
+            href={gameUrl}
+            target="_blank"
+          >
+            {gameUrl}
+          </a>
+          {urlClipboard.copied ? (
+            <FaRegCircleCheck className="text-green-600" />
+          ) : (
+            <MdContentCopy
+              role="button"
+              onClick={() => urlClipboardCopy(urlClipboard, gameUrl)}
+            />
+          )}
+        </Card>
+      )}
+    </>
+  );
 };
 
 export default DoomCanvas;
