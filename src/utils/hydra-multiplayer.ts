@@ -79,7 +79,6 @@ export class HydraMultiplayer {
     }
     const packets = decodePackets(packetsRaw);
     for (const packet of packets) {
-      console.log("Packet for", packet.to);
       if (packet.to == this.myIP) {
         const buf = this.module._malloc!(packet.data.length);
         this.module.HEAPU8!.set(packet.data, buf);

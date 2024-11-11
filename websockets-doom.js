@@ -1,4 +1,18 @@
-var Module = typeof Module != "undefined" ? Module : {};
+
+var createModule = (() => {
+  var _scriptDir = import.meta.url;
+  
+  return (
+async function(moduleArg = {}) {
+
+var Module = moduleArg;
+
+var readyPromiseResolve, readyPromiseReject;
+
+Module["ready"] = new Promise((resolve, reject) => {
+ readyPromiseResolve = resolve;
+ readyPromiseReject = reject;
+});
 
 var moduleOverrides = Object.assign({}, Module);
 
@@ -30,12 +44,14 @@ function locateFile(path) {
 var read_, readAsync, readBinary;
 
 if (ENVIRONMENT_IS_NODE) {
+ const {createRequire: createRequire} = await import("module");
+ /** @suppress{duplicate} */ var require = createRequire(import.meta.url);
  var fs = require("fs");
  var nodePath = require("path");
  if (ENVIRONMENT_IS_WORKER) {
   scriptDirectory = nodePath.dirname(scriptDirectory) + "/";
  } else {
-  scriptDirectory = __dirname + "/";
+  scriptDirectory = require("url").fileURLToPath(new URL("./", import.meta.url));
  }
  read_ = (filename, binary) => {
   filename = isFileURI(filename) ? new URL(filename) : nodePath.normalize(filename);
@@ -58,14 +74,6 @@ if (ENVIRONMENT_IS_NODE) {
   thisProgram = process.argv[1].replace(/\\/g, "/");
  }
  arguments_ = process.argv.slice(2);
- if (typeof module != "undefined") {
-  module["exports"] = Module;
- }
- process.on("uncaughtException", ex => {
-  if (ex !== "unwind" && !(ex instanceof ExitStatus) && !(ex.context instanceof ExitStatus)) {
-   throw ex;
-  }
- });
  quit_ = (status, toThrow) => {
   process.exitCode = status;
   throw toThrow;
@@ -76,6 +84,9 @@ if (ENVIRONMENT_IS_NODE) {
   scriptDirectory = self.location.href;
  } else if (typeof document != "undefined" && document.currentScript) {
   scriptDirectory = document.currentScript.src;
+ }
+ if (_scriptDir) {
+  scriptDirectory = _scriptDir;
  }
  if (scriptDirectory.indexOf("blob:") !== 0) {
   scriptDirectory = scriptDirectory.substr(0, scriptDirectory.replace(/[?#].*/, "").lastIndexOf("/") + 1);
@@ -379,6 +390,7 @@ function removeRunDependency(id) {
  EXITSTATUS = 1;
  what += ". Build with -sASSERTIONS for more info.";
  /** @suppress {checkTypes} */ var e = new WebAssembly.RuntimeError(what);
+ readyPromiseReject(e);
  throw e;
 }
 
@@ -396,10 +408,13 @@ var dataURIPrefix = "data:application/octet-stream;base64,";
 
 var wasmBinaryFile;
 
-wasmBinaryFile = "websockets-doom.wasm";
-
-if (!isDataURI(wasmBinaryFile)) {
- wasmBinaryFile = locateFile(wasmBinaryFile);
+if (Module["locateFile"]) {
+ wasmBinaryFile = "websockets-doom.wasm";
+ if (!isDataURI(wasmBinaryFile)) {
+  wasmBinaryFile = locateFile(wasmBinaryFile);
+ }
+} else {
+ wasmBinaryFile = new URL("websockets-doom.wasm", import.meta.url).href;
 }
 
 function getBinarySync(file) {
@@ -479,10 +494,10 @@ function createWasm() {
    return Module["instantiateWasm"](info, receiveInstance);
   } catch (e) {
    err(`Module.instantiateWasm callback failed with error: ${e}`);
-   return false;
+   readyPromiseReject(e);
   }
  }
- instantiateAsync(wasmBinary, wasmBinaryFile, info, receiveInstantiationResult);
+ instantiateAsync(wasmBinary, wasmBinaryFile, info, receiveInstantiationResult).catch(readyPromiseReject);
  return {};
 }
 
@@ -491,7 +506,7 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 448256: $0 => {
+ 448771: $0 => {
   var str = UTF8ToString($0) + "\n\n" + "Abort/Retry/Ignore/AlwaysIgnore? [ariA] :";
   var reply = window.prompt(str, "i");
   if (reply === null) {
@@ -499,7 +514,7 @@ var ASM_CONSTS = {
   }
   return allocate(intArrayFromString(reply), "i8", ALLOC_NORMAL);
  },
- 448481: () => {
+ 448996: () => {
   if (typeof (AudioContext) !== "undefined") {
    return true;
   } else if (typeof (webkitAudioContext) !== "undefined") {
@@ -507,7 +522,7 @@ var ASM_CONSTS = {
   }
   return false;
  },
- 448628: () => {
+ 449143: () => {
   if ((typeof (navigator.mediaDevices) !== "undefined") && (typeof (navigator.mediaDevices.getUserMedia) !== "undefined")) {
    return true;
   } else if (typeof (navigator.webkitGetUserMedia) !== "undefined") {
@@ -515,7 +530,7 @@ var ASM_CONSTS = {
   }
   return false;
  },
- 448862: $0 => {
+ 449377: $0 => {
   if (typeof (Module["SDL2"]) === "undefined") {
    Module["SDL2"] = {};
   }
@@ -537,11 +552,11 @@ var ASM_CONSTS = {
   }
   return SDL2.audioContext === undefined ? -1 : 0;
  },
- 449355: () => {
+ 449870: () => {
   var SDL2 = Module["SDL2"];
   return SDL2.audioContext.sampleRate;
  },
- 449423: ($0, $1, $2, $3) => {
+ 449938: ($0, $1, $2, $3) => {
   var SDL2 = Module["SDL2"];
   var have_microphone = function(stream) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -582,7 +597,7 @@ var ASM_CONSTS = {
    }, have_microphone, no_microphone);
   }
  },
- 451075: ($0, $1, $2, $3) => {
+ 451590: ($0, $1, $2, $3) => {
   var SDL2 = Module["SDL2"];
   SDL2.audio.scriptProcessorNode = SDL2.audioContext["createScriptProcessor"]($1, 0, $0);
   SDL2.audio.scriptProcessorNode["onaudioprocess"] = function(e) {
@@ -594,7 +609,7 @@ var ASM_CONSTS = {
   };
   SDL2.audio.scriptProcessorNode["connect"](SDL2.audioContext["destination"]);
  },
- 451485: ($0, $1) => {
+ 452e3: ($0, $1) => {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.capture.currentCaptureBuffer.numberOfChannels;
   for (var c = 0; c < numChannels; ++c) {
@@ -613,7 +628,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 452090: ($0, $1) => {
+ 452605: ($0, $1) => {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.audio.currentOutputBuffer["numberOfChannels"];
   for (var c = 0; c < numChannels; ++c) {
@@ -626,7 +641,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 452570: $0 => {
+ 453085: $0 => {
   var SDL2 = Module["SDL2"];
   if ($0) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -664,7 +679,7 @@ var ASM_CONSTS = {
    SDL2.audioContext = undefined;
   }
  },
- 453742: ($0, $1, $2) => {
+ 454257: ($0, $1, $2) => {
   var w = $0;
   var h = $1;
   var pixels = $2;
@@ -735,7 +750,7 @@ var ASM_CONSTS = {
   }
   SDL2.ctx.putImageData(SDL2.image, 0, 0);
  },
- 455211: ($0, $1, $2, $3, $4) => {
+ 455726: ($0, $1, $2, $3, $4) => {
   var w = $0;
   var h = $1;
   var hot_x = $2;
@@ -772,32 +787,48 @@ var ASM_CONSTS = {
   stringToUTF8(url, urlBuf, url.length + 1);
   return urlBuf;
  },
- 456200: $0 => {
+ 456715: $0 => {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = UTF8ToString($0);
   }
  },
- 456283: () => {
+ 456798: () => {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = "none";
   }
  },
- 456352: () => window.innerWidth,
- 456382: () => window.innerHeight,
- 456413: ($0, $1) => {
+ 456867: () => window.innerWidth,
+ 456897: () => window.innerHeight,
+ 456928: ($0, $1) => {
   alert(UTF8ToString($0) + "\n\n" + UTF8ToString($1));
  }
 };
 
 function hydra_set_ip(ip) {
- window.HydraMultiplayer.setIP(ip);
+ let g = typeof window !== "undefined" ? window : global;
+ let hydra = !!g ? g.HydraMultiplayer : null;
+ if (!!hydra) {
+  hydra.setIP(ip);
+ }
 }
 
 function __asyncjs__hydra_send_packet(to, from, packet, len) {
  return Asyncify.handleAsync(async () => {
   let data = HEAPU8.subarray(packet, packet + len);
-  await window.HydraMultiplayer.SendPacket(to, from, data);
+  let g = typeof window !== "undefined" ? window : global;
+  let hydra = !!g ? g.HydraMultiplayer : null;
+  if (!!hydra) {
+   await hydra.SendPacket(to, from, data);
+  }
  });
+}
+
+function hydra_record_kill(killer, killed) {
+ console.log("KILL: " + killer + " -> " + killed);
+}
+
+function hydra_record_suicide(killer) {
+ console.log("SUICIDE: " + killer);
 }
 
 /** @constructor */ function ExitStatus(status) {
@@ -8498,6 +8529,8 @@ var wasmImports = {
  /** @export */ fd_read: _fd_read,
  /** @export */ fd_seek: _fd_seek,
  /** @export */ fd_write: _fd_write,
+ /** @export */ hydra_record_kill: hydra_record_kill,
+ /** @export */ hydra_record_suicide: hydra_record_suicide,
  /** @export */ hydra_set_ip: hydra_set_ip,
  /** @export */ segfault: segfault,
  /** @export */ system: _system
@@ -8625,9 +8658,9 @@ var _asyncify_start_rewind = a0 => (_asyncify_start_rewind = wasmExports["asynci
 
 var _asyncify_stop_rewind = () => (_asyncify_stop_rewind = wasmExports["asyncify_stop_rewind"])();
 
-var ___start_em_js = Module["___start_em_js"] = 447984;
+var ___start_em_js = Module["___start_em_js"] = 448160;
 
-var ___stop_em_js = Module["___stop_em_js"] = 448256;
+var ___stop_em_js = Module["___stop_em_js"] = 448771;
 
 function intArrayFromBase64(s) {
  if (typeof ENVIRONMENT_IS_NODE != "undefined" && ENVIRONMENT_IS_NODE) {
@@ -8658,6 +8691,8 @@ Module["FS_createPath"] = FS.createPath;
 Module["FS_createLazyFile"] = FS.createLazyFile;
 
 Module["FS_createDevice"] = FS.createDevice;
+
+Module["callMain"] = callMain;
 
 Module["ccall"] = ccall;
 
@@ -8717,6 +8752,7 @@ function run(args = arguments_) {
   if (ABORT) return;
   initRuntime();
   preMain();
+  readyPromiseResolve(Module);
   if (Module["onRuntimeInitialized"]) Module["onRuntimeInitialized"]();
   if (shouldRunNow) callMain(args);
   postRun();
@@ -8742,8 +8778,16 @@ if (Module["preInit"]) {
  }
 }
 
-var shouldRunNow = true;
+var shouldRunNow = false;
 
 if (Module["noInitialRun"]) shouldRunNow = false;
 
 run();
+
+
+  return moduleArg.ready
+}
+
+);
+})();
+export default createModule;
