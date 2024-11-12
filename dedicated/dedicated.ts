@@ -63,20 +63,21 @@ global.HydraMultiplayer = new HydraMultiplayer(
 );
 
 global.gameStarted = () => {
-  // Hit localhost to record game start
+  // TODO: Hit localhost to record game start
 };
 global.playerConnected = () => {
-  // Hit localhost to record a player joined
+  // TODO: Hit localhost to record a player joined
+  // NOTE: might need to ignore ourselves joining, so we don't inflate the player metrics
 };
 global.playerDisconnected = () => {
-  // Hit localhost to record a player disconnected
+  // TODO: Hit localhost to record a player disconnected
 };
 global.kill = (_killer, _victim) => {
   // TODO: map from player idx to ephemeral key
-  // Hit localhost to record a kill
+  // TODO: Hit localhost to record a kill
 };
 global.suicide = (_player) => {
-  // Hit localhist to record a kill
+  // TODO: Hit localhist to record a kill
 };
 
 // TODO: check for a pending game and run cleanup
@@ -111,5 +112,6 @@ while (!done) {
 }
 
 // TODO: record the game as ended
+// TODO: also decrement metrics by the number of players?
 
 process.exit(0);
