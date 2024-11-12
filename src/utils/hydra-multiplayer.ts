@@ -82,12 +82,10 @@ export class HydraMultiplayer {
     await this.selectUTxO();
     const datum = encodePackets(this.packetQueue);
 
-    const [newUTxO, tx] = buildTx(
-      this.latestUTxO!,
-      this.keys,
-      datum,
-      this.outboundScript,
-    );
+    const [newUTxO, tx] = buildTx(this.latestUTxO!, this.keys, datum, {
+      hash: this.outboundAddress.hash,
+      script: this.outboundScript,
+    });
     await this.hydra.submitTx(tx);
     this.latestUTxO = newUTxO;
     this.packetQueue = [];
@@ -147,7 +145,7 @@ const buildTx = (
   inputUtxo: UTxO,
   keys: Keys,
   datum: string,
-  nativeScript: string,
+  nativeScript: { hash: string; script: string },
 ): [UTxO, string] => {
   // Hand-roll transaction creation for more performance
   const datumLength = datum.length / 2;
@@ -159,7 +157,7 @@ const buildTx = (
   const txBodyByHand =
     `a3` + // Prefix
     `0081825820${inputUtxo.txHash}0${inputUtxo.outputIndex}` + // One input
-    `0181a300581d60${keys.publicKeyHashHex!}018200a0028201d818${lengthLengthTag}${datumLengthHex}${datum}` + // Output to users PKH
+    `0181a300581d70${nativeScript.hash}018200a0028201d818${lengthLengthTag}${datumLengthHex}${datum}` + // Output to users PKH
     `0200`; // No fee
 
   const txId = toHex(blake2b(fromHex(txBodyByHand), { dkLen: 256 / 8 }));
