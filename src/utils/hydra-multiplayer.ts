@@ -6,6 +6,7 @@ import {
   TxComplete,
   TxHash,
   UTxO,
+  C,
 } from "lucid-cardano";
 import { Hydra } from "./hydra";
 
@@ -18,15 +19,32 @@ ed25519.etc.sha512Sync = (...m) => sha512(ed25519.etc.concatBytes(...m));
 
 export class HydraMultiplayer {
   keys: Keys;
+  // inbound is ANY(admin, player)
+  inboundScript: string;
+  inboundAddress: { address: string; hash: string };
+  // outobund is ANY(player, admin)
+  outboundScript: string;
+  outboundAddress: { address: string; hash: string };
   hydra: Hydra;
   myIP: number = 0;
   latestUTxO: UTxO | null = null;
   packetQueue: Packet[] = [];
   module: EmscriptenModule;
 
-  constructor(keys: Keys, url: string, module: EmscriptenModule) {
+  constructor(
+    keys: Keys,
+    adminPkh: string,
+    url: string,
+    module: EmscriptenModule,
+  ) {
     this.module = module;
     this.keys = keys;
+
+    this.inboundScript = `8202828200581c${adminPkh}8200581c${keys.publicKeyHashHex!}`;
+    this.inboundAddress = getNativeScriptAddress(this.inboundScript, 0);
+    this.outboundScript = `8202828200581c${keys.publicKeyHashHex!}8200581c${adminPkh}`;
+    this.outboundAddress = getNativeScriptAddress(this.outboundScript, 0);
+
     this.hydra = new Hydra(url, 100);
     this.hydra.onTxSeen = this.onTxSeen.bind(this);
 
@@ -43,7 +61,7 @@ export class HydraMultiplayer {
       return;
     }
     await this.hydra.populateUTxO();
-    const utxos = await this.hydra.getUtxos(this.keys.address!);
+    const utxos = await this.hydra.getUtxos(this.outboundAddress.address);
     // TODO: robust
     this.latestUTxO = utxos.find((u) => !u.datumHash)!;
   }
@@ -64,7 +82,12 @@ export class HydraMultiplayer {
     await this.selectUTxO();
     const datum = encodePackets(this.packetQueue);
 
-    const [newUTxO, tx] = buildTx(this.latestUTxO!, this.keys, datum);
+    const [newUTxO, tx] = buildTx(
+      this.latestUTxO!,
+      this.keys,
+      datum,
+      this.outboundScript,
+    );
     await this.hydra.submitTx(tx);
     this.latestUTxO = newUTxO;
     this.packetQueue = [];
@@ -124,6 +147,7 @@ const buildTx = (
   inputUtxo: UTxO,
   keys: Keys,
   datum: string,
+  nativeScript: string,
 ): [UTxO, string] => {
   // Hand-roll transaction creation for more performance
   const datumLength = datum.length / 2;
@@ -141,7 +165,7 @@ const buildTx = (
   const txId = toHex(blake2b(fromHex(txBodyByHand), { dkLen: 256 / 8 }));
   const signature = toHex(ed25519.sign(txId, keys.privateKeyBytes!));
 
-  const witnessSetByHand = `a10081825820${keys.publicKeyHex!}5840${signature}`; // just signed by the user
+  const witnessSetByHand = `a20081825820${keys.publicKeyHex!}5840${signature}01${nativeScript}`; // just signed by the user
   const txByHand = `84${txBodyByHand}${witnessSetByHand}f5f6`;
 
   const newUtxo: UTxO = {
@@ -155,4 +179,25 @@ const buildTx = (
   };
 
   return [newUtxo, txByHand];
+};
+
+const getNativeScriptAddress = (
+  scriptHex: string,
+  networkId: number,
+): { address: string; hash: string } => {
+  const script = C.NativeScript.from_bytes(fromHex(scriptHex));
+  const scriptHash = script.hash(C.ScriptHashNamespace.NativeScript);
+  const scriptHashBytes = new Uint8Array([
+    0b01110000 | networkId,
+    ...scriptHash.to_bytes(),
+  ]);
+  const address = C.Address.from_bytes(scriptHashBytes);
+  const stringAddress = address.to_bech32(undefined);
+  const stringScriptHash = scriptHash.to_hex();
+
+  script.free();
+  scriptHash.free();
+  address.free();
+
+  return { address: stringAddress, hash: stringScriptHash };
 };

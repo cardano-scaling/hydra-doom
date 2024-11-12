@@ -103,12 +103,15 @@ const DoomCanvas: React.FC = () => {
 
     // Attach Module to the window object to make it globally accessible
     window.Module = Module;
-
     // Initialize HydraMultiplayer
     if (data?.ip) {
-      window.HydraMultiplayer = new HydraMultiplayer(keys, data.ip, Module);
+      window.HydraMultiplayer = new HydraMultiplayer(
+        keys,
+        data.admin_pkh,
+        data.ip,
+        Module,
+      );
     }
-
     // Dynamically load websockets-doom.js
     const loadDoom = async () => {
       const args = getArgs({ code, petName, type });
@@ -120,7 +123,7 @@ const DoomCanvas: React.FC = () => {
     return () => {
       canvas.removeEventListener("webglcontextlost", handleContextLost);
     };
-  }, [code, data?.ip, keys, petName, type]);
+  }, [code, data?.admin_pkh, data?.ip, keys, petName, type]);
 
   return (
     <>
