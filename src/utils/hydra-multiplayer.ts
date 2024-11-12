@@ -72,19 +72,23 @@ export class HydraMultiplayer {
 
   public onTxSeen(_txId: TxHash, tx: TxComplete): void {
     // TODO: tolerate other txs here
-    const output = tx.txComplete.body().outputs().get(0);
-    const packetsRaw = output?.datum()?.as_data()?.get().to_bytes();
-    if (!packetsRaw) {
-      return;
-    }
-    const packets = decodePackets(packetsRaw);
-    for (const packet of packets) {
-      if (packet.to == this.myIP) {
-        const buf = this.module._malloc!(packet.data.length);
-        this.module.HEAPU8!.set(packet.data, buf);
-        this.module._ReceivePacket!(packet.from, buf, packet.data.length);
-        this.module._free!(buf);
+    try {
+      const output = tx.txComplete.body().outputs().get(0);
+      const packetsRaw = output?.datum()?.as_data()?.get().to_bytes();
+      if (!packetsRaw) {
+        return;
       }
+      const packets = decodePackets(packetsRaw);
+      for (const packet of packets) {
+        if (packet.to == this.myIP) {
+          const buf = this.module._malloc!(packet.data.length);
+          this.module.HEAPU8!.set(packet.data, buf);
+          this.module._ReceivePacket!(packet.from, buf, packet.data.length);
+          this.module._free!(buf);
+        }
+      }
+    } catch (err) {
+      console.warn(err);
     }
   }
 }
