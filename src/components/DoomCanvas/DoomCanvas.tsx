@@ -5,7 +5,6 @@ import { HydraMultiplayer } from "../../utils/hydra-multiplayer";
 import useKeys from "../../hooks/useKeys";
 import { getArgs } from "../../utils/game";
 import { useMutation } from "@tanstack/react-query";
-import { SERVER_URL } from "../../constants";
 import Card from "../Card";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { MdContentCopy } from "react-icons/md";
@@ -16,6 +15,7 @@ const DoomCanvas: React.FC = () => {
   const isEffectRan = useRef(false);
   const {
     gameData: { code, petName, type },
+    region,
   } = useAppContext();
   const keys = useKeys();
   const urlClipboard = useClipboard({ copiedTimeout: 1500 });
@@ -25,8 +25,8 @@ const DoomCanvas: React.FC = () => {
     mutationFn: async () => {
       const url =
         type === EGameType.HOST
-          ? `${SERVER_URL}new_game?address=${keys.address}`
-          : `${SERVER_URL}add_player?address=${keys.address}&id=${code}`;
+          ? `http://api.${region}.hydra-doom.sundae.fi/new_game?address=${keys.address}`
+          : `http://api.${region}.hydra-doom.sundae.fi/add_player?address=${keys.address}&id=${code}`;
       const response = await fetch(url);
       return response.json();
     },
@@ -42,10 +42,10 @@ const DoomCanvas: React.FC = () => {
   );
 
   useEffect(() => {
-    if (!keys.address) return;
+    if (!keys.address || !region) return;
 
     fetchGameData();
-  }, [fetchGameData, keys.address]);
+  }, [fetchGameData, keys.address, region]);
 
   useEffect(() => {
     if (!keys.address || !data?.ip) return;

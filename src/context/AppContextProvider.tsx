@@ -1,25 +1,24 @@
 import { FC, PropsWithChildren, useMemo, useState } from "react";
 import { AppContext } from "./useAppContext";
+import { EGameType } from "../types";
+import useBestRegion from "../hooks/useBestRegion";
 import { REGIONS } from "../constants";
-import { EGameType, Region } from "../types";
 
 const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
+  const { bestRegion } = useBestRegion(REGIONS);
   const [gameData, setGameData] = useState({
     code: "",
     petName: "",
     type: EGameType.SOLO,
   });
 
-  const [region, setRegion] = useState<Region>(REGIONS[0]);
-
   const value = useMemo(
     () => ({
       gameData,
-      region,
+      region: bestRegion,
       setGameData,
-      setRegion,
     }),
-    [gameData, region],
+    [gameData, bestRegion],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
