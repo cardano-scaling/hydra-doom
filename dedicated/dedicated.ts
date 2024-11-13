@@ -1,6 +1,6 @@
 // Run as a node process to run a dedicated doom server
 
-import { HydraMultiplayer } from "../src/utils/hydra-multiplayer";
+import { HydraMultiplayer } from "utils/hydra-multiplayer";
 import { Lucid, toHex } from "lucid-cardano";
 import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
@@ -34,13 +34,14 @@ console.log("Address: ", keys.address);
 const { default: createModule } = await import("../websockets-doom.js");
 const module = await createModule({
   locateFile: (path, scripts) => {
+    console.log(scripts + "public/" + path);
     return scripts + "public/" + path;
   },
   noInitialRun: true,
   preRun: function (mod: any) {
     const files = ["freedoom2.wad", "default.cfg", "Cardano.wad"];
     files.forEach((file) => {
-      mod.FS!.createPreloadedFile("/", file, "public/" + file, true, true);
+      mod.FS!.createPreloadedFile("/", file, "../public/" + file, true, true);
     });
   },
   canvas: null as any,
