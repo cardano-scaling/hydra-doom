@@ -1,50 +1,17 @@
-# React + TypeScript + Vite
+# Hydra Doom
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This repository contains the parts of the hydra doom project that are written in javascript, including the frontend UI, the dedicated backend server, and the AI agents.
 
-Currently, two official plugins are available:
+## UI
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+To run the UI, set `VITE_SERVER_URL` in your environment to point to a hydra-control-plane API URL, then run `yarn dev`
 
-## Expanding the ESLint configuration
+## Dedicated Server
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+To run the dedicated server, switch to the `dedicated` directory, then run `yarn`, and then `npx tsx dedicated.ts`.
 
-- Configure the top-level `parserOptions` property like this:
+You can also build a docker image with `docker build -f ./dedicated/Dockerfile .`
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## AI Agent
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+TBD

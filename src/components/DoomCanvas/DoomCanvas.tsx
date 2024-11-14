@@ -9,6 +9,7 @@ import Card from "../Card";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { MdContentCopy } from "react-icons/md";
 import { ClipboardAPI, useClipboard } from "use-clipboard-copy";
+import createModule from "../../../websockets-doom.js";
 import { useUrls } from "../../hooks/useUrls";
 
 const DoomCanvas: React.FC = () => {
@@ -25,6 +26,9 @@ const DoomCanvas: React.FC = () => {
   const { mutate: fetchGameData, data } = useMutation<NewGameResponse>({
     mutationKey: ["fetchGameData", keys.address, code, type],
     mutationFn: async () => {
+      if (type === EGameType.SOLO) {
+        return { game_id: "solo" };
+      }
       const url =
         type === EGameType.HOST
           ? newGame(keys.address!)
@@ -50,7 +54,8 @@ const DoomCanvas: React.FC = () => {
   }, [fetchGameData, keys.address, region]);
 
   useEffect(() => {
-    if (!keys.address || !data?.ip) return;
+    if (!keys.address) return;
+    if (type !== EGameType.SOLO && !data?.ip) return;
 
     // Prevent effect from running twice
     if (isEffectRan.current) return;
@@ -93,26 +98,27 @@ const DoomCanvas: React.FC = () => {
       setStatus: (text: string) => {
         console.log("setStatus:", text);
       },
-      onRuntimeInitialized: function () {
-        const args = getArgs({ code, petName, type });
-        window.callMain(args);
-      },
+      onRuntimeInitialized: function () {},
     };
 
     // Attach Module to the window object to make it globally accessible
     window.Module = Module;
 
     // Initialize HydraMultiplayer
-    window.HydraMultiplayer = new HydraMultiplayer(keys, data.ip, Module);
+    if (data?.ip) {
+      window.HydraMultiplayer = new HydraMultiplayer(keys, data.ip, Module);
+    }
 
     // Dynamically load websockets-doom.js
-    const script = document.createElement("script");
-    script.src = "/websockets-doom.js";
-    document.body.appendChild(script);
+    const loadDoom = async () => {
+      const args = getArgs({ code, petName, type });
+      const module = await createModule(Module);
+      module.callMain(args);
+    };
+    loadDoom();
 
     return () => {
       canvas.removeEventListener("webglcontextlost", handleContextLost);
-      document.body.removeChild(script);
     };
   }, [code, data?.ip, keys, petName, type]);
 

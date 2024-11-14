@@ -53,6 +53,7 @@ export interface EmscriptenModule {
   FS?: FileSystem;
   noInitialRun?: boolean;
   HEAPU8?: HEAPU8;
+  locateFile?: (path: string, scripts: string) => string;
   onRuntimeInitialized?: () => void;
   postRun?: () => void;
   preRun?: (module: EmscriptenModule) => void;
@@ -78,7 +79,6 @@ export interface GameData {
 
 declare global {
   interface Window {
-    callMain: (args: string[]) => void;
     Module: EmscriptenModule;
     HydraMultiplayer: HydraMultiplayer;
   }
