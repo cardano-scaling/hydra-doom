@@ -1,23 +1,24 @@
 // Run as a node process to run a dedicated doom server
 
+import { readFile } from "node:fs/promises";
 import { HydraMultiplayer } from "utils/hydra-multiplayer";
-import { Lucid, toHex } from "lucid-cardano";
+import { Lucid, toHex, fromHex } from "lucid-cardano";
 import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
 
 let done = false;
-
-// TODO: read key from k8s secret / local file
 const lucid = await Lucid.new(undefined, "Preprod");
-const key =
-  "ed25519_sk13ergqg9vy7rj6h4v05yf4v2ltctxml5ua9kxvc04ph8hjvs3m3hs9gsn2x";
-const privateKeyBytes = bech32.decode(key).data;
+const adminKeyFile = process.env.ADMIN_KEY_FILE ?? "admin.sk";
+const adminKey = JSON.parse((await readFile(adminKeyFile)).toString());
+const privateKeyBytes = adminKey.cborHex.slice(4);
+const sessionKeyBech32 = bech32.encode("ed25519_sk", fromHex(privateKeyBytes));
+
 const publicKeyBytes = await ed25519.getPublicKeyAsync(privateKeyBytes);
 const publicKeyHashBytes = blake2b(publicKeyBytes, { dkLen: 224 / 8 });
 const publicKeyHashHex = toHex(publicKeyHashBytes);
 const keys = {
-  sessionKeyBech32: key,
+  sessionKeyBech32,
   privateKeyBytes,
   privateKeyHex: toHex(privateKeyBytes),
   publicKeyBytes,
