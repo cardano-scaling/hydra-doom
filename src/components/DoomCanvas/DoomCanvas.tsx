@@ -3,7 +3,7 @@ import { EGameType, EmscriptenModule, NewGameResponse } from "../../types";
 import { useAppContext } from "../../context/useAppContext";
 import { HydraMultiplayer } from "../../utils/hydra-multiplayer";
 import useKeys from "../../hooks/useKeys";
-import { getArgs } from "../../utils/game";
+import { getArgs, getBaseUrl } from "../../utils/game";
 import { useMutation } from "@tanstack/react-query";
 import Card from "../Card";
 import { FaRegCircleCheck } from "react-icons/fa6";
@@ -19,14 +19,15 @@ const DoomCanvas: React.FC = () => {
   } = useAppContext();
   const keys = useKeys();
   const urlClipboard = useClipboard({ copiedTimeout: 1500 });
+  const baseUrl = getBaseUrl(region);
 
   const { mutate: fetchGameData, data } = useMutation<NewGameResponse>({
     mutationKey: ["fetchGameData", keys.address, code, type],
     mutationFn: async () => {
       const url =
         type === EGameType.HOST
-          ? `http://api.${region}.hydra-doom.sundae.fi/new_game?address=${keys.address}`
-          : `http://api.${region}.hydra-doom.sundae.fi/add_player?address=${keys.address}&id=${code}`;
+          ? `${baseUrl}/new_game?address=${keys.address}`
+          : `${baseUrl}/add_player?address=${keys.address}&id=${code}`;
       const response = await fetch(url);
       return response.json();
     },
