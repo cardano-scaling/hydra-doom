@@ -2,7 +2,6 @@ import { FC, useEffect, useState } from "react";
 import Button from "../Button";
 import hydraText from "../../assets/images/hydra-text.png";
 import Modal from "../Modal";
-import SelectContinentDialog from "../SelectContinentDialog";
 import Layout from "../Layout";
 import SetNameModal from "../SetNameModal";
 import { useAppContext } from "../../context/useAppContext";
@@ -25,8 +24,6 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
   const [isNameModalOpen, setIsNameModalOpen] = useState(
     pathSegments[0] === EGameType.JOIN,
   );
-  const [isSelectContinentModalOpen, setIsSelectContinentModalOpen] =
-    useState(false);
   const code = pathSegments[1];
 
   useEffect(() => {
@@ -111,11 +108,6 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
           </p>
         </div>
       </Modal>
-      <SelectContinentDialog
-        close={() => setIsSelectContinentModalOpen(false)}
-        isOpen={isSelectContinentModalOpen}
-        startGame={startGame}
-      />
       <SetNameModal
         close={() => setIsNameModalOpen(false)}
         isOpen={isNameModalOpen}

@@ -34,11 +34,6 @@ export interface NewGameResponse {
   player_state: string;
 }
 
-export interface Region {
-  name: string;
-  value: string;
-}
-
 interface FileSystem {
   createPreloadedFile(
     parent: string,
