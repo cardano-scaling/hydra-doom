@@ -16,8 +16,3 @@ export const getArgs = ({ type, code, petName }: GameData) => {
 
   return args;
 };
-
-export const getBaseUrl = (region: string | null, local = false) => {
-  if (local) return "http://localhost:3000";
-  return `http://api.${region}.hydra-doom.sundae.fi`;
-};

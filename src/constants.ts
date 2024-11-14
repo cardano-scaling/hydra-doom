@@ -1,3 +1,4 @@
+export const IS_LOCAL = !!import.meta.env.VITE_IS_LOCAL;
 export const CABINET_KEY = import.meta.env.VITE_CABINET_KEY;
 export const GLOBAL_MAX_SPEED = 30 * 100;
 export const HANDLE_CACHE_KEY = "player-handle-cache";

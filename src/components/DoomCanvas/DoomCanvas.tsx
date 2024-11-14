@@ -3,12 +3,13 @@ import { EGameType, EmscriptenModule, NewGameResponse } from "../../types";
 import { useAppContext } from "../../context/useAppContext";
 import { HydraMultiplayer } from "../../utils/hydra-multiplayer";
 import useKeys from "../../hooks/useKeys";
-import { getArgs, getBaseUrl } from "../../utils/game";
+import { getArgs } from "../../utils/game";
 import { useMutation } from "@tanstack/react-query";
 import Card from "../Card";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { MdContentCopy } from "react-icons/md";
 import { ClipboardAPI, useClipboard } from "use-clipboard-copy";
+import useUrls from "../../hooks/useUrls";
 
 const DoomCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -19,21 +20,21 @@ const DoomCanvas: React.FC = () => {
   } = useAppContext();
   const keys = useKeys();
   const urlClipboard = useClipboard({ copiedTimeout: 1500 });
-  const baseUrl = getBaseUrl(region);
+  const { newGame, addPlayer, share } = useUrls();
 
   const { mutate: fetchGameData, data } = useMutation<NewGameResponse>({
     mutationKey: ["fetchGameData", keys.address, code, type],
     mutationFn: async () => {
       const url =
         type === EGameType.HOST
-          ? `${baseUrl}/new_game?address=${keys.address}`
-          : `${baseUrl}/add_player?address=${keys.address}&id=${code}`;
+          ? newGame(keys.address!)
+          : addPlayer(keys.address!, code);
       const response = await fetch(url);
       return response.json();
     },
   });
 
-  const gameUrl = `${window.location.origin}/join/${data?.game_id}`;
+  const gameUrl = share(data?.game_id);
 
   const urlClipboardCopy = useCallback(
     (clipboard: ClipboardAPI, value: string) => {
