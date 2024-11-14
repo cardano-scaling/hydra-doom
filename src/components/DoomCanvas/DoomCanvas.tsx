@@ -5,21 +5,23 @@ import { HydraMultiplayer } from "../../utils/hydra-multiplayer";
 import useKeys from "../../hooks/useKeys";
 import { getArgs } from "../../utils/game";
 import { useMutation } from "@tanstack/react-query";
-import { SERVER_URL } from "../../constants";
 import Card from "../Card";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { MdContentCopy } from "react-icons/md";
 import { ClipboardAPI, useClipboard } from "use-clipboard-copy";
 import createModule from "../../../websockets-doom.js";
+import { useUrls } from "../../hooks/useUrls";
 
 const DoomCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isEffectRan = useRef(false);
   const {
     gameData: { code, petName, type },
+    region,
   } = useAppContext();
   const keys = useKeys();
   const urlClipboard = useClipboard({ copiedTimeout: 1500 });
+  const { newGame, addPlayer, share } = useUrls();
 
   const { mutate: fetchGameData, data } = useMutation<NewGameResponse>({
     mutationKey: ["fetchGameData", keys.address, code, type],
@@ -29,14 +31,14 @@ const DoomCanvas: React.FC = () => {
       }
       const url =
         type === EGameType.HOST
-          ? `${SERVER_URL}new_game?address=${keys.address}`
-          : `${SERVER_URL}add_player?address=${keys.address}&id=${code}`;
+          ? newGame(keys.address!)
+          : addPlayer(keys.address!, code);
       const response = await fetch(url);
       return response.json();
     },
   });
 
-  const gameUrl = `${window.location.origin}/join/${data?.game_id}`;
+  const gameUrl = share(data?.game_id);
 
   const urlClipboardCopy = useCallback(
     (clipboard: ClipboardAPI, value: string) => {
@@ -46,10 +48,10 @@ const DoomCanvas: React.FC = () => {
   );
 
   useEffect(() => {
-    if (!keys.address) return;
+    if (!keys.address || !region) return;
 
     fetchGameData();
-  }, [fetchGameData, keys.address]);
+  }, [fetchGameData, keys.address, region]);
 
   useEffect(() => {
     if (!keys.address) return;
