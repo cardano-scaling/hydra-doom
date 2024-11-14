@@ -64,22 +64,52 @@ global.HydraMultiplayer = new HydraMultiplayer(
   module,
 );
 
-global.gameStarted = () => {
-  // TODO: Hit localhost to record game start
+let playerCount = 0;
+global.gameStarted = async () => {
+  try {
+    await fetch("localhost:8000/");
+    console.log(`Game started with ${playerCount} players`);
+  } catch (e) {
+    console.warn("Failed to record game start: ", e);
+  }
 };
-global.playerConnected = () => {
-  // TODO: Hit localhost to record a player joined
+global.playerConnected = async () => {
   // NOTE: might need to ignore ourselves joining, so we don't inflate the player metrics
+  playerCount++;
+  try {
+    await fetch("localhost:8000/player_joined");
+    console.log(`Player joined, now ${playerCount} players`);
+  } catch (e) {
+    console.warn("Failed to record player joined: ", e);
+  }
 };
-global.playerDisconnected = () => {
+global.playerDisconnected = async () => {
+  playerCount--;
+  try {
+    await fetch("localhost:8000/player_left");
+    console.log(`Player left, now ${playerCount} players`);
+  } catch (e) {
+    console.warn("Failed to record player left: ", e);
+  }
   // TODO: Hit localhost to record a player disconnected
 };
-global.kill = (_killer, _victim) => {
+global.kill = async (killer, victim) => {
   // TODO: map from player idx to ephemeral key
-  // TODO: Hit localhost to record a kill
+  // TODO: ddz leaderboards
+  try {
+    await fetch("localhost:8000/player_killed");
+    console.log(`Player ${killer} killed ${victim}`);
+  } catch (e) {
+    console.warn("Failed to record a kill: ", e);
+  }
 };
-global.suicide = (_player) => {
-  // TODO: Hit localhist to record a kill
+global.suicide = async (player) => {
+  try {
+    await fetch("localhost:8000/player_suicided");
+    console.log(`Player ${player} suicided`);
+  } catch (e) {
+    console.warn("Failed to record a suicide: ", e);
+  }
 };
 
 // TODO: check for a pending game and run cleanup
@@ -107,13 +137,21 @@ try {
   console.error(e);
 }
 
-// TODO: hit localhost to record the server is online
+try {
+  await fetch("localhost:8000/start_server");
+} catch (e) {
+  console.warn("Failed to record server start: ", e);
+}
 
 while (!done) {
   await new Promise((resolve) => setTimeout(resolve, 1000));
 }
 
-// TODO: record the game as ended
-// TODO: also decrement metrics by the number of players?
+try {
+  await fetch(`localhost:8000/end_game?remaining_players=${playerCount}`);
+  console.log("Game finished.");
+} catch (e) {
+  console.warn("Failed to record game finished: ", e);
+}
 
 process.exit(0);
