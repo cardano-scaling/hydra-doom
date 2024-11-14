@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQueries } from "@tanstack/react-query";
+import { healthUrl } from "./useUrls";
 
 interface ServerHealth {
   region: string;
@@ -13,7 +14,7 @@ const useBestRegion = (regions: string[]) => {
   const [isError, setIsError] = useState<boolean>(false);
 
   const checkServerHealth = async (region: string): Promise<ServerHealth> => {
-    const url = `http://api.${region}.hydra-doom.sundae.fi/health`;
+    const url = healthUrl(region);
 
     try {
       const start = performance.now();

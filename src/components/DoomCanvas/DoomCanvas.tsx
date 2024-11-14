@@ -9,7 +9,7 @@ import Card from "../Card";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { MdContentCopy } from "react-icons/md";
 import { ClipboardAPI, useClipboard } from "use-clipboard-copy";
-import useUrls from "../../hooks/useUrls";
+import { useUrls } from "../../hooks/useUrls";
 
 const DoomCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);

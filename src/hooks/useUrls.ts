@@ -1,12 +1,19 @@
 import { IS_LOCAL } from "../constants";
 import { useAppContext } from "../context/useAppContext";
 
+const healthUrl = (region: string) => {
+  if (IS_LOCAL) {
+    return `http://localhost:3000/health`;
+  } else {
+    return `https://api.${region}.hydra-doom.sundae.fi/health`;
+  }
+};
+
 const useUrls = () => {
   const { region } = useAppContext();
 
   if (IS_LOCAL) {
     return {
-      health: () => "http://localhost:3000/health",
       newGame: (address: string) =>
         `http://localhost:3000/new_game?address=${address}`,
       addPlayer: (address: string, code: string) =>
@@ -16,7 +23,6 @@ const useUrls = () => {
     };
   } else {
     return {
-      health: () => `https://api.${region}.hydra-doom.sundae.fi/health`,
       newGame: (address: string) =>
         `https://api.${region}.hydra-doom.sundae.fi/new_game?address=${address}`,
       addPlayer: (address: string, code: string) =>
@@ -27,4 +33,4 @@ const useUrls = () => {
   }
 };
 
-export default useUrls;
+export { useUrls, healthUrl };
