@@ -1,0 +1,12 @@
+{
+  "name": "ai-doom",
+  "type": "module",
+  "module": "ES2022",
+  "target": "ES2022",
+  "dependencies": {
+    "@noble/ed25519": "^2.1.0",
+    "@noble/hashes": "^1.5.0",
+    "bech32-buffer": "^0.2.1",
+    "lucid-cardano": "^0.10.7"
+  }
+}
