@@ -159,11 +159,12 @@ const buildTx = (
     `0081825820${inputUtxo.txHash}0${inputUtxo.outputIndex}` + // One input
     `0181a300581d70${nativeScript.hash}018200a0028201d818${lengthLengthTag}${datumLengthHex}${datum}` + // Output to users PKH
     `0200`; // No fee
+  // `0D81825820${inputUtxo.txHash}0${inputUtxo.outputIndex}`; // collateral (we can resuse our input as it's valid collateral)
 
   const txId = toHex(blake2b(fromHex(txBodyByHand), { dkLen: 256 / 8 }));
   const signature = toHex(ed25519.sign(txId, keys.privateKeyBytes!));
 
-  const witnessSetByHand = `a20081825820${keys.publicKeyHex!}5840${signature}01${nativeScript}`; // just signed by the user
+  const witnessSetByHand = `a20081825820${keys.publicKeyHex!}5840${signature}0181${nativeScript.script}`; // just signed by the user
   const txByHand = `84${txBodyByHand}${witnessSetByHand}f5f6`;
 
   const newUtxo: UTxO = {
