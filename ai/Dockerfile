@@ -18,5 +18,4 @@ COPY ./public/ ./public/
 
 
 WORKDIR /usr/src/app
-EXPOSE 3000
-CMD npx -y tsx ai.ts
+CMD ["npx", "-y", "tsx", "ai.ts"]
