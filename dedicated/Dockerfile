@@ -11,7 +11,7 @@ USER node
 WORKDIR /usr/src
 COPY ./dedicated ./app
 COPY ./dedicated/tsconfig.docker.json ./app/tsconfig.json
-COPY ./src/utils/hydra-multiplayer.ts ./app/utils/hydra-multiplayer.ts
+COPY ./src/utils/HydraMultiplayer ./app/utils/HydraMultiplayer
 COPY ./src/utils/hydra.ts ./app/utils/hydra.ts
 COPY ./websockets-doom.js ./websockets-doom.js
 COPY ./public/ ./public/
