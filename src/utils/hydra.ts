@@ -61,7 +61,7 @@ export class Hydra {
     this.url.protocol = this.url.protocol.replace("ws", "http");
     const websocketUrl = new URL(url);
     websocketUrl.protocol = websocketUrl.protocol.replace("http", "ws");
-    this.connection = new WebSocket(websocketUrl + "?history=no");
+    this.connection = new WebSocket(websocketUrl + "&history=no");
     this.connection.onopen = () => {
       console.log("Connected to Hydra");
     };
