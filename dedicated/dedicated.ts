@@ -1,7 +1,7 @@
 // Run as a node process to run a dedicated doom server
 
 import { readFile } from "node:fs/promises";
-import { HydraMultiplayer } from "utils/hydra-multiplayer";
+import { HydraMultiplayerServer } from "utils/HydraMultiplayer/server";
 import { Lucid, toHex, fromHex } from "lucid-cardano";
 import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
@@ -58,11 +58,15 @@ const module = await createModule({
   },
 });
 global.Module = module;
-global.HydraMultiplayer = new HydraMultiplayer(
-  keys,
-  "http://localhost:4001",
+global.HydraMultiplayer = new HydraMultiplayerServer({
+  key: {
+    pkh: keys.publicKeyHashHex,
+    privateKeyBytes: keys.privateKeyBytes,
+  },
+  address: keys.address,
+  url: "http://localhost:4001",
   module,
-);
+});
 
 let playerCount = 0;
 global.gameStarted = async () => {

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef } from "react";
 import { EGameType, EmscriptenModule, NewGameResponse } from "../../types";
 import { useAppContext } from "../../context/useAppContext";
-import { HydraMultiplayer } from "../../utils/hydra-multiplayer";
 import useKeys from "../../hooks/useKeys";
 import { getArgs } from "../../utils/game";
 import { useMutation } from "@tanstack/react-query";
@@ -11,6 +10,8 @@ import { MdContentCopy } from "react-icons/md";
 import { ClipboardAPI, useClipboard } from "use-clipboard-copy";
 import createModule from "../../../websockets-doom.js";
 import { useUrls } from "../../hooks/useUrls";
+import { C, fromHex } from "lucid-cardano";
+import { HydraMultiplayerClient } from "../../utils/HydraMultiplayer/client.js";
 
 const DoomCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -104,13 +105,21 @@ const DoomCanvas: React.FC = () => {
     // Attach Module to the window object to make it globally accessible
     window.Module = Module;
     // Initialize HydraMultiplayer
-    if (data?.ip) {
-      window.HydraMultiplayer = new HydraMultiplayer(
-        keys,
-        data.admin_pkh,
-        data.ip,
-        Module,
+    if (data?.ip && keys.publicKeyHashHex && keys.privateKeyBytes) {
+      const adminAddress = C.Address.from_bytes(
+        new Uint8Array([0b1100000, ...fromHex(data.admin_pkh)]),
       );
+      window.HydraMultiplayer = new HydraMultiplayerClient({
+        key: {
+          pkh: keys.publicKeyHashHex,
+          privateKeyBytes: keys.privateKeyBytes,
+        },
+        adminPkh: data.admin_pkh,
+        url: `${data.ip}/?address=${adminAddress.to_bech32(undefined)}`,
+        module: Module,
+      });
+
+      adminAddress.free();
     }
     // Dynamically load websockets-doom.js
     const loadDoom = async () => {

@@ -242,7 +242,7 @@ export class Hydra {
   }
 
   public async getUtxos(address: Address): Promise<UTxO[]> {
-    const ret = [];
+    const ret: UTxO[] = [];
     for (const key in this.utxos) {
       const utxo = this.utxos[key];
       if (utxo.address === address) {
@@ -264,7 +264,7 @@ export class Hydra {
     ) {
       throw new Error("not implemented");
     }
-    const ret = [];
+    const ret: UTxO[] = [];
     for (const key in this.utxos) {
       const utxo = this.utxos[key];
       if (utxo.address === addressOrCredential && utxo.assets[unit]) {
@@ -283,7 +283,7 @@ export class Hydra {
     throw new Error("UTxO not found");
   }
   public async getUtxosByOutRef(outRefs: Array<OutRef>): Promise<UTxO[]> {
-    const ret = [];
+    const ret: UTxO[] = [];
     for (const outRef of outRefs) {
       const utxo = this.utxos[`${outRef.txHash}#${outRef.outputIndex}`];
       if (utxo) {
