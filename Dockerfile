@@ -8,4 +8,4 @@ RUN yarn install
 RUN npm install -g vite
 
 EXPOSE 3000
-CMD yarn start
+CMD ["yarn", "start"]
