@@ -7,7 +7,7 @@ import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
 
-const HYDRA_NODE = "http://localhost:4001/";
+const HYDRA_NODE = "http://a1.us-east-1.hydra-doom.sundae.fi/";
 
 let done = false;
 const lucid = await Lucid.new(undefined, "Preprod");
