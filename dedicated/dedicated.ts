@@ -8,6 +8,7 @@ import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
 
 const HYDRA_NODE = "http://a1.us-east-1.hydra-doom.sundae.fi/";
+const RECORD_STATS = false;
 
 let done = false;
 const lucid = await Lucid.new(undefined, "Preprod");
@@ -73,6 +74,7 @@ global.HydraMultiplayer = new HydraMultiplayerServer({
 
 let playerCount = 0;
 global.gameStarted = async () => {
+  if (!RECORD_STATS) return;
   try {
     await fetch("localhost:8000/");
     console.log(`Game started with ${playerCount} players`);
@@ -81,6 +83,7 @@ global.gameStarted = async () => {
   }
 };
 global.playerConnected = async () => {
+  if (!RECORD_STATS) return;
   // NOTE: might need to ignore ourselves joining, so we don't inflate the player metrics
   playerCount++;
   try {
@@ -91,6 +94,7 @@ global.playerConnected = async () => {
   }
 };
 global.playerDisconnected = async () => {
+  if (!RECORD_STATS) return;
   playerCount--;
   try {
     await fetch("localhost:8000/player_left");
@@ -101,6 +105,7 @@ global.playerDisconnected = async () => {
   // TODO: Hit localhost to record a player disconnected
 };
 global.kill = async (killer, victim) => {
+  if (!RECORD_STATS) return;
   // TODO: map from player idx to ephemeral key
   // TODO: ddz leaderboards
   try {
@@ -111,6 +116,7 @@ global.kill = async (killer, victim) => {
   }
 };
 global.suicide = async (player) => {
+  if (!RECORD_STATS) return;
   try {
     await fetch("localhost:8000/player_suicided");
     console.log(`Player ${player} suicided`);
