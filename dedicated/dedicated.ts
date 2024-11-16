@@ -77,7 +77,7 @@ global.gameStarted = async () => {
   console.log(`Game started with ${playerCount} players`);
   if (!RECORD_STATS) return;
   try {
-    await fetch("localhost:8000/");
+    await fetch("http://localhost:8000/");
   } catch (e) {
     console.warn("Failed to record game start: ", e);
   }
@@ -88,7 +88,7 @@ global.playerConnected = async () => {
   if (!RECORD_STATS) return;
   // NOTE: might need to ignore ourselves joining, so we don't inflate the player metrics
   try {
-    await fetch("localhost:8000/player_joined");
+    await fetch("http://localhost:8000/player_joined");
   } catch (e) {
     console.warn("Failed to record player joined: ", e);
   }
@@ -98,7 +98,7 @@ global.playerDisconnected = async () => {
   console.log(`Player left, now ${playerCount} players`);
   if (!RECORD_STATS) return;
   try {
-    await fetch("localhost:8000/player_left");
+    await fetch("http://localhost:8000/player_left");
   } catch (e) {
     console.warn("Failed to record player left: ", e);
   }
@@ -110,7 +110,7 @@ global.kill = async (killer, victim) => {
   // TODO: map from player idx to ephemeral key
   // TODO: ddz leaderboards
   try {
-    await fetch("localhost:8000/player_killed");
+    await fetch("http://localhost:8000/player_killed");
   } catch (e) {
     console.warn("Failed to record a kill: ", e);
   }
@@ -119,7 +119,7 @@ global.suicide = async (player) => {
   console.log(`Player ${player} suicided`);
   if (!RECORD_STATS) return;
   try {
-    await fetch("localhost:8000/player_suicided");
+    await fetch("http://localhost:8000/player_suicided");
   } catch (e) {
     console.warn("Failed to record a suicide: ", e);
   }
@@ -151,7 +151,8 @@ try {
 }
 
 try {
-  // await fetch("localhost:8000/start_server");
+  console.log("Server started.");
+  await fetch("http://localhost:8000/start_server");
 } catch (e) {
   console.warn("Failed to record server start: ", e);
 }
@@ -161,8 +162,8 @@ while (!done) {
 }
 
 try {
-  // await fetch(`localhost:8000/end_game?remaining_players=${playerCount}`);
   console.log("Game finished.");
+  await fetch(`localhost:8000/end_game`);
 } catch (e) {
   console.warn("Failed to record game finished: ", e);
 }
