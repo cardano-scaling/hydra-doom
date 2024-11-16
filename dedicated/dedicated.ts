@@ -7,8 +7,8 @@ import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
 
-const HYDRA_NODE = "http://a0.us-east-1.hydra-doom.sundae.fi/";
-const RECORD_STATS = false;
+const HYDRA_NODE = "http://localhost:4001/";
+const RECORD_STATS = true;
 
 let done = false;
 const lucid = await Lucid.new(undefined, "Preprod");
@@ -83,10 +83,10 @@ global.gameStarted = async () => {
   }
 };
 global.playerConnected = async () => {
+  playerCount++;
   console.log(`Player joined, now ${playerCount} players`);
   if (!RECORD_STATS) return;
   // NOTE: might need to ignore ourselves joining, so we don't inflate the player metrics
-  playerCount++;
   try {
     await fetch("localhost:8000/player_joined");
   } catch (e) {
@@ -94,9 +94,9 @@ global.playerConnected = async () => {
   }
 };
 global.playerDisconnected = async () => {
+  playerCount--;
   console.log(`Player left, now ${playerCount} players`);
   if (!RECORD_STATS) return;
-  playerCount--;
   try {
     await fetch("localhost:8000/player_left");
   } catch (e) {
