@@ -127,6 +127,7 @@ global.suicide = async (player) => {
 
 // check for extraneous state utxos and cleanup
 try {
+  console.log("Checking head's utxo set for stale games...");
   const response = await fetch(`${HYDRA_NODE}snapshot/utxo`);
   const data = response.json();
   // Currently, we are just wiping the utxos after every game
@@ -181,8 +182,8 @@ while (!done) {
 }
 
 console.log("Game finished.");
-
 try {
+  console.log("Ending game. Marking game as 'Aborted'.");
   await fetch(
     "http://control-plane.hydra-doom.svc.cluster.local/end_game?id=a0",
     { method: "POST" },
