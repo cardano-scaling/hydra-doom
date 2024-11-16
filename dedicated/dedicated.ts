@@ -7,7 +7,7 @@ import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
 
-const HYDRA_NODE = "http://a1.us-east-1.hydra-doom.sundae.fi/";
+const HYDRA_NODE = "http://a0.us-east-1.hydra-doom.sundae.fi/";
 const RECORD_STATS = false;
 
 let done = false;
@@ -74,52 +74,52 @@ global.HydraMultiplayer = new HydraMultiplayerServer({
 
 let playerCount = 0;
 global.gameStarted = async () => {
+  console.log(`Game started with ${playerCount} players`);
   if (!RECORD_STATS) return;
   try {
     await fetch("localhost:8000/");
-    console.log(`Game started with ${playerCount} players`);
   } catch (e) {
     console.warn("Failed to record game start: ", e);
   }
 };
 global.playerConnected = async () => {
+  console.log(`Player joined, now ${playerCount} players`);
   if (!RECORD_STATS) return;
   // NOTE: might need to ignore ourselves joining, so we don't inflate the player metrics
   playerCount++;
   try {
     await fetch("localhost:8000/player_joined");
-    console.log(`Player joined, now ${playerCount} players`);
   } catch (e) {
     console.warn("Failed to record player joined: ", e);
   }
 };
 global.playerDisconnected = async () => {
+  console.log(`Player left, now ${playerCount} players`);
   if (!RECORD_STATS) return;
   playerCount--;
   try {
     await fetch("localhost:8000/player_left");
-    console.log(`Player left, now ${playerCount} players`);
   } catch (e) {
     console.warn("Failed to record player left: ", e);
   }
   // TODO: Hit localhost to record a player disconnected
 };
 global.kill = async (killer, victim) => {
+  console.log(`Player ${killer} killed ${victim}`);
   if (!RECORD_STATS) return;
   // TODO: map from player idx to ephemeral key
   // TODO: ddz leaderboards
   try {
     await fetch("localhost:8000/player_killed");
-    console.log(`Player ${killer} killed ${victim}`);
   } catch (e) {
     console.warn("Failed to record a kill: ", e);
   }
 };
 global.suicide = async (player) => {
+  console.log(`Player ${player} suicided`);
   if (!RECORD_STATS) return;
   try {
     await fetch("localhost:8000/player_suicided");
-    console.log(`Player ${player} suicided`);
   } catch (e) {
     console.warn("Failed to record a suicide: ", e);
   }
