@@ -125,7 +125,26 @@ global.suicide = async (player) => {
   }
 };
 
-// TODO: check for a pending game and run cleanup
+// check for extraneous state utxos and cleanup
+try {
+  const response = await fetch(`${HYDRA_NODE}snapshot/utxo`);
+  const data = response.json();
+  // Currently, we are just wiping the utxos after every game
+  // We may want to make this logic more robust if we are hoping to preserve those utxos
+  if (Object.keys(data).length > 1) {
+    console.log("Cleaning up old game state");
+    try {
+      await fetch(
+        "http://control-plane.hydra-doom.svc.cluster.local/cleanup?id=a0",
+        { method: "POST" },
+      );
+    } catch (e) {
+      console.log("Failed to cleanup old game: ", e);
+    }
+  }
+} catch (e) {
+  console.warn("Failed to fetch and parse node utxos: ", e);
+}
 
 const args = [
   "-server",
@@ -161,8 +180,17 @@ while (!done) {
   await new Promise((resolve) => setTimeout(resolve, 1000));
 }
 
+console.log("Game finished.");
+
 try {
-  console.log("Game finished.");
+  await fetch(
+    "http://control-plane.hydra-doom.svc.cluster.local/end_game?id=a0",
+    { method: "POST" },
+  );
+} catch (e) {
+  console.warn("Failed to mark game as ended: ", e);
+}
+try {
   await fetch("http://localhost:8000/end_game", { method: "POST" });
 } catch (e) {
   console.warn("Failed to record game finished: ", e);
