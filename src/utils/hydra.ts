@@ -49,6 +49,7 @@ export class Hydra {
 
   constructor(
     url: string | URL,
+    filterAddress?: string,
     public queue_length: number = 10,
   ) {
     this.tx_count = 0;
@@ -61,7 +62,10 @@ export class Hydra {
     this.url.protocol = this.url.protocol.replace("ws", "http");
     const websocketUrl = new URL(url);
     websocketUrl.protocol = websocketUrl.protocol.replace("http", "ws");
-    this.connection = new WebSocket(websocketUrl + "&history=no");
+    this.connection = new WebSocket(
+      websocketUrl +
+        `/?${filterAddress ? `address=${filterAddress}&` : ""}history=no`,
+    );
     this.connection.onopen = () => {
       console.log("Connected to Hydra");
     };

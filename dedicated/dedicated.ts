@@ -7,6 +7,8 @@ import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
 
+const HYDRA_NODE = "http://localhost:4001/";
+
 let done = false;
 const lucid = await Lucid.new(undefined, "Preprod");
 const adminKeyFile = process.env.ADMIN_KEY_FILE ?? "admin.sk";
@@ -60,11 +62,12 @@ const module = await createModule({
 global.Module = module;
 global.HydraMultiplayer = new HydraMultiplayerServer({
   key: {
-    pkh: keys.publicKeyHashHex,
+    publicKey: keys.publicKeyHex,
+    publicKeyHash: keys.publicKeyHashHex,
     privateKeyBytes: keys.privateKeyBytes,
   },
   address: keys.address,
-  url: "http://localhost:4001",
+  url: HYDRA_NODE,
   module,
 });
 
@@ -142,7 +145,7 @@ try {
 }
 
 try {
-  await fetch("localhost:8000/start_server");
+  // await fetch("localhost:8000/start_server");
 } catch (e) {
   console.warn("Failed to record server start: ", e);
 }
@@ -152,7 +155,7 @@ while (!done) {
 }
 
 try {
-  await fetch(`localhost:8000/end_game?remaining_players=${playerCount}`);
+  // await fetch(`localhost:8000/end_game?remaining_players=${playerCount}`);
   console.log("Game finished.");
 } catch (e) {
   console.warn("Failed to record game finished: ", e);

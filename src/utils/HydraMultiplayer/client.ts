@@ -11,16 +11,22 @@ export class HydraMultiplayerClient extends HydraMultiplayer {
   constructor({
     key,
     adminPkh,
+    filterAddress,
     url,
     module,
   }: {
-    key: { pkh: string; privateKeyBytes: Uint8Array };
+    key: {
+      publicKey: string;
+      publicKeyHash: string;
+      privateKeyBytes: Uint8Array;
+    };
     adminPkh: string;
+    filterAddress?: string;
     url: string;
     module: EmscriptenModule;
   }) {
-    super({ key, url, module });
-    this.outboundScript = getNativeScript(key.pkh, adminPkh, 0);
+    super({ key, url, module, filterAddress });
+    this.outboundScript = getNativeScript(key.publicKeyHash, adminPkh, 0);
   }
 
   public override async selectUTxO(): Promise<void> {
@@ -61,7 +67,7 @@ export class HydraMultiplayerClient extends HydraMultiplayer {
 
     const txId = toHex(blake2b(fromHex(txBodyByHand), { dkLen: 256 / 8 }));
 
-    const witnessSetByHand = `a20081825820${this.key.pkh}5840${this.signData(txId)}0181${this.outboundScript.cbor}`; // signed by the user with the provided native script
+    const witnessSetByHand = `a20081825820${this.key.publicKey}5840${this.signData(txId)}0181${this.outboundScript.cbor}`; // signed by the user with the provided native script
     const txByHand = `84${txBodyByHand}${witnessSetByHand}f5f6`;
 
     const newUtxo: UTxO = {

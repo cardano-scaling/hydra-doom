@@ -105,17 +105,24 @@ const DoomCanvas: React.FC = () => {
     // Attach Module to the window object to make it globally accessible
     window.Module = Module;
     // Initialize HydraMultiplayer
-    if (data?.ip && keys.publicKeyHashHex && keys.privateKeyBytes) {
+    if (
+      data?.ip &&
+      keys.publicKeyHashHex &&
+      keys.privateKeyBytes &&
+      keys.publicKeyHex
+    ) {
       const adminAddress = C.Address.from_bytes(
         new Uint8Array([0b1100000, ...fromHex(data.admin_pkh)]),
       );
+
       window.HydraMultiplayer = new HydraMultiplayerClient({
         key: {
-          pkh: keys.publicKeyHashHex,
+          publicKey: keys.publicKeyHex,
+          publicKeyHash: keys.publicKeyHashHex,
           privateKeyBytes: keys.privateKeyBytes,
         },
         adminPkh: data.admin_pkh,
-        url: `${data.ip}/?address=${adminAddress.to_bech32(undefined)}`,
+        url: data.ip,
         module: Module,
       });
 

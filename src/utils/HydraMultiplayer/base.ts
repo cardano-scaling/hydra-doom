@@ -15,7 +15,11 @@ import { EmscriptenModule } from "../../types";
 ed25519.etc.sha512Sync = (...m) => sha512(ed25519.etc.concatBytes(...m));
 
 export abstract class HydraMultiplayer {
-  key: { pkh: string; privateKeyBytes: Uint8Array };
+  key: {
+    publicKeyHash: string;
+    publicKey: string;
+    privateKeyBytes: Uint8Array;
+  };
   hydra: Hydra;
   myIP: number = 0;
   latestUTxO: UTxO | null = null;
@@ -25,16 +29,22 @@ export abstract class HydraMultiplayer {
   constructor({
     key,
     url,
+    filterAddress,
     module,
   }: {
-    key: { pkh: string; privateKeyBytes: Uint8Array };
+    key: {
+      publicKey: string;
+      publicKeyHash: string;
+      privateKeyBytes: Uint8Array;
+    };
     url: string;
     module: EmscriptenModule;
+    filterAddress?: string;
   }) {
     this.key = key;
     this.module = module;
 
-    this.hydra = new Hydra(url, 100);
+    this.hydra = new Hydra(url, filterAddress, 100);
     this.hydra.onTxSeen = this.onTxSeen.bind(this);
 
     this.SendPacket = this.SendPacket.bind(this);
