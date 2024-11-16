@@ -163,7 +163,7 @@ while (!done) {
 
 try {
   console.log("Game finished.");
-  await fetch(`localhost:8000/end_game`);
+  await fetch(`http://localhost:8000/end_game`);
 } catch (e) {
   console.warn("Failed to record game finished: ", e);
 }
