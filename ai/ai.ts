@@ -1,6 +1,6 @@
 // Run as a node process to run an AI agent
 
-import { HydraMultiplayerClient } from "utils/HydraMultiplayer/client.js";
+import { HydraMultiplayerClient } from "utils/HydraMultiplayer/client";
 import { Lucid, toHex, fromHex } from "lucid-cardano";
 import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
