@@ -75,6 +75,13 @@ global.HydraMultiplayer = new HydraMultiplayerServer({
 let playerCount = 0;
 global.gameStarted = async () => {
   console.log(`Game started with ${playerCount} players`);
+
+  console.log("Updating game state to 'Running'.");
+  try {
+    await fetch("http://api.us-east-1.hydra-doom.sundae.fi/start_game?id=a0");
+  } catch (e) {
+    console.warn("Failed to update game state to 'Running': ", e);
+  }
   if (!RECORD_STATS) return;
   try {
     await fetch("http://localhost:8000/start_game", { method: "POST" });
