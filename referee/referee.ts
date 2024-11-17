@@ -38,7 +38,6 @@ console.log("Address: ", keys.address);
 const { default: createModule } = await import("../websockets-doom.js");
 const module = await createModule({
   locateFile: (path, scripts) => {
-    console.log(scripts + "public/" + path);
     return scripts + "public/" + path;
   },
   noInitialRun: true,

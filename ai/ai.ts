@@ -7,13 +7,15 @@ import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
 
+// TODO: support multiple bots
+const bot_index = 0;
+
 // TODO: should we generate this key, like the UI does? no reason we need to keep it around
 let done = false;
 const lucid = await Lucid.new(undefined, "Preprod");
-const adminKeyFile = process.env.BOT_KEY_FILE ?? "bot.sk";
-const adminKey = JSON.parse((await readFile(adminKeyFile)).toString());
-const privateKeyBytes = adminKey.cborHex.slice(4);
-const sessionKeyBech32 = bech32.encode("ed25519_sk", fromHex(privateKeyBytes));
+
+const sessionKeyBech32 = lucid.utils.generatePrivateKey();
+const privateKeyBytes = bech32.decode(sessionKeyBech32).data;
 
 const publicKeyBytes = await ed25519.getPublicKeyAsync(privateKeyBytes);
 const publicKeyHashBytes = blake2b(publicKeyBytes, { dkLen: 224 / 8 });
@@ -31,12 +33,11 @@ const keys = {
     hash: publicKeyHashHex,
   }),
 };
-console.log("Address: ", keys.address);
+console.log(`Bot ${bot_index} Address: ${keys.address}`);
 
 const { default: createModule } = await import("../websockets-doom.js");
 const module = await createModule({
   locateFile: (path, scripts) => {
-    console.log(scripts + "public/" + path);
     return scripts + "public/" + path;
   },
   noInitialRun: true,
