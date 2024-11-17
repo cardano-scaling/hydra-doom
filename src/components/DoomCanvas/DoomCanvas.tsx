@@ -81,10 +81,10 @@ const DoomCanvas: React.FC = () => {
       noInitialRun: true,
       preRun: function () {
         const files = [
-          "doom1.wad",
           "freedoom2.wad",
           "default.cfg",
-          "Cardano.wad",
+          "dm_iog.wad",
+          "iog_assets.wad",
         ];
         files.forEach((file) => {
           Module.FS!.createPreloadedFile("/", file, file, true, true);

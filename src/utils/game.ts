@@ -3,7 +3,15 @@ import { EGameType, GameData } from "../types";
 export const getArgs = ({ type, petName }: GameData) => {
   const args = ["-window", "-nogui", "-nomusic", "-config", "default.cfg"];
 
-  args.push("-iwad", "freedoom2.wad", "-file", "Cardano.wad");
+  args.push(
+    "-iwad",
+    "freedoom2.wad",
+    "-merge",
+    "dm_iog.wad",
+    "iog_assets.wad",
+    "-warp",
+    "1",
+  );
   if (type === EGameType.SOLO) {
     // Do nothing
     console.log("SOLO");
