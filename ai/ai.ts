@@ -1,7 +1,6 @@
 // Run as a node process to run an AI agent
 
-import { readFile } from "node:fs/promises";
-import { HydraMultiplayer } from "utils/hydra-multiplayer";
+import { HydraMultiplayerClient } from "utils/HydraMultiplayer/client.js";
 import { Lucid, toHex, fromHex } from "lucid-cardano";
 import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
@@ -60,11 +59,12 @@ const module = await createModule({
   },
 });
 global.Module = module;
-global.HydraMultiplayer = new HydraMultiplayer(
-  keys,
-  "http://localhost:4001",
-  module,
-);
+global.HydraMultiplayer = new HydraMultiplayerClient({
+  key: keys,
+  adminPkh: "",
+  url: "http://localhost:4001",
+  module: module,
+});
 
 // TODO: modify new-game transaction to record # of players
 // TODO: watch for new-game transaction to decide if we're participating in this game

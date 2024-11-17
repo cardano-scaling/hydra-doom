@@ -2,6 +2,7 @@ import { fromHex, toHex, UTxO } from "lucid-cardano";
 import { HydraMultiplayer } from "./base";
 import { EmscriptenModule } from "../../types";
 import { blake2b } from "@noble/hashes/blake2b";
+import { Keys } from "../../hooks/useKeys";
 
 export class HydraMultiplayerServer extends HydraMultiplayer {
   address: string;
@@ -12,11 +13,7 @@ export class HydraMultiplayerServer extends HydraMultiplayer {
     url,
     module,
   }: {
-    key: {
-      publicKey: string;
-      publicKeyHash: string;
-      privateKeyBytes: Uint8Array;
-    };
+    key: Keys;
     address: string;
     url: string;
     module: EmscriptenModule;
@@ -60,12 +57,12 @@ export class HydraMultiplayerServer extends HydraMultiplayer {
     const txBodyByHand =
       `a3` + // Prefix
       `0081825820${this.latestUTxO.txHash}0${this.latestUTxO.outputIndex}` + // One input
-      `0181a300581d60${this.key.publicKeyHash}018200a0028201d818${lengthLengthTag}${datumLengthHex}${datum}` + // Single output to self
+      `0181a300581d60${this.key.publicKeyHashHex}018200a0028201d818${lengthLengthTag}${datumLengthHex}${datum}` + // Single output to self
       `0200`; // No fee
 
     const txId = toHex(blake2b(fromHex(txBodyByHand), { dkLen: 256 / 8 }));
 
-    const witnessSetByHand = `a10081825820${this.key.publicKey}5840${this.signData(txId)}`; // just signed by self
+    const witnessSetByHand = `a10081825820${this.key.publicKeyHex}5840${this.signData(txId)}`; // just signed by self
     const txByHand = `84${txBodyByHand}${witnessSetByHand}f5f6`;
 
     const newUtxo: UTxO = {

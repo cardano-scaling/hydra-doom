@@ -7,14 +7,14 @@ import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
 
 export interface Keys {
-  sessionKeyBech32?: string;
-  privateKeyBytes?: Uint8Array;
-  privateKeyHex?: string;
-  publicKeyBytes?: Uint8Array;
-  publicKeyHex?: string;
-  publicKeyHashBytes?: Uint8Array;
-  publicKeyHashHex?: string;
-  address?: string;
+  sessionKeyBech32: string;
+  privateKeyBytes: Uint8Array;
+  privateKeyHex: string;
+  publicKeyBytes: Uint8Array;
+  publicKeyHex: string;
+  publicKeyHashBytes: Uint8Array;
+  publicKeyHashHex: string;
+  address: string;
 }
 
 const useKeys = () => {
@@ -22,7 +22,7 @@ const useKeys = () => {
     HYDRA_DOOM_SESSION_KEY,
     "",
   );
-  const [keys, setKeys] = useState<Keys>({});
+  const [keys, setKeys] = useState<Keys>();
 
   const generateKeys = useCallback(async (lucid: Lucid) => {
     const key = lucid.utils.generatePrivateKey();
@@ -51,14 +51,14 @@ const useKeys = () => {
     const initKeys = async () => {
       const lucid = await Lucid.new(undefined, "Preprod");
 
-      if (!keys.sessionKeyBech32) {
+      if (!keys?.sessionKeyBech32) {
         const newKeys = await generateKeys(lucid);
         setKeys(newKeys);
       }
     };
 
     initKeys();
-  }, [keys.sessionKeyBech32, sessionKeyBech32, generateKeys]);
+  }, [keys, keys?.sessionKeyBech32, sessionKeyBech32, generateKeys]);
 
   return keys;
 };

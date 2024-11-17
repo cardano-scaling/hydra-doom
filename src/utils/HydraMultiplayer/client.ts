@@ -3,6 +3,7 @@ import { fromHex, toHex, UTxO, C } from "lucid-cardano";
 import { blake2b } from "@noble/hashes/blake2b";
 import { EmscriptenModule } from "../../types";
 import { HydraMultiplayer } from "./base";
+import { Keys } from "../../hooks/useKeys";
 
 export class HydraMultiplayerClient extends HydraMultiplayer {
   // outboundScript is ANY(player, admin) native script
@@ -15,18 +16,14 @@ export class HydraMultiplayerClient extends HydraMultiplayer {
     url,
     module,
   }: {
-    key: {
-      publicKey: string;
-      publicKeyHash: string;
-      privateKeyBytes: Uint8Array;
-    };
+    key: Keys;
     adminPkh: string;
     filterAddress?: string;
     url: string;
     module: EmscriptenModule;
   }) {
     super({ key, url, module, filterAddress });
-    this.outboundScript = getNativeScript(key.publicKeyHash, adminPkh, 0);
+    this.outboundScript = getNativeScript(key.publicKeyHashHex, adminPkh, 0);
   }
 
   public override async selectUTxO(): Promise<void> {
@@ -67,7 +64,7 @@ export class HydraMultiplayerClient extends HydraMultiplayer {
 
     const txId = toHex(blake2b(fromHex(txBodyByHand), { dkLen: 256 / 8 }));
 
-    const witnessSetByHand = `a20081825820${this.key.publicKey}5840${this.signData(txId)}0181${this.outboundScript.cbor}`; // signed by the user with the provided native script
+    const witnessSetByHand = `a20081825820${this.key.publicKeyHex}5840${this.signData(txId)}0181${this.outboundScript.cbor}`; // signed by the user with the provided native script
     const txByHand = `84${txBodyByHand}${witnessSetByHand}f5f6`;
 
     const newUtxo: UTxO = {

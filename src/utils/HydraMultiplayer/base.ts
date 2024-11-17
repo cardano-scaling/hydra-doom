@@ -12,14 +12,11 @@ import { Hydra } from ".././hydra";
 import * as ed25519 from "@noble/ed25519";
 import { sha512 } from "@noble/hashes/sha512";
 import { EmscriptenModule } from "../../types";
+import { Keys } from "../../hooks/useKeys";
 ed25519.etc.sha512Sync = (...m) => sha512(ed25519.etc.concatBytes(...m));
 
 export abstract class HydraMultiplayer {
-  key: {
-    publicKeyHash: string;
-    publicKey: string;
-    privateKeyBytes: Uint8Array;
-  };
+  public key: Keys;
   hydra: Hydra;
   myIP: number = 0;
   latestUTxO: UTxO | null = null;
@@ -32,11 +29,7 @@ export abstract class HydraMultiplayer {
     filterAddress,
     module,
   }: {
-    key: {
-      publicKey: string;
-      publicKeyHash: string;
-      privateKeyBytes: Uint8Array;
-    };
+    key: Keys;
     url: string;
     module: EmscriptenModule;
     filterAddress?: string;
@@ -100,7 +93,7 @@ export abstract class HydraMultiplayer {
   }
 
   protected signData(data: string): string {
-    return toHex(ed25519.sign(data, this.key.privateKeyBytes));
+    return toHex(ed25519.sign(data, this.key.privateKeyBytes!));
   }
   public abstract selectUTxO(): Promise<void>;
   protected abstract buildTx(datum: string): [UTxO, string];

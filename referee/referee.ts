@@ -61,11 +61,7 @@ const module = await createModule({
 });
 global.Module = module;
 global.HydraMultiplayer = new HydraMultiplayerServer({
-  key: {
-    publicKey: keys.publicKeyHex,
-    publicKeyHash: keys.publicKeyHashHex,
-    privateKeyBytes: keys.privateKeyBytes,
-  },
+  key: keys,
   address: keys.address,
   url: HYDRA_NODE,
   module,

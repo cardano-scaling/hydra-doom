@@ -25,15 +25,15 @@ const DoomCanvas: React.FC = () => {
   const { newGame, addPlayer, share } = useUrls();
 
   const { mutate: fetchGameData, data } = useMutation<NewGameResponse>({
-    mutationKey: ["fetchGameData", keys.address, code, type],
+    mutationKey: ["fetchGameData", keys?.address, code, type],
     mutationFn: async () => {
       if (type === EGameType.SOLO) {
         return { game_id: "solo" };
       }
       const url =
         type === EGameType.HOST
-          ? newGame(keys.address!)
-          : addPlayer(keys.address!, code);
+          ? newGame(keys!.address)
+          : addPlayer(keys!.address, code);
       const response = await fetch(url);
       return response.json();
     },
@@ -49,13 +49,13 @@ const DoomCanvas: React.FC = () => {
   );
 
   useEffect(() => {
-    if (!keys.address || !region) return;
+    if (!keys?.address || !region) return;
 
     fetchGameData();
-  }, [fetchGameData, keys.address, region]);
+  }, [fetchGameData, keys?.address, region]);
 
   useEffect(() => {
-    if (!keys.address) return;
+    if (!keys?.address) return;
     if (type !== EGameType.SOLO && !data?.ip) return;
 
     // Prevent effect from running twice
@@ -105,22 +105,13 @@ const DoomCanvas: React.FC = () => {
     // Attach Module to the window object to make it globally accessible
     window.Module = Module;
     // Initialize HydraMultiplayer
-    if (
-      data?.ip &&
-      keys.publicKeyHashHex &&
-      keys.privateKeyBytes &&
-      keys.publicKeyHex
-    ) {
+    if (data?.ip && !!keys) {
       const adminAddress = C.Address.from_bytes(
         new Uint8Array([0b1100000, ...fromHex(data.admin_pkh)]),
       );
 
       window.HydraMultiplayer = new HydraMultiplayerClient({
-        key: {
-          publicKey: keys.publicKeyHex,
-          publicKeyHash: keys.publicKeyHashHex,
-          privateKeyBytes: keys.privateKeyBytes,
-        },
+        key: keys,
         adminPkh: data.admin_pkh,
         url: data.ip,
         module: Module,
