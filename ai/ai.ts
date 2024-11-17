@@ -7,7 +7,19 @@ import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
 
 // TODO: support multiple bots
+const HYDRA_NODE = "http://localhost:4001/";
 const bot_index = 0;
+
+// Wait until we see a player join
+// TODO: make this more robust? check if we are actually supposed to join?
+while (true) {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  const response = await fetch(`${HYDRA_NODE}snapshot/utxo`);
+  const data = response.json();
+  if (Object.keys(data).length > 1) {
+    break;
+  }
+}
 
 // TODO: should we generate this key, like the UI does? no reason we need to keep it around
 let done = false;
