@@ -1,5 +1,5 @@
 {
-  "name": "dedicated-doom",
+  "name": "doom-referee",
   "type": "module",
   "module": "ES2022",
   "target": "ES2022",

@@ -3,9 +3,9 @@
     "module": "ES2022",
     "target": "ES2022",
     "paths": {
-      "utils/*": ["../src/utils/*"]
+      "utils/*": ["./utils/*"]
     }
   },
-  "files": ["dedicated.ts"],
+  "files": ["referee.ts"],
   "references": []
 }

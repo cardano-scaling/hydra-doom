@@ -9,8 +9,8 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 USER node
 
 WORKDIR /usr/src
-COPY ./dedicated ./app
-COPY ./dedicated/tsconfig.docker.json ./app/tsconfig.json
+COPY ./referee ./app
+COPY ./referee/tsconfig.docker.json ./app/tsconfig.json
 COPY ./src/utils/HydraMultiplayer ./app/utils/HydraMultiplayer
 COPY ./src/utils/hydra.ts ./app/utils/hydra.ts
 COPY ./websockets-doom.js ./websockets-doom.js
@@ -18,4 +18,4 @@ COPY ./public/ ./public/
 
 
 WORKDIR /usr/src/app
-CMD ["npx", "-y", "tsx", "dedicated.ts"]
+CMD ["npx", "-y", "tsx", "referee.ts"]

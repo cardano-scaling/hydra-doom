@@ -32,11 +32,11 @@ jobs:
             type=semver,pattern=v{{version}}
             type=sha
 
-      - name: Extract metadata (tags, labels) for the dedicated server docker image
-        id: meta_dedicated
+      - name: Extract metadata (tags, labels) for the referee server docker image
+        id: meta_referee
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/cardano-scaling/hydra-doom-dedicated
+          images: ghcr.io/cardano-scaling/hydra-doom-referee
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=semver,pattern=v{{major}}
@@ -72,14 +72,14 @@ jobs:
           tags: ${{ steps.meta_frontend.outputs.tags }}
           labels: ${{ steps.meta_frontend.outputs.labels }}
 
-      - name: Build and push dedicated image
+      - name: Build and push referee image
         uses: docker/build-push-action@v5
         with:
-          file: ./dedicated/Dockerfile
+          file: ./referee/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ${{ steps.meta_dedicated.outputs.tags }}
-          labels: ${{ steps.meta_dedicated.outputs.labels }}
+          tags: ${{ steps.meta_referee.outputs.tags }}
+          labels: ${{ steps.meta_referee.outputs.labels }}
 
       - name: Build and push AI image
         uses: docker/build-push-action@v5

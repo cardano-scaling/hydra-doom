@@ -1,4 +1,4 @@
-// Run as a node process to run a dedicated doom server
+// Run as a node process to run a referee doom server
 
 import { readFile } from "node:fs/promises";
 import { HydraMultiplayerServer } from "utils/HydraMultiplayer/server";

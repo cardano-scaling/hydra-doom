@@ -1,4 +1,4 @@
-// Run as a node process to run a dedicated doom server
+// Run as a node process to run an AI agent
 
 import { readFile } from "node:fs/promises";
 import { HydraMultiplayer } from "utils/hydra-multiplayer";
