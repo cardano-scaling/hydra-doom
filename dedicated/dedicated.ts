@@ -135,10 +135,9 @@ try {
   if (Object.keys(data).length > 1) {
     console.log("Cleaning up old game state");
     try {
-      await fetch(
-        "http://control-plane.hydra-doom.svc.cluster.local/cleanup?id=a0",
-        { method: "POST" },
-      );
+      await fetch("http://api.us-east-1.hydra-doom.sundae.fi/cleanup?id=a0", {
+        method: "POST",
+      });
     } catch (e) {
       console.log("Failed to cleanup old game: ", e);
     }
@@ -184,10 +183,9 @@ while (!done) {
 console.log("Game finished.");
 try {
   console.log("Ending game. Marking game as 'Aborted'.");
-  await fetch(
-    "http://control-plane.hydra-doom.svc.cluster.local/end_game?id=a0",
-    { method: "POST" },
-  );
+  await fetch("http://api.us-east-1.hydra-doom.sundae.fi/end_game?id=a0", {
+    method: "POST",
+  });
 } catch (e) {
   console.warn("Failed to mark game as ended: ", e);
 }
