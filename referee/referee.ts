@@ -136,7 +136,7 @@ global.suicide = async (player) => {
 try {
   console.log("Checking head's utxo set for stale games...");
   const response = await fetch(`${HYDRA_NODE}snapshot/utxo`);
-  const data = response.json();
+  const data = await response.json();
   // Currently, we are just wiping the utxos after every game
   // We may want to make this logic more robust if we are hoping to preserve those utxos
   if (Object.keys(data).length > 1) {
