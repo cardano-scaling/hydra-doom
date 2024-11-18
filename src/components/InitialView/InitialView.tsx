@@ -6,6 +6,7 @@ import Layout from "../Layout";
 import SetNameModal from "../SetNameModal";
 import { useAppContext } from "../../context/useAppContext";
 import { EGameType } from "../../types";
+import LoginModal from "../LoginModal/LoginModal";
 
 interface InitialViewProps {
   startGame: () => void;
@@ -21,6 +22,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
     },
   });
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isNameModalOpen, setIsNameModalOpen] = useState(
     pathSegments[0] === EGameType.JOIN,
   );
@@ -64,6 +66,10 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
     setIsNameModalOpen(true);
   };
 
+  const handleTournamentLogin = () => {
+    setIsLoginModalOpen(true);
+  };
+
   return (
     <Layout>
       <img
@@ -72,6 +78,9 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
         className="w-full max-w-5xl relative -bottom-14 -mt-14 z-10 pointer-events-none"
       />
       <div className="flex flex-col gap-6">
+        <Button className="w-96 h-16" onClick={handleTournamentLogin}>
+          Tournament Login
+        </Button>
         <Button className="w-96 h-16" onClick={handleClickPlaySolo}>
           Play Solo
         </Button>
@@ -113,6 +122,10 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
         isOpen={isNameModalOpen}
         submit={modalData.submit}
         title={modalData.title}
+      />
+      <LoginModal
+        close={() => setIsLoginModalOpen(false)}
+        isOpen={isLoginModalOpen}
       />
     </Layout>
   );

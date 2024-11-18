@@ -84,3 +84,40 @@ declare global {
     HydraMultiplayer: HydraMultiplayer;
   }
 }
+
+// {
+//   "authenticated": true,
+//   "account": {
+//     "auth_provider": "google",
+//     "auth_provider_id": "114493962815994125644",
+//     "auth_name": "Selvio Perez",
+//     "auth_email": "selvio.perez@sundaeswap.finance",
+//     "auth_avatar": "https://lh3.googleusercontent.com/a/ACg8ocLqN4aFyOu89WYGcG48YS02DW2RMMRLSUPao0NX6qV-nBmj-w=s96-c"
+//   },
+//   "session": {
+//     "reference": "ed25519_sk1n80sl3p24vcgaj6eynqpn4m36xpxn8mp78999hkpv4awf2hn6xusd8eu25",
+//     "session_id": "201dfe3d-01da-4b3a-a9c9-e19e0946441d",
+//     "auth_country_code": "CO",
+//     "authenticated_at": "2024-11-18 23:00:02"
+//   }
+// }
+
+export interface Account {
+  auth_provider: string;
+  auth_provider_id: string;
+  auth_name: string;
+  auth_email: string;
+  auth_avatar: string;
+}
+
+export interface Session {
+  reference: string;
+  session_id: string;
+  auth_country_code: string;
+  authenticated_at: string;
+}
+export interface AuthResponse {
+  authenticated: boolean;
+  account: Account;
+  session: Session;
+}
