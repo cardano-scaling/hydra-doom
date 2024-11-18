@@ -42,7 +42,12 @@ const module = await createModule({
   },
   noInitialRun: true,
   preRun: function (mod: any) {
-    const files = ["freedoom2.wad", "default.cfg", "Cardano.wad"];
+    const files = [
+      "freedoom2.wad",
+      "default.cfg",
+      "dm_iog.wad",
+      "iog_assets.wad",
+    ];
     files.forEach((file) => {
       mod.FS!.createPreloadedFile("/", file, "../public/" + file, true, true);
     });
@@ -153,8 +158,9 @@ const args = [
   "-deathmatch",
   "-iwad",
   "freedoom2.wad",
-  "-file",
-  "Cardano.wad",
+  "-merge",
+  "dm_iog.wad",
+  "iog_assets.wad",
   "-drone",
   "-nodraw",
   "-nomouse",
