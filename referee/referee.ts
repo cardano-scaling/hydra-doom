@@ -9,6 +9,7 @@ import { blake2b } from "@noble/hashes/blake2b";
 
 const HYDRA_NODE = "http://localhost:4001/";
 const RECORD_STATS = true;
+const API_KEY = process.env.API_KEY;
 
 let done = false;
 const lucid = await Lucid.new(undefined, "Preprod");
@@ -78,7 +79,12 @@ global.gameStarted = async () => {
 
   console.log("Updating game state to 'Running'.");
   try {
-    await fetch("http://api.us-east-1.hydra-doom.sundae.fi/start_game?id=a0");
+    await fetch("http://api.us-east-1.hydra-doom.sundae.fi/start_game?id=a0", {
+      method: "POST",
+      headers: {
+        Authorization: API_KEY,
+      },
+    });
   } catch (e) {
     console.warn("Failed to update game state to 'Running': ", e);
   }
@@ -144,6 +150,9 @@ try {
     try {
       await fetch("http://api.us-east-1.hydra-doom.sundae.fi/cleanup?id=a0", {
         method: "POST",
+        headers: {
+          Authorization: API_KEY,
+        },
       });
     } catch (e) {
       console.log("Failed to cleanup old game: ", e);
@@ -193,6 +202,9 @@ try {
   console.log("Ending game. Marking game as 'Aborted'.");
   await fetch("http://api.us-east-1.hydra-doom.sundae.fi/end_game?id=a0", {
     method: "POST",
+    headers: {
+      Authorization: API_KEY,
+    },
   });
 } catch (e) {
   console.warn("Failed to mark game as ended: ", e);
