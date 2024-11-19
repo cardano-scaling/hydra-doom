@@ -14,8 +14,9 @@ import { useAppContext } from "../../context/useAppContext";
 import { AuthResponse } from "../../types";
 
 interface LoginModalProps {
-  isOpen: boolean;
   close: () => void;
+  isOpen: boolean;
+  showActionButtons: () => void;
 }
 
 const providerIcons: { [key: string]: JSX.Element } = {
@@ -44,7 +45,11 @@ const checkSignin = async (sessionKeyBech32: string): Promise<AuthResponse> => {
   return response.json();
 };
 
-const LoginModal: React.FC<LoginModalProps> = ({ isOpen, close }) => {
+const LoginModal: React.FC<LoginModalProps> = ({
+  close,
+  isOpen,
+  showActionButtons,
+}) => {
   const { keys, setAccountData } = useAppContext();
   const { sessionKeyBech32 } = keys || {};
   const [isWaitingSigning, setIsWaitingSigning] = useState(false);
@@ -67,9 +72,16 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, close }) => {
     if (userData?.authenticated) {
       setIsWaitingSigning(false);
       close();
+      showActionButtons();
       setAccountData(userData.account);
     }
-  }, [close, setAccountData, userData?.account, userData?.authenticated]);
+  }, [
+    close,
+    setAccountData,
+    showActionButtons,
+    userData?.account,
+    userData?.authenticated,
+  ]);
 
   const handleLogin = (provider: string) => {
     if (!sessionKeyBech32) return;

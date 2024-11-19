@@ -4,70 +4,55 @@ import hydraText from "../../assets/images/hydra-text.png";
 import Modal from "../Modal";
 import Layout from "../Layout";
 import SetNameModal from "../SetNameModal";
+import LoginModal from "../LoginModal/LoginModal";
 import { useAppContext } from "../../context/useAppContext";
 import { EGameType } from "../../types";
-import LoginModal from "../LoginModal/LoginModal";
 
 interface InitialViewProps {
   startGame: () => void;
 }
 
 const InitialView: FC<InitialViewProps> = ({ startGame }) => {
-  const { setGameData } = useAppContext();
+  const { setGameData, accountData } = useAppContext();
   const pathSegments = window.location.pathname.split("/").filter(Boolean);
-  const [modalData, setModalData] = useState({
-    title: "Join Multiplayer",
-    submit: () => {
-      startGame();
-    },
-  });
-  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const code = pathSegments[1];
+  const [modalTitle, setModalTitle] = useState("Join Multiplayer");
   const [isNameModalOpen, setIsNameModalOpen] = useState(
     pathSegments[0] === EGameType.JOIN,
   );
-  const code = pathSegments[1];
+  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [displayActionButtons, setDisplayActionButtons] = useState(false);
 
   useEffect(() => {
     if (code) {
-      setGameData((prev) => ({ ...prev, code: code, type: EGameType.JOIN }));
+      setGameData((prev) => ({ ...prev, code, type: EGameType.JOIN }));
     }
   }, [code, setGameData]);
 
-  const handleClickPlaySolo = () => {
-    startGame();
-    setGameData((prev) => ({
-      ...prev,
-      code: "",
-      petName: "",
-      type: EGameType.SOLO,
-    }));
-  };
-
   const handleClickStartMultiplayer = () => {
-    setModalData({
-      title: "New Game",
-      submit: () => {
-        startGame();
-      },
-    });
+    setModalTitle("New Game");
     setIsNameModalOpen(true);
     setGameData((prev) => ({ ...prev, type: EGameType.HOST }));
   };
 
   const handleClickJoinMultiplayer = () => {
-    setModalData({
-      title: "Join Multiplayer",
-      submit: () => {
-        startGame();
-      },
-    });
-    setGameData((prev) => ({ ...prev, type: EGameType.JOIN }));
+    setModalTitle("Join Multiplayer");
     setIsNameModalOpen(true);
+    setGameData((prev) => ({ ...prev, type: EGameType.JOIN }));
   };
 
   const handleTournamentLogin = () => {
     setIsLoginModalOpen(true);
+  };
+
+  const handleSubmitNameModal = () => {
+    setIsNameModalOpen(false);
+    startGame();
+  };
+
+  const showActionButtons = () => {
+    setDisplayActionButtons(true);
   };
 
   return (
@@ -77,55 +62,80 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
         alt="Hydra"
         className="w-full max-w-5xl relative -bottom-14 -mt-14 z-10 pointer-events-none"
       />
-      <div className="flex flex-col gap-6">
-        <Button className="w-96 h-16" onClick={handleTournamentLogin}>
-          Tournament Login
-        </Button>
-        <Button className="w-96 h-16" onClick={handleClickPlaySolo}>
-          Play Solo
-        </Button>
-        <Button className="w-96 h-16" onClick={handleClickStartMultiplayer}>
-          Start Multiplayer
-        </Button>
-        <Button className="w-96 h-16" onClick={handleClickJoinMultiplayer}>
-          Join Multiplayer
-        </Button>
+      <div className="flex flex-col gap-6 items-center">
+        {displayActionButtons ? (
+          <>
+            {accountData ? (
+              <div className="flex items-center gap-6 justify-center mb-8">
+                <div className="text-3xl">
+                  Logged In as:{" "}
+                  <span className="bg-yellow-400 px-2">
+                    {accountData.auth_name}
+                  </span>
+                </div>
+                <Button tick className="text-xl w-36 h-11">
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <div className="text-center text-5xl mb-8">Free Play</div>
+            )}
+            <Button className="w-96 h-16" onClick={handleClickStartMultiplayer}>
+              New Game
+            </Button>
+            <Button className="w-96 h-16" onClick={handleClickJoinMultiplayer}>
+              Join Game
+            </Button>
+            <Button className="w-96 h-16">Watch</Button>
+          </>
+        ) : (
+          <>
+            <Button className="w-96 h-16" onClick={handleTournamentLogin}>
+              Tournament Login
+            </Button>
+            <Button className="w-96 h-16" onClick={showActionButtons}>
+              Free Play
+            </Button>
+          </>
+        )}
       </div>
-
-      <Modal
-        isOpen={isWelcomeModalOpen}
-        close={() => setIsWelcomeModalOpen(false)}
-      >
-        <div className="text-center text-4xl flex flex-col gap-8">
-          <h1 className="text-5xl">Welcome to Hydra Doom</h1>
-          <p>
-            Hydra Doom is a technology demonstration showcasing one of Cardano’s
-            scaling solutions called Hydra using the shareware levels of the
-            1993 id software game Doom.
-          </p>
-          <p>
-            While you are playing, the game states will be streamed into a Hydra
-            head, which uses Cardano smart contracts to validate the game
-            transition for every frame, in real time. It’s a passion project put
-            together by a small team, including Sundae Labs, Adam Dean, and a
-            few folks from IOG, in a short amount of time. All the code is fully
-            open sourced.
-          </p>
-          <p>
-            Hydra Doom is intended as a light-hearted tech demo and is not a
-            commercial product.
-          </p>
-        </div>
-      </Modal>
+      {isWelcomeModalOpen && (
+        <Modal
+          isOpen={isWelcomeModalOpen}
+          close={() => setIsWelcomeModalOpen(false)}
+        >
+          <div className="text-center text-4xl flex flex-col gap-8">
+            <h1 className="text-5xl">Welcome to Hydra Doom</h1>
+            <p>
+              Hydra Doom is a technology demonstration showcasing one of
+              Cardano’s scaling solutions called Hydra using the shareware
+              levels of the 1993 id software game Doom.
+            </p>
+            <p>
+              While you are playing, the game states will be streamed into a
+              Hydra head, which uses Cardano smart contracts to validate the
+              game transition for every frame, in real time. It’s a passion
+              project put together by a small team, including Sundae Labs, Adam
+              Dean, and a few folks from IOG, in a short amount of time. All the
+              code is fully open sourced.
+            </p>
+            <p>
+              Hydra Doom is intended as a light-hearted tech demo and is not a
+              commercial product.
+            </p>
+          </div>
+        </Modal>
+      )}
       <SetNameModal
         close={() => setIsNameModalOpen(false)}
         isOpen={isNameModalOpen}
-        submit={modalData.submit}
-        title={modalData.title}
+        submit={handleSubmitNameModal}
+        title={modalTitle}
       />
       <LoginModal
         close={() => setIsLoginModalOpen(false)}
         isOpen={isLoginModalOpen}
+        showActionButtons={showActionButtons}
       />
     </Layout>
   );
