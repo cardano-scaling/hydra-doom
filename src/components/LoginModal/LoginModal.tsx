@@ -10,8 +10,8 @@ import {
   FaGoogle,
   FaTwitter,
 } from "react-icons/fa6";
-import useKeys from "../../hooks/useKeys";
 import { useAppContext } from "../../context/useAppContext";
+import { AuthResponse } from "../../types";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -34,9 +34,19 @@ const fetchAuthProviders = async (): Promise<string[]> => {
   return response.json();
 };
 
+const checkSignin = async (sessionKeyBech32: string): Promise<AuthResponse> => {
+  const response = await fetch(
+    `${API_BASE_URL}/auth/check/${API_KEY}/?reference=${sessionKeyBech32}`,
+  );
+  if (!response.ok) {
+    throw new Error("Failed to check sign-in status");
+  }
+  return response.json();
+};
+
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, close }) => {
-  const { accountData } = useAppContext();
-  const { sessionKeyBech32 } = useKeys();
+  const { keys, setAccountData } = useAppContext();
+  const { sessionKeyBech32 } = keys || {};
   const [isWaitingSigning, setIsWaitingSigning] = useState(false);
 
   const { data: providers, isLoading: isLoadingProviders } = useQuery<string[]>(
@@ -46,12 +56,20 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, close }) => {
     },
   );
 
+  const { data: userData } = useQuery<AuthResponse>({
+    queryKey: ["signinCheck", sessionKeyBech32],
+    queryFn: () => checkSignin(sessionKeyBech32 ?? ""),
+    enabled: !!sessionKeyBech32 && isWaitingSigning,
+    refetchInterval: 1000,
+  });
+
   useEffect(() => {
-    if (accountData) {
+    if (userData?.authenticated) {
       setIsWaitingSigning(false);
       close();
+      setAccountData(userData.account);
     }
-  }, [accountData, close]);
+  }, [close, setAccountData, userData?.account, userData?.authenticated]);
 
   const handleLogin = (provider: string) => {
     if (!sessionKeyBech32) return;
