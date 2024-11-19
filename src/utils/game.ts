@@ -16,7 +16,7 @@ export const getArgs = ({ type, petName }: GameData) => {
     // Do nothing
     console.log("SOLO");
   } else {
-    args.push("-deathmatch", "-connect", "1");
+    args.push("-altdeath", "-connect", "1");
   }
 
   if (petName) args.push("-pet", petName);
