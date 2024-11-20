@@ -115,6 +115,7 @@ const DoomCanvas: React.FC = () => {
         adminPkh: data.admin_pkh,
         url: data.ip,
         module: Module,
+        filterAddress: keys.address,
       });
 
       adminAddress.free();
