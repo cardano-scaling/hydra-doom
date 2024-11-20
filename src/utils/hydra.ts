@@ -149,8 +149,7 @@ export class Hydra {
           break;
         case "SnapshotConfirmed":
           {
-            // console.log("SnapshotConfirmed", data.snapshot.snapshotNumber, data.snapshot.confirmedTransactions.length);
-            for (const txid of data.snapshot.confirmedTransactions) {
+            for (const txid of data.snapshot.confirmed) {
               if (!this.tx_timings[txid]?.sent) {
                 continue;
               }
