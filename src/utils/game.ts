@@ -11,6 +11,9 @@ export const getArgs = ({ type, petName }: GameData) => {
     "iog_assets.wad",
     "-warp",
     "1",
+    "-ticdup",
+    "2",
+    "-devparm",
   );
   if (type === EGameType.SOLO) {
     // Do nothing
