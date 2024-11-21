@@ -174,7 +174,7 @@ const args = [
   "-ticdup",
   "2",
   "-nodes",
-  "3",
+  "4",
   "-timer",
   "5",
   "-nodraw",
