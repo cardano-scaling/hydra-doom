@@ -50,6 +50,7 @@ export class Hydra {
   onTxInvalid?: (txid: TxHash) => void;
 
   tx_count: number;
+  startTime: number;
   tx_timings: {
     [tx: string]: TransactionTiming;
   };
@@ -59,6 +60,7 @@ export class Hydra {
     filterAddress?: string,
     public queue_length: number = 10,
   ) {
+    this.startTime = 0;
     this.tx_count = 0;
     this.tx_timings = {};
     this.outbound_transactions = [];
@@ -66,9 +68,14 @@ export class Hydra {
     this.tombstones = {};
 
     this.url = new URL(url);
-    this.url.protocol = this.url.protocol.replace("ws", "http");
+    this.url.protocol = this.url.protocol.replace("ws", "https");
     const websocketUrl = new URL(url);
-    websocketUrl.protocol = websocketUrl.protocol.replace("http", "ws");
+    websocketUrl.protocol = websocketUrl.protocol.replace("https", "ws");
+    console.log(
+      websocketUrl +
+        (websocketUrl.toString().endsWith("/") ? "" : "/") +
+        `?${filterAddress ? `address=${filterAddress}&` : ""}history=no`,
+    );
     this.connection = new WebSocket(
       websocketUrl +
         (websocketUrl.toString().endsWith("/") ? "" : "/") +
@@ -112,16 +119,48 @@ export class Hydra {
           break;
         case "TxValid":
           {
-            const txid = data.transaction.txId;
-            // Record seen time
-            if (this.tx_timings[txid]?.sent) {
-              const seenTime = now - this.tx_timings[txid].sent;
-              this.tx_timings[txid].seen = seenTime;
-              // console.log(`seen ${txid} after ${seenTime}ms`);
+            if (this.startTime === 0) {
+              this.startTime = performance.now();
             }
-            const cbor = fromHex(data.transaction.cborHex);
-            const tx = decode(cbor);
-            this.onTxSeen?.(txid, tx);
+            this.tx_count += 1;
+            const endTime = performance.now();
+            if (endTime > this.startTime + 1000) {
+              console.log(
+                `Current Data: ${this.tx_count} Transactions | ${this.tx_count / ((endTime - this.startTime) / 1000)} TPS`,
+              );
+
+              this.startTime = performance.now();
+              this.tx_count = 0;
+            }
+            // // Record seen time
+            // if (this.tx_timings[txid]?.sent) {
+            //   const seenTime = now - this.tx_timings[txid].sent;
+            //   this.tx_timings[txid].seen = seenTime;
+            //   // console.log(`seen ${txid} after ${seenTime}ms`);
+            // }
+            // const tx = tx_parser.fromTx(data.transaction.cborHex);
+            // for (const input of tx.txComplete.body().inputs().to_js_value()) {
+            //   const ref = `${input.transaction_id}#${input.index}`;
+            //   if (this.utxos[ref]) {
+            //     delete this.utxos[ref];
+            //   } else {
+            //     this.tombstones[ref] = true;
+            //   }
+            // }
+            // let idx = 0;
+            // for (const output of tx.txComplete.body().outputs().to_js_value()) {
+            //   const ref = `${tx.toHash()}#${idx}`;
+            //   if (!this.tombstones[ref]) {
+            //     this.utxos[ref] = hydraUtxoToLucidUtxo(
+            //       tx.toHash(),
+            //       idx,
+            //       output,
+            //     );
+            //   }
+            //   idx++;
+            // }
+            // this.onTxSeen?.(txid, tx);
+            // tx.txComplete.free();
           }
           break;
         case "TxInvalid":

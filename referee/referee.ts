@@ -10,14 +10,15 @@ import { KinesisClient, PutRecordsCommand } from "@aws-sdk/client-kinesis";
 import { Packet } from "utils/HydraMultiplayer/base.js";
 import { fromHex, toHex } from "utils/helpers.js";
 
-
-
 const NETWORK_ID = Number(process.env.NETWORK_ID);
 const HYDRA_NODE = "http://localhost:4001/";
 const RECORD_STATS = true;
 
 const kinesis = new KinesisClient({
-  region: process.env.AWS_REGION === "ap-southeast-1" ? "ap-southeast-1" : "us-east-1",
+  region:
+    process.env.AWS_REGION === "ap-southeast-1"
+      ? "ap-southeast-1"
+      : "us-east-1",
 });
 const encoder = new TextEncoder();
 
@@ -111,7 +112,6 @@ const module = await createModule({
   },
 });
 global.Module = module;
-
 const hydra = new HydraMultiplayerServer({
   key: keys,
   address: keys.address,
@@ -354,20 +354,29 @@ const args = [
   "-config",
   "default.cfg",
 ];
-try {
-  module.callMain(args);
-} catch (e) {
-  console.error(e);
+// try {
+//   module.callMain(args);
+// } catch (e) {
+//   console.error(e);
+// }
+
+while (true) {
+  if (!hydra.hydra.isConnected()) {
+    continue;
+  }
+  // According to https://www.doomworld.com/forum/topic/99810-how-much-data-does-online-dming-consume/ assumptions, the network packet is about 6 bytes
+  await hydra.SendPacket(0, 0, new Uint8Array([0, 0, 0, 0, 0, 0]));
+  await new Promise((resolve) => setTimeout(resolve, 1));
 }
 
-while (!done) {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  timeout -= 1000;
-  if (timeout <= 0) {
-    console.log("Game timed out.");
-    done = true;
-  }
-}
+// while (!done) {
+//   await new Promise((resolve) => setTimeout(resolve, 1000));
+//   timeout -= 1000;
+//   if (timeout <= 0) {
+//     console.log("Game timed out.");
+//     done = true;
+//   }
+// }
 
 console.log("Game finished.");
 try {

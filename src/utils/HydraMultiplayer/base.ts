@@ -211,7 +211,7 @@ function decodeGame(raw: Uint8Array): TGame {
     referee_key_hash: referee_key_hash,
     playerCount,
     botCount,
-    players: player_payments.map(p => p.payment_key_hash),
+    players: player_payments.map((p) => p.payment_key_hash),
     state: stateTag,
     winner: winnerRaw,
     cheater: cheaterRaw,

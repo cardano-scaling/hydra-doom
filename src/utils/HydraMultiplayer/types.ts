@@ -17,7 +17,7 @@ export const PacketArray = PacketArraySchema as unknown as TPacketArray;
 
 export const GameSchema = Data.Object({
   referee_payment: Data.Object({
-    payment_key_hash: Data.Bytes()
+    payment_key_hash: Data.Bytes(),
   }),
   playerCountRaw: Data.Integer(),
   botCountRaw: Data.Integer(),

@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "main"
+      - "fast-submit-test"
 
 jobs:
   docker:
@@ -43,7 +44,7 @@ jobs:
             type=semver,pattern=v{{major}}.{{minor}}
             type=semver,pattern=v{{version}}
             type=sha
-      
+
       - name: Extract metadata (tags, labels) for the AI docker image
         id: meta_ai
         uses: docker/metadata-action@v5
