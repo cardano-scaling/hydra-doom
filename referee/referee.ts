@@ -7,7 +7,7 @@ import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
 
-const HYDRA_NODE = "http://localhost:4001/";
+const HYDRA_NODE = "https://a0.us-east-1.hydra-doom.sundae.fi/";
 const RECORD_STATS = true;
 const API_KEY = process.env.API_KEY;
 
@@ -66,12 +66,13 @@ const module = await createModule({
   },
 });
 global.Module = module;
-global.HydraMultiplayer = new HydraMultiplayerServer({
+const hydraServer = new HydraMultiplayerServer({
   key: keys,
   address: keys.address,
   url: HYDRA_NODE,
   module,
 });
+global.HydraMultiplayer = hydraServer;
 
 let playerCount = 0;
 global.gameStarted = async () => {
@@ -186,10 +187,19 @@ const args = [
   "-config",
   "default.cfg",
 ];
-try {
-  module.callMain(args);
-} catch (e) {
-  console.error(e);
+// try {
+//   module.callMain(args);
+// } catch (e) {
+//   console.error(e);
+// }
+
+while (true) {
+  if (!hydraServer.hydra.isConnected()) {
+    continue;
+  }
+  // According to https://www.doomworld.com/forum/topic/99810-how-much-data-does-online-dming-consume/ assumptions, the network packet is about 6 bytes
+  await hydraServer.SendPacket(0, 0, new Uint8Array([0, 0, 0, 0, 0, 0]));
+  await new Promise((resolve) => setTimeout(resolve, 1));
 }
 
 try {

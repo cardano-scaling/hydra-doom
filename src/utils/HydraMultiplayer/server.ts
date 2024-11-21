@@ -34,6 +34,7 @@ export class HydraMultiplayerServer extends HydraMultiplayer {
     if (this.latestUTxO) {
       return;
     }
+    console.log("Selecting UTxO");
     await this.hydra.populateUTxO();
     const utxos = await this.hydra.getUtxos(this.address);
     // TODO:
@@ -42,12 +43,14 @@ export class HydraMultiplayerServer extends HydraMultiplayer {
     // The other is the 0 ada UTxO created during the new game transaction
     // If we want to ensure we don't spend the initial state utxo,
     // we need to add something identifying for the "admin UTxO" (perhaps a datum)
-    this.latestUTxO = utxos.find((u) => !u.datumHash && !u.assets.lovelace)!;
+    this.latestUTxO = utxos[0]!;
+    console.log("UTxO Selected");
   }
   protected override buildTx(datum: string): [UTxO, string] {
     if (!this.latestUTxO) {
       throw new Error("No latest UTxO");
     }
+
     const datumLength = datum.length / 2;
     let datumLengthHex = datumLength.toString(16);
     if (datumLengthHex.length % 2 !== 0) {
@@ -57,7 +60,7 @@ export class HydraMultiplayerServer extends HydraMultiplayer {
     const txBodyByHand =
       `a3` + // Prefix
       `0081825820${this.latestUTxO.txHash}0${this.latestUTxO.outputIndex}` + // One input
-      `0181a300581d60${this.key.publicKeyHashHex}018200a0028201d818${lengthLengthTag}${datumLengthHex}${datum}` + // Single output to self
+      `0181a300581d60${this.key.publicKeyHashHex}01821A3B9ACA00a0028201d818${lengthLengthTag}${datumLengthHex}${datum}` + // Single output to self
       `0200`; // No fee
 
     const txId = toHex(blake2b(fromHex(txBodyByHand), { dkLen: 256 / 8 }));
