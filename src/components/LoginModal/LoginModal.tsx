@@ -12,6 +12,8 @@ import {
 } from "react-icons/fa6";
 import { useAppContext } from "../../context/useAppContext";
 import { AuthResponse } from "../../types";
+import { useSessionReferenceKeyCache } from "../../utils/localStorage";
+import { checkSignin, fetchAuthProviders } from "../../utils/requests";
 
 interface LoginModalProps {
   close: () => void;
@@ -27,29 +29,12 @@ const providerIcons: { [key: string]: JSX.Element } = {
   github: <FaGithub />,
 };
 
-const fetchAuthProviders = async (): Promise<string[]> => {
-  const response = await fetch(`${API_BASE_URL}/auth/providers`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch auth providers");
-  }
-  return response.json();
-};
-
-const checkSignin = async (sessionKeyBech32: string): Promise<AuthResponse> => {
-  const response = await fetch(
-    `${API_BASE_URL}/auth/check/${API_KEY}/?reference=${sessionKeyBech32}`,
-  );
-  if (!response.ok) {
-    throw new Error("Failed to check sign-in status");
-  }
-  return response.json();
-};
-
 const LoginModal: React.FC<LoginModalProps> = ({
   close,
   isOpen,
   showActionButtons,
 }) => {
+  const [, setSessionReference] = useSessionReferenceKeyCache();
   const { keys, setAccountData } = useAppContext();
   const { sessionKeyBech32 } = keys || {};
   const [isWaitingSigning, setIsWaitingSigning] = useState(false);
@@ -74,10 +59,13 @@ const LoginModal: React.FC<LoginModalProps> = ({
       close();
       showActionButtons();
       setAccountData(userData.account);
+      if (sessionKeyBech32) setSessionReference(sessionKeyBech32);
     }
   }, [
     close,
+    sessionKeyBech32,
     setAccountData,
+    setSessionReference,
     showActionButtons,
     userData?.account,
     userData?.authenticated,

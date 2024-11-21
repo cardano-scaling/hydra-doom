@@ -7,13 +7,16 @@ import SetNameModal from "../SetNameModal";
 import LoginModal from "../LoginModal/LoginModal";
 import { useAppContext } from "../../context/useAppContext";
 import { EGameType } from "../../types";
+import { useSessionReferenceKeyCache } from "../../utils/localStorage";
 
 interface InitialViewProps {
   startGame: () => void;
 }
 
 const InitialView: FC<InitialViewProps> = ({ startGame }) => {
-  const { setGameData, accountData } = useAppContext();
+  const { setGameData, accountData, isLoadingUserData, setAccountData } =
+    useAppContext();
+  const [, setSessionReference] = useSessionReferenceKeyCache();
   const pathSegments = window.location.pathname.split("/").filter(Boolean);
   const code = pathSegments[1];
   const [modalTitle, setModalTitle] = useState("Join Multiplayer");
@@ -55,6 +58,57 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
     setDisplayActionButtons(true);
   };
 
+  const onLogout = () => {
+    setAccountData(undefined);
+    setSessionReference("");
+  };
+
+  const renderButtons = () => {
+    if (isLoadingUserData) {
+      return <div className="h-72 flex items-center text-3xl">Loading...</div>;
+    }
+
+    if (displayActionButtons || accountData) {
+      return (
+        <>
+          {accountData ? (
+            <div className="flex items-center gap-6 justify-center mb-8">
+              <div className="text-3xl">
+                Logged In as:{" "}
+                <span className="bg-yellow-400 px-2">
+                  {accountData.auth_name}
+                </span>
+              </div>
+              <Button className="text-xl w-36 h-11" onClick={onLogout} tick>
+                Logout
+              </Button>
+            </div>
+          ) : (
+            <div className="text-center text-5xl mb-8">Free Play</div>
+          )}
+          <Button className="w-96 h-16" onClick={handleClickStartMultiplayer}>
+            New Game
+          </Button>
+          <Button className="w-96 h-16" onClick={handleClickJoinMultiplayer}>
+            Join Game
+          </Button>
+          <Button className="w-96 h-16">Watch</Button>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Button className="w-96 h-16" onClick={handleTournamentLogin}>
+          Tournament Login
+        </Button>
+        <Button className="w-96 h-16" onClick={showActionButtons}>
+          Free Play
+        </Button>
+      </>
+    );
+  };
+
   return (
     <Layout>
       <img
@@ -62,43 +116,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
         alt="Hydra"
         className="w-full max-w-5xl relative -bottom-14 -mt-14 z-10 pointer-events-none"
       />
-      <div className="flex flex-col gap-6 items-center">
-        {displayActionButtons ? (
-          <>
-            {accountData ? (
-              <div className="flex items-center gap-6 justify-center mb-8">
-                <div className="text-3xl">
-                  Logged In as:{" "}
-                  <span className="bg-yellow-400 px-2">
-                    {accountData.auth_name}
-                  </span>
-                </div>
-                <Button tick className="text-xl w-36 h-11">
-                  Logout
-                </Button>
-              </div>
-            ) : (
-              <div className="text-center text-5xl mb-8">Free Play</div>
-            )}
-            <Button className="w-96 h-16" onClick={handleClickStartMultiplayer}>
-              New Game
-            </Button>
-            <Button className="w-96 h-16" onClick={handleClickJoinMultiplayer}>
-              Join Game
-            </Button>
-            <Button className="w-96 h-16">Watch</Button>
-          </>
-        ) : (
-          <>
-            <Button className="w-96 h-16" onClick={handleTournamentLogin}>
-              Tournament Login
-            </Button>
-            <Button className="w-96 h-16" onClick={showActionButtons}>
-              Free Play
-            </Button>
-          </>
-        )}
-      </div>
+      <div className="flex flex-col gap-6 items-center">{renderButtons()}</div>
       {isWelcomeModalOpen && (
         <Modal
           isOpen={isWelcomeModalOpen}

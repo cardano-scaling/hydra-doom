@@ -4,6 +4,7 @@ import { Account, EGameType, GameData, Keys } from "../types";
 interface AppContextInterface {
   accountData?: Account;
   gameData: GameData;
+  isLoadingUserData: boolean;
   keys: Keys | null;
   region: string | null;
   setAccountData: Dispatch<React.SetStateAction<Account | undefined>>;
@@ -13,6 +14,7 @@ interface AppContextInterface {
 export const AppContext = createContext<AppContextInterface>({
   accountData: undefined,
   gameData: { petName: "", code: "", type: EGameType.SOLO },
+  isLoadingUserData: false,
   keys: null,
   region: null,
   setAccountData: () => {},
