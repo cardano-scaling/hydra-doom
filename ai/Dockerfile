@@ -3,8 +3,8 @@ FROM node:20-alpine AS base
 RUN apk add 
 
 WORKDIR /usr/src/app
-RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=yarn.lock,target=yarn.lock \
+RUN --mount=type=bind,source=ai/package.json,target=package.json \
+    --mount=type=bind,source=ai/yarn.lock,target=yarn.lock \
     yarn install --frozen-lockfile
 USER node
 
