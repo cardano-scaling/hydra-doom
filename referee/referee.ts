@@ -8,6 +8,7 @@ import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
 import { KinesisClient, PutRecordsCommand } from "@aws-sdk/client-kinesis";
 
+const NETWORK_ID = Number(process.env.NETWORK_ID);
 const HYDRA_NODE = "http://localhost:4001/";
 const RECORD_STATS = true;
 const API_KEY = process.env.API_KEY;
@@ -36,7 +37,10 @@ async function sendEvent(gameId, data) {
 }
 
 let done = false;
-const lucid = await Lucid.new(undefined, "Preprod");
+const lucid = await Lucid.new(
+  undefined,
+  NETWORK_ID === 1 ? "Mainnet" : "Preprod",
+);
 const adminKeyFile = process.env.ADMIN_KEY_FILE ?? "admin.sk";
 const adminKey = JSON.parse((await readFile(adminKeyFile)).toString());
 const privateKeyBytes = adminKey.cborHex.slice(4);
