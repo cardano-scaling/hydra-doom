@@ -1,4 +1,4 @@
-import { HydraMultiplayer } from "./utils/hydra-multiplayer";
+import { HydraMultiplayerClient } from "./utils/HydraMultiplayer/client";
 
 export type LeaderboardEntry = [string, number];
 
@@ -81,6 +81,37 @@ export interface GameData {
 declare global {
   interface Window {
     Module: EmscriptenModule;
-    HydraMultiplayer: HydraMultiplayer;
+    HydraMultiplayer: HydraMultiplayerClient;
   }
+}
+
+export interface Account {
+  auth_provider: string;
+  auth_provider_id: string;
+  auth_name: string;
+  auth_email: string;
+  auth_avatar: string;
+}
+
+export interface Session {
+  reference: string;
+  session_id: string;
+  auth_country_code: string;
+  authenticated_at: string;
+}
+export interface AuthResponse {
+  authenticated: boolean;
+  account: Account;
+  session: Session;
+}
+
+export interface Keys {
+  sessionKeyBech32: string;
+  privateKeyBytes: Uint8Array;
+  privateKeyHex: string;
+  publicKeyBytes: Uint8Array;
+  publicKeyHex: string;
+  publicKeyHashBytes: Uint8Array;
+  publicKeyHashHex: string;
+  address: string;
 }
