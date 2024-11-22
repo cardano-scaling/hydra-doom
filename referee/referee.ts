@@ -221,7 +221,7 @@ const args = [
   "-extratics",
   "1",
   "-nodes",
-  "2",
+  "3",
   "-timer",
   "5",
   "-nodraw",
