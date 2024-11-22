@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: "Less Perfect DOS VGA";
+    font-style: normal;
+    font-weight: 400;
+    src:
+      url("./assets/fonts/lessperfectdosvga-webfont.woff2") format("woff2"),
+      url("./assets/fonts/lessperfectdosvga-webfont.woff") format("woff");
+  }
+
+  @font-face {
+    font-family: "Pixelify Sans";
+    font-style: normal;
+    font-weight: 400;
+    src: url("./assets/fonts/pixelifysans-regular.ttf") format("truetype");
+  }
+
+  @font-face {
+    font-family: "VT323";
+    font-style: normal;
+    font-weight: 400;
+    src: url("./assets/fonts/VT323-Regular.ttf") format("truetype");
+  }
+
+  html {
+    font-size: 12px;
+    scroll-behavior: smooth;
+
+    @screen xl {
+      font-size: 14px;
+    }
+
+    @screen 2xl {
+      font-size: 16px;
+    }
+  }
+
+  body {
+    font-family: "Less Perfect DOS VGA", monospace;
+  }
+
+  #hubspotForm form {
+    background: #00000088;
+    padding: 2rem;
+    max-width: 800px;
+    margin: auto;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  #hubspotForm form .hs-form-field,
+  #hubspotForm form .actions {
+    margin: 1rem;
+  }
+
+  #hubspotForm form .hs-richtext {
+    margin: 1rem;
+  }
+
+  #hubspotForm form input[type="email"] {
+    font-family: "VT323";
+    width: 100%;
+    font-size: 1.2rem;
+    background: #00000044;
+    color: white;
+    padding: 0.5rem;
+    border: solid 1px red;
+    margin-top: 0.2rem;
+  }
+
+  #hubspotForm form input[type="submit"] {
+    font-family: "VT323";
+    text-transform: uppercase;
+    font-size: 1.1rem;
+    background: red;
+    padding: 0.5rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    color: white;
+    border: none;
+  }
+
+  #hubspotForm form a {
+    color: rgb(250 204 21);
+    text-decoration: underline;
+  }
+}
