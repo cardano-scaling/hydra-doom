@@ -53,7 +53,7 @@ const module = await createModule({
   },
   noInitialRun: true,
   preRun: function (mod: any) {
-    const files = ["freedoom2.wad", "default.cfg", "Cardano.wad"];
+    const files = ["freedoom2.wad", "default.cfg", "iog_assets.wad", "dm_iog.wad"];
     files.forEach((file) => {
       mod.FS!.createPreloadedFile("/", file, "../public/" + file, true, true);
     });
@@ -85,12 +85,13 @@ global.HydraMultiplayer = new HydraMultiplayerClient({
 const args = [
   "-connect",
   "1",
-  "-deathmatch",
+  "-altdeath",
   "-ai",
   "-iwad",
   "freedoom2.wad",
-  "-file",
-  "Cardano.wad",
+  "-merge",
+  "dm_iog.wad",
+  "iog_assets.wad",
   "-nodraw",
   "-nomouse",
   "-nograbmouse",

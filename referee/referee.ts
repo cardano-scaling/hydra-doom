@@ -211,7 +211,7 @@ try {
 
 const args = [
   "-server",
-  "-deathmatch",
+  "-altdeath",
   "-iwad",
   "freedoom2.wad",
   "-merge",
