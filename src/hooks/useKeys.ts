@@ -1,4 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useLocalStorage } from "usehooks-ts";
+import { HYDRA_DOOM_SESSION_KEY, NETWORK_ID } from "../constants";
+import { useEffect, useState, useCallback } from "react";
 import { Lucid, toHex } from "lucid-cardano";
 import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
@@ -14,7 +16,10 @@ const useKeys = () => {
     hasInitialized.current = true;
 
     const initKeys = async () => {
-      const lucid = await Lucid.new(undefined, "Preprod");
+      const lucid = await Lucid.new(
+        undefined,
+        NETWORK_ID === 1 ? "Mainnet" : "Preprod",
+      );
 
       const key = lucid.utils.generatePrivateKey();
       const privateKeyBytes = bech32.decode(key).data;

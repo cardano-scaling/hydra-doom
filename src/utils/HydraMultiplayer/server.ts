@@ -12,13 +12,15 @@ export class HydraMultiplayerServer extends HydraMultiplayer {
     address,
     url,
     module,
+    networkId,
   }: {
     key: Keys;
     address: string;
     url: string;
     module: EmscriptenModule;
+    networkId?: number;
   }) {
-    super({ key, url, module });
+    super({ key, url, module, networkId });
     this.address = address;
   }
   public override async SendPacket(
@@ -57,7 +59,7 @@ export class HydraMultiplayerServer extends HydraMultiplayer {
     const txBodyByHand =
       `a3` + // Prefix
       `0081825820${this.latestUTxO.txHash}0${this.latestUTxO.outputIndex}` + // One input
-      `0181a300581d60${this.key.publicKeyHashHex}018200a0028201d818${lengthLengthTag}${datumLengthHex}${datum}` + // Single output to self
+      `0181a300581d${this.networkId === 0 ? "60" : "61"}${this.key.publicKeyHashHex}018200a0028201d818${lengthLengthTag}${datumLengthHex}${datum}` + // Single output to self
       `0200`; // No fee
 
     const txId = toHex(blake2b(fromHex(txBodyByHand), { dkLen: 256 / 8 }));

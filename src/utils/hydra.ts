@@ -16,7 +16,11 @@ import {
   Credential as Cred,
 } from "lucid-cardano";
 
-const tx_parser = await Lucid.new(undefined, "Preprod");
+const NETWORK_ID = Number(process.env.NETWORK_ID);
+const tx_parser = await Lucid.new(
+  undefined,
+  NETWORK_ID === 1 ? "Mainnet" : "Preprod",
+);
 const utils = new Utils(tx_parser);
 
 export interface TransactionTiming {
