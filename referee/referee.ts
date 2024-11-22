@@ -6,10 +6,34 @@ import { Lucid, toHex, fromHex } from "lucid-cardano";
 import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
+import { KinesisClient, PutRecordsCommand } from "@aws-sdk/client-kinesis";
 
 const HYDRA_NODE = "http://localhost:4001/";
 const RECORD_STATS = true;
 const API_KEY = process.env.API_KEY;
+
+const kinesis = new KinesisClient();
+const encoder = new TextEncoder();
+
+async function sendEvent(gameId, data) {
+  const dataRaw = encoder.encode(
+    JSON.stringify({
+      timestamp: new Date().valueOf(),
+      data,
+    }),
+  );
+  const record = {
+    Records: [
+      {
+        Data: dataRaw,
+        PartitionKey: gameId,
+      },
+    ],
+    StreamName: "hydra-doom-event-queue",
+  };
+  const command = new PutRecordsCommand(record);
+  return kinesis.send(command);
+}
 
 let done = false;
 const lucid = await Lucid.new(undefined, "Preprod");
@@ -90,7 +114,10 @@ global.gameStarted = async () => {
   }
   if (!RECORD_STATS) return;
   try {
-    await fetch("http://localhost:8000/start_game", { method: "POST" });
+    await Promise.all([
+      fetch("http://localhost:8000/start_game", { method: "POST" }),
+      sendEvent("a0", { type: "game_started", game_id: "a0", keys: [] }),
+    ]);
   } catch (e) {
     console.warn("Failed to record game start: ", e);
   }
@@ -109,13 +136,16 @@ global.playerConnected = async () => {
 global.playerDisconnected = async () => {
   playerCount--;
   console.log(`Player left, now ${playerCount} players`);
+  if (playerCount === 1) {
+    // We're the last player, so quit
+    done = true;
+  }
   if (!RECORD_STATS) return;
   try {
     await fetch("http://localhost:8000/player_left", { method: "POST" });
   } catch (e) {
     console.warn("Failed to record player left: ", e);
   }
-  // TODO: Hit localhost to record a player disconnected
 };
 global.kill = async (killer, victim) => {
   console.log(`Player ${killer} killed ${victim}`);
@@ -123,16 +153,33 @@ global.kill = async (killer, victim) => {
   // TODO: map from player idx to ephemeral key
   // TODO: ddz leaderboards
   try {
-    await fetch("http://localhost:8000/player_killed", { method: "POST" });
+    await Promise.all([
+      fetch("http://localhost:8000/player_killed", { method: "POST" }),
+      sendEvent("a0", {
+        type: "kill",
+        game_id: "a0",
+        killer: "addr1abc",
+        victim: "addr1def",
+      }),
+    ]);
   } catch (e) {
     console.warn("Failed to record a kill: ", e);
   }
 };
+// TODO: collapse down into kill
 global.suicide = async (player) => {
   console.log(`Player ${player} suicided`);
   if (!RECORD_STATS) return;
   try {
-    await fetch("http://localhost:8000/player_suicided", { method: "POST" });
+    await Promise.all([
+      fetch("http://localhost:8000/player_suicided", { method: "POST" }),
+      sendEvent("a0", {
+        type: "kill",
+        game_id: "a0",
+        killer: "addr1def",
+        victim: "addr1def",
+      }),
+    ]);
   } catch (e) {
     console.warn("Failed to record a suicide: ", e);
   }
@@ -174,7 +221,7 @@ const args = [
   "-ticdup",
   "2",
   "-nodes",
-  "4",
+  "2",
   "-timer",
   "5",
   "-nodraw",
@@ -216,7 +263,10 @@ try {
   console.warn("Failed to mark game as ended: ", e);
 }
 try {
-  await fetch("http://localhost:8000/end_game", { method: "POST" });
+  await Promise.all([
+    fetch("http://localhost:8000/end_game", { method: "POST" }),
+    sendEvent("a0", { type: "game_finished", game_id: "a0" }),
+  ]);
 } catch (e) {
   console.warn("Failed to record game finished: ", e);
 }
