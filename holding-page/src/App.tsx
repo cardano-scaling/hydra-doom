@@ -30,11 +30,13 @@ function App() {
         </div>
         <div className="flex flex-col gap-6 text-white max-w-2xl text-2xl text-center mb-12">
           <p>
-            After the initial success of the Hydra Doom demo at Rare Evo 2024,
-            we’re raising hell once again, only this time it’s bigger and badder
-            than ever before.
+            The Tournament will kick off on December 3, 2024, with 100,000 USDM
+            in various prizes up for grabs. The initial qualifier will be played
+            against bots with further elimination rounds between December 8–18.
+            Player vs. player rounds will follow with an in-person finale in
+            January.
           </p>
-          <p>Coming soon ... !</p>
+          <p>Good luck!</p>
           <p>
             To get information and updates regarding the Hydra Doom Tournament,
             enter your email below.
