@@ -12,7 +12,7 @@ const HYDRA_NODE = "http://localhost:4001/";
 const RECORD_STATS = true;
 const API_KEY = process.env.API_KEY;
 
-const kinesis = new KinesisClient();
+const kinesis = new KinesisClient({ region: "us-east-1" }); // TODO: env variable?
 const encoder = new TextEncoder();
 
 async function sendEvent(gameId, data) {
@@ -218,8 +218,8 @@ const args = [
   "dm_iog.wad",
   "iog_assets.wad",
   "-ai",
-  "-ticdup",
-  "2",
+  "-extratics",
+  "1",
   "-nodes",
   "2",
   "-timer",
