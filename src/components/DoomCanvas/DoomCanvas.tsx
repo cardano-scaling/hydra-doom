@@ -14,7 +14,6 @@ import { HydraMultiplayerClient } from "../../utils/HydraMultiplayer/client.js";
 
 const DoomCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const isEffectRan = useRef(false);
   const isGameDataFetched = useRef(false);
   const {
     gameData: { code, petName, type },
@@ -57,10 +56,6 @@ const DoomCanvas: React.FC = () => {
   useEffect(() => {
     if (!address) return;
     if (type !== EGameType.SOLO && !data?.ip) return;
-
-    // Prevent effect from running twice
-    if (isEffectRan.current) return;
-    isEffectRan.current = true;
 
     const canvas = canvasRef.current;
 
