@@ -3,7 +3,7 @@ import { AppContext } from "./useAppContext";
 import { Account, AuthResponse, EGameType } from "../types";
 import useBestRegion from "../hooks/useBestRegion";
 import useKeys from "../hooks/useKeys";
-import { MAX_PLAYERS, REGIONS } from "../constants";
+import { REGIONS } from "../constants";
 import { useQuery } from "@tanstack/react-query";
 import { useSessionReferenceKeyCache } from "../utils/localStorage";
 import { checkSignin } from "../utils/requests";
@@ -18,8 +18,6 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
     type: EGameType.SOLO,
   });
   const [accountData, setAccountData] = useState<Account>();
-  const [players, setPlayers] = useState(1);
-  const bots = MAX_PLAYERS - players;
 
   const { data: userData, isLoading: isLoadingUserData } =
     useQuery<AuthResponse>({
@@ -42,17 +40,14 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const value = useMemo(
     () => ({
       accountData,
-      bots,
       gameData,
       isLoadingUserData,
       keys,
-      players,
       region: bestRegion,
       setAccountData,
       setGameData,
-      setPlayers,
     }),
-    [accountData, bots, gameData, isLoadingUserData, keys, players, bestRegion],
+    [accountData, gameData, keys, bestRegion, isLoadingUserData],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
