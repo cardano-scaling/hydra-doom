@@ -36,33 +36,3 @@
     font-family: "Less Perfect DOS VGA", monospace;
   }
 }
-
-.range-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 24px;
-  height: 24px;
-  background: #d40018;
-  border-radius: 50%;
-  cursor: pointer;
-  margin-top: -11px;
-}
-
-.range-slider::-webkit-slider-runnable-track {
-  height: 2px;
-  background: #d1d5db;
-}
-
-.range-slider::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
-  background: #d40018;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.range-slider::-moz-range-track {
-  height: 2px;
-  background: #d1d5db;
-}
