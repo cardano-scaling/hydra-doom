@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef } from "react";
 import { EGameType, EmscriptenModule, NewGameResponse } from "../../types";
 import { useAppContext } from "../../context/useAppContext";
+import useKeys from "../../hooks/useKeys";
 import { getArgs } from "../../utils/game";
 import { useMutation } from "@tanstack/react-query";
 import Card from "../Card";
@@ -17,21 +18,22 @@ const DoomCanvas: React.FC = () => {
   const isEffectRan = useRef(false);
   const {
     gameData: { code, petName, type },
-    keys,
     region,
   } = useAppContext();
-  const { address } = keys || {};
+  const keys = useKeys();
   const urlClipboard = useClipboard({ copiedTimeout: 1500 });
   const { newGame, addPlayer, share } = useUrls();
 
   const { mutate: fetchGameData, data } = useMutation<NewGameResponse>({
-    mutationKey: ["fetchGameData", address, code, type],
+    mutationKey: ["fetchGameData", keys?.address, code, type],
     mutationFn: async () => {
       if (type === EGameType.SOLO) {
         return { game_id: "solo" };
       }
       const url =
-        type === EGameType.HOST ? newGame(address!) : addPlayer(address!, code);
+        type === EGameType.HOST
+          ? newGame(keys!.address)
+          : addPlayer(keys!.address, code);
       const response = await fetch(url);
       return response.json();
     },
@@ -47,13 +49,13 @@ const DoomCanvas: React.FC = () => {
   );
 
   useEffect(() => {
-    if (!address || !region) return;
+    if (!keys?.address || !region) return;
 
     fetchGameData();
-  }, [fetchGameData, address, region]);
+  }, [fetchGameData, keys?.address, region]);
 
   useEffect(() => {
-    if (!address) return;
+    if (!keys?.address) return;
     if (type !== EGameType.SOLO && !data?.ip) return;
 
     // Prevent effect from running twice
@@ -129,7 +131,7 @@ const DoomCanvas: React.FC = () => {
     return () => {
       canvas.removeEventListener("webglcontextlost", handleContextLost);
     };
-  }, [address, code, data?.admin_pkh, data?.ip, keys, petName, type]);
+  }, [code, data?.admin_pkh, data?.ip, keys, petName, type]);
 
   return (
     <>
