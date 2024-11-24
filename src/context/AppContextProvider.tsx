@@ -1,6 +1,6 @@
 import { FC, PropsWithChildren, useEffect, useMemo, useState } from "react";
 import { AppContext } from "./useAppContext";
-import { Account, AuthResponse, EGameType } from "../types";
+import { Account, AuthResponse, EGameType, Region } from "../types";
 import useBestRegion from "../hooks/useBestRegion";
 import useKeys from "../hooks/useKeys";
 import { MAX_PLAYERS, REGIONS } from "../constants";
@@ -18,6 +18,7 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
     type: EGameType.SOLO,
   });
   const [accountData, setAccountData] = useState<Account>();
+  const [region, setRegion] = useState<Region | null>(null);
   const [players, setPlayers] = useState(1);
   const bots = MAX_PLAYERS - players;
 
@@ -39,20 +40,35 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, [setSessionReference, userData]);
 
+  useEffect(() => {
+    if (bestRegion) setRegion(bestRegion);
+  }, [bestRegion]);
+
   const value = useMemo(
     () => ({
       accountData,
+      bestRegion,
       bots,
       gameData,
       isLoadingUserData,
       keys,
       players,
-      region: bestRegion,
+      region,
       setAccountData,
       setGameData,
       setPlayers,
+      setRegion,
     }),
-    [accountData, bots, gameData, isLoadingUserData, keys, players, bestRegion],
+    [
+      accountData,
+      bestRegion,
+      bots,
+      gameData,
+      isLoadingUserData,
+      keys,
+      players,
+      region,
+    ],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -1,20 +1,21 @@
 import { useState, useEffect } from "react";
 import { useQueries } from "@tanstack/react-query";
 import { healthUrl } from "./useUrls";
+import { Region } from "../types";
 
 interface ServerHealth {
-  region: string;
+  region: Region;
   latency: number;
   error?: string;
 }
 
-const useBestRegion = (regions: string[]) => {
-  const [bestRegion, setBestRegion] = useState<string | null>(null);
+const useBestRegion = (regions: Region[]) => {
+  const [bestRegion, setBestRegion] = useState<Region | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isError, setIsError] = useState<boolean>(false);
 
-  const checkServerHealth = async (region: string): Promise<ServerHealth> => {
-    const url = healthUrl(region);
+  const checkServerHealth = async (region: Region): Promise<ServerHealth> => {
+    const url = healthUrl(region.value);
 
     try {
       const start = performance.now();

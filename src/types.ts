@@ -115,3 +115,8 @@ export interface Keys {
   publicKeyHashHex: string;
   address: string;
 }
+
+export interface Region {
+  name: string;
+  value: string;
+}
