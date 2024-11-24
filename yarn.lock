@@ -1806,7 +1806,7 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
-lucid-cardano@^0.10.7:
+lucid-cardano@^0.10.10:
   version "0.10.10"
   resolved "https://registry.yarnpkg.com/lucid-cardano/-/lucid-cardano-0.10.10.tgz#0ef56d6366419b0f740187791655251f54217e05"
   integrity sha512-Yp1o8/kbVUgkRpQqllGQCT9I9w70a+uQKSoJdZEHVrEo5MFbT3Vds314Q8ClqgExzN7pj9NHGbiwiow2ik7mUA==
