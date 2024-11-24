@@ -12,11 +12,6 @@
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.5.0.tgz#abadc5ca20332db2b1b2aa3e496e9af1213570b0"
   integrity sha512-1j6kQFb7QRru7eKN3ZDvRcP13rugwdxZqCjbiAVZfIJwgj2A65UmT4TgARXGlXgnRkORLTDTrO19ZErt7+QXgA==
 
-"@opentelemetry/api@^1.4.0":
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/@opentelemetry/api/-/api-1.9.0.tgz#d03eba68273dc0f7509e2a3d5cba21eae10379fe"
-  integrity sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg==
-
 "@peculiar/asn1-schema@^2.3.13", "@peculiar/asn1-schema@^2.3.8":
   version "2.3.13"
   resolved "https://registry.yarnpkg.com/@peculiar/asn1-schema/-/asn1-schema-2.3.13.tgz#ec8509cdcbc0da3abe73fd7e690556b57a61b8f4"
@@ -58,11 +53,6 @@ bech32-buffer@^0.2.1:
   resolved "https://registry.yarnpkg.com/bech32-buffer/-/bech32-buffer-0.2.1.tgz#8106f2f51bcb2ba1d9fb7718905c3042c5be2fcd"
   integrity sha512-fCG1TyZuCN48Sdw97p/IR39fvqpFlWDVpG7qnuU1Uc3+Xtc/0uqAp8U7bMW/bGuVF5CcNVIXwxQsWwUr6un6FQ==
 
-bintrees@1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/bintrees/-/bintrees-1.0.2.tgz#49f896d6e858a4a499df85c38fb399b9aff840f8"
-  integrity sha512-VOMgTMwjAaUG580SXn3LacVgjurrbMme7ZZNYGSSV7mmtY6QQRh0Eg3pwIcntQ77DErK1L0NxkbetjcoXzVwKw==
-
 data-uri-to-buffer@^4.0.0:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/data-uri-to-buffer/-/data-uri-to-buffer-4.0.1.tgz#d8feb2b2881e6a4f58c2e08acfd0e2834e26222e"
@@ -83,7 +73,7 @@ formdata-polyfill@^4.0.10:
   dependencies:
     fetch-blob "^3.1.2"
 
-lucid-cardano@^0.10.7:
+lucid-cardano@^0.10.10:
   version "0.10.10"
   resolved "https://registry.yarnpkg.com/lucid-cardano/-/lucid-cardano-0.10.10.tgz#0ef56d6366419b0f740187791655251f54217e05"
   integrity sha512-Yp1o8/kbVUgkRpQqllGQCT9I9w70a+uQKSoJdZEHVrEo5MFbT3Vds314Q8ClqgExzN7pj9NHGbiwiow2ik7mUA==
@@ -106,14 +96,6 @@ node-fetch@^3.2.3:
     fetch-blob "^3.1.4"
     formdata-polyfill "^4.0.10"
 
-prom-client@^15.1.3:
-  version "15.1.3"
-  resolved "https://registry.yarnpkg.com/prom-client/-/prom-client-15.1.3.tgz#69fa8de93a88bc9783173db5f758dc1c69fa8fc2"
-  integrity sha512-6ZiOBfCywsD4k1BN9IX0uZhF+tJkV8q8llP64G5Hajs4JOeVLPCwpPVcpXy3BwYiUGgyJzsJJQeOIv7+hDSq8g==
-  dependencies:
-    "@opentelemetry/api" "^1.4.0"
-    tdigest "^0.1.1"
-
 pvtsutils@^1.3.2, pvtsutils@^1.3.5:
   version "1.3.5"
   resolved "https://registry.yarnpkg.com/pvtsutils/-/pvtsutils-1.3.5.tgz#b8705b437b7b134cd7fd858f025a23456f1ce910"
@@ -125,18 +107,6 @@ pvutils@^1.1.3:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/pvutils/-/pvutils-1.1.3.tgz#f35fc1d27e7cd3dfbd39c0826d173e806a03f5a3"
   integrity sha512-pMpnA0qRdFp32b1sJl1wOJNxZLQ2cbQx+k6tjNtZ8CpvVhNqEPRgivZ2WOUev2YMajecdH7ctUPDvEe87nariQ==
-
-readline@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/readline/-/readline-1.3.0.tgz#c580d77ef2cfc8752b132498060dc9793a7ac01c"
-  integrity sha512-k2d6ACCkiNYz222Fs/iNze30rRJ1iIicW7JuX/7/cozvih6YCkFZH+J6mAFDVgv0dRBaAyr4jDqC95R2y4IADg==
-
-tdigest@^0.1.1:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/tdigest/-/tdigest-0.1.2.tgz#96c64bac4ff10746b910b0e23b515794e12faced"
-  integrity sha512-+G0LLgjjo9BZX2MfdvPfH+MKLCrxlXSYec5DaPYP1fe6Iyhf0/fSmJ0bFiZ1F8BT6cGXl2LpltQptzjXKWEkKA==
-  dependencies:
-    bintrees "1.0.2"
 
 tslib@^2.0.0, tslib@^2.4.0, tslib@^2.6.1, tslib@^2.6.2, tslib@^2.7.0:
   version "2.8.0"
