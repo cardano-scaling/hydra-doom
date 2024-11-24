@@ -24,9 +24,9 @@ const useUrls = () => {
   } else {
     return {
       newGame: (address: string) =>
-        `https://api.${region}.hydra-doom.sundae.fi/new_game?address=${address}`,
+        `https://api.${region?.value}.hydra-doom.sundae.fi/new_game?address=${address}`,
       addPlayer: (address: string, code: string) =>
-        `https://api.${region}.hydra-doom.sundae.fi/add_player?address=${address}&id=${code}`,
+        `https://api.${region?.value}.hydra-doom.sundae.fi/add_player?address=${address}&id=${code}`,
       share: (code?: string) =>
         code ? `${window.location.origin}/join/${code}` : "",
     };
