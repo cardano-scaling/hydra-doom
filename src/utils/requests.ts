@@ -1,5 +1,5 @@
 import { API_BASE_URL, API_KEY } from "../constants";
-import { AuthResponse } from "../types";
+import { AuthResponse, GameStatistics } from "../types";
 
 export const fetchAuthProviders = async (): Promise<string[]> => {
   const response = await fetch(`${API_BASE_URL}/auth/providers`);
@@ -17,6 +17,18 @@ export const checkSignin = async (
   );
   if (!response.ok) {
     throw new Error("Failed to check sign-in status");
+  }
+  return response.json();
+};
+
+export const fetchGlobalStats = async (
+  region: string,
+): Promise<GameStatistics> => {
+  const response = await fetch(
+    `https://api.${region}.hydra-doom.sundae.fi/global_stats`,
+  );
+  if (!response.ok) {
+    throw new Error("Failed to fetch global stats");
   }
   return response.json();
 };
