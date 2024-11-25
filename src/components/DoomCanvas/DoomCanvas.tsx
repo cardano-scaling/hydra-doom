@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { EGameType, EmscriptenModule, NewGameResponse } from "../../types";
 import { useAppContext } from "../../context/useAppContext";
 import { getArgs } from "../../utils/game";
@@ -11,10 +11,10 @@ import createModule from "../../../websockets-doom.js";
 import { useUrls } from "../../hooks/useUrls";
 import { C, fromHex } from "lucid-cardano";
 import { HydraMultiplayerClient } from "../../utils/HydraMultiplayer/client.js";
+import cx from "classnames";
 
 const DoomCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const isGameDataFetched = useRef(false);
   const {
     gameData: { code, petName, type },
     keys,
@@ -23,8 +23,13 @@ const DoomCanvas: React.FC = () => {
   const { address } = keys || {};
   const urlClipboard = useClipboard({ copiedTimeout: 1500 });
   const { newGame, addPlayer, share } = useUrls();
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { mutate: fetchGameData, data } = useMutation<NewGameResponse>({
+  const {
+    mutate: fetchGameData,
+    data,
+    isError,
+  } = useMutation<NewGameResponse>({
     mutationKey: ["fetchGameData", address, code, type],
     mutationFn: async () => {
       if (type === EGameType.SOLO) {
@@ -47,8 +52,7 @@ const DoomCanvas: React.FC = () => {
   );
 
   useEffect(() => {
-    if (!address || !region || isGameDataFetched.current) return;
-    isGameDataFetched.current = true;
+    if (!address || !region) return;
 
     fetchGameData();
   }, [address, fetchGameData, region]);
@@ -86,7 +90,9 @@ const DoomCanvas: React.FC = () => {
         });
       },
       printErr: console.error,
-      postRun: () => {},
+      postRun: () => {
+        setIsLoading(false);
+      },
       canvas: canvas,
       print: (text: string) => {
         console.log("stdout:", text);
@@ -94,7 +100,7 @@ const DoomCanvas: React.FC = () => {
       setStatus: (text: string) => {
         console.log("setStatus:", text);
       },
-      onRuntimeInitialized: function () {},
+      onRuntimeInitialized: () => {},
     };
 
     // Attach Module to the window object to make it globally accessible
@@ -130,10 +136,23 @@ const DoomCanvas: React.FC = () => {
 
   return (
     <>
-      <Card className="h-[40rem]">
-        <canvas id="canvas" ref={canvasRef} className="w-full h-full" />
+      <Card className="h-[40rem] relative">
+        <canvas
+          id="canvas"
+          ref={canvasRef}
+          className={cx("w-full h-full", { "opacity-0": isLoading || isError })}
+        />
+        {(isLoading || isError) && (
+          <div className="absolute inset-0 flex items-center justify-center text-yellow-400 text-4xl text-center px-4 w-4/5 mx-auto">
+            {isLoading && !isError
+              ? "Loading..."
+              : type === EGameType.HOST
+                ? "We're spinning up more servers to meet demand, please try again later."
+                : "Oops! You can't join this game right now. It may have already started or hasn't begun yet. Please try again later or check for a new game to join!"}
+          </div>
+        )}
       </Card>
-      {type === EGameType.HOST && (
+      {type === EGameType.HOST && data?.game_id && (
         <Card className="px-4 py-2 text-center text-xl text-white flex items-center gap-2 justify-center">
           Share this URL with friends{" "}
           <a
