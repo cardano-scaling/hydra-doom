@@ -1,5 +1,12 @@
 import { createContext, Dispatch, useContext } from "react";
-import { Account, EGameType, GameData, Keys, Region } from "../types";
+import {
+  Account,
+  EGameType,
+  GameData,
+  GameStatistics,
+  Keys,
+  Region,
+} from "../types";
 import { MAX_PLAYERS } from "../constants";
 
 interface AppContextInterface {
@@ -7,6 +14,8 @@ interface AppContextInterface {
   bestRegion: Region | null;
   bots: number;
   gameData: GameData;
+  globalStats?: GameStatistics;
+  isLoadingGlobalStats: boolean;
   isLoadingUserData: boolean;
   keys: Keys | null;
   players: number;
@@ -22,6 +31,8 @@ export const AppContext = createContext<AppContextInterface>({
   bestRegion: null,
   bots: MAX_PLAYERS - 1,
   gameData: { petName: "", code: "", type: EGameType.SOLO },
+  globalStats: undefined,
+  isLoadingGlobalStats: false,
   isLoadingUserData: false,
   keys: null,
   players: 1,

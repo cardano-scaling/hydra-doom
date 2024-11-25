@@ -1,6 +1,7 @@
 import { TIC_RATE_MAGIC } from "../constants";
 
-export const formatNumber = (num: number) => {
+export const formatNumber = (num?: number) => {
+  if (!num) return "-";
   return new Intl.NumberFormat("en").format(num);
 };
 
