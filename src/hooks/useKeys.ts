@@ -1,6 +1,5 @@
-import { useLocalStorage } from "usehooks-ts";
-import { HYDRA_DOOM_SESSION_KEY, NETWORK_ID } from "../constants";
-import { useEffect, useState, useCallback } from "react";
+import { NETWORK_ID } from "../constants";
+import { useEffect, useState, useRef } from "react";
 import { Lucid, toHex } from "lucid-cardano";
 import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
