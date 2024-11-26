@@ -6,10 +6,6 @@ export interface PlayerStats {
   [key: string]: number;
 }
 
-export interface PlayerPlayTime {
-  [key: string]: number[];
-}
-
 export interface GameStatistics {
   active_bots: number;
   active_games: number;
