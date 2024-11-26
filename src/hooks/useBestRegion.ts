@@ -14,27 +14,38 @@ const useBestRegion = (regions: Region[]) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isError, setIsError] = useState<boolean>(false);
 
-  const checkServerHealth = async (region: Region): Promise<ServerHealth> => {
+  const checkServerHealth = async (
+    region: Region,
+    rounds = 3,
+  ): Promise<ServerHealth> => {
     const url = healthUrl(region.value);
 
-    try {
+    let successfulRounds = 0;
+    let cumulativeLatency = 0;
+
+    for (let i = 0; i < rounds; i++) {
       const start = performance.now();
       const response = await fetch(url, { method: "HEAD" });
       const end = performance.now();
 
-      if (!response.ok) throw new Error("Server not healthy");
+      if (response.ok) {
+        cumulativeLatency += end - start;
+        successfulRounds += 1;
+      }
+    }
 
-      return {
-        region,
-        latency: end - start,
-      };
-    } catch (error: any) {
+    if (successfulRounds === 0) {
       return {
         region,
         latency: Infinity,
-        error: error.message,
+        error: "No successful rounds",
       };
     }
+
+    return {
+      region,
+      latency: cumulativeLatency / successfulRounds,
+    };
   };
 
   const results = useQueries({
