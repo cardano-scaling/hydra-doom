@@ -14,7 +14,9 @@ const GameView = () => {
       <RestartButton />
       <div className="grid grid-cols-[20.5rem_1fr_20.5rem] container gap-16 items-center">
         <GlobalTotals size="sm" titleAlign="left" />
-        <DoomCanvas />
+        <div className="flex flex-col gap-6">
+          <DoomCanvas />
+        </div>
         <GlobalTPS size="sm" titleAlign="left" />
       </div>
     </Layout>
