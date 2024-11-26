@@ -11,7 +11,6 @@ import { KinesisClient, PutRecordsCommand } from "@aws-sdk/client-kinesis";
 const NETWORK_ID = Number(process.env.NETWORK_ID);
 const HYDRA_NODE = "http://localhost:4001/";
 const RECORD_STATS = true;
-const API_KEY = process.env.API_KEY;
 
 const kinesis = new KinesisClient({ region: "us-east-1" }); // TODO: env variable?
 const encoder = new TextEncoder();
@@ -107,11 +106,8 @@ global.gameStarted = async () => {
 
   console.log("Updating game state to 'Running'.");
   try {
-    await fetch("http://api.us-east-1.hydra-doom.sundae.fi/start_game?id=a0", {
+    await fetch("http://localhost:8000/game/start_game", {
       method: "POST",
-      headers: {
-        Authorization: API_KEY,
-      },
     });
   } catch (e) {
     console.warn("Failed to update game state to 'Running': ", e);
@@ -201,11 +197,8 @@ try {
   if (Object.keys(data).length > 1) {
     console.log("Cleaning up old game state");
     try {
-      await fetch("http://api.us-east-1.hydra-doom.sundae.fi/cleanup?id=a0", {
+      await fetch("http://localhost:8080/game/cleanup", {
         method: "POST",
-        headers: {
-          Authorization: API_KEY,
-        },
       });
     } catch (e) {
       console.log("Failed to cleanup old game: ", e);
@@ -257,11 +250,8 @@ while (!done) {
 console.log("Game finished.");
 try {
   console.log("Ending game. Marking game as 'Aborted'.");
-  await fetch("http://api.us-east-1.hydra-doom.sundae.fi/end_game?id=a0", {
+  await fetch("http://localhost:8080/game/end_game", {
     method: "POST",
-    headers: {
-      Authorization: API_KEY,
-    },
   });
 } catch (e) {
   console.warn("Failed to mark game as ended: ", e);
