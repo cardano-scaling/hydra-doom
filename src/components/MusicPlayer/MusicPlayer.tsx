@@ -14,66 +14,50 @@ const MusicPlayer: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const currentAudioIndexRef = useRef<number>(currentIndex);
 
   useEffect(() => {
-    const handleEnded = () => {
-      // Advance to the next song, wrapping around to create an infinite loop
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % files.length);
-    };
-
-    let currentAudio = audioRef.current;
+    const currentAudio = audioRef.current;
 
     if (!currentAudio) {
-      // No audio object yet, create one
-      currentAudio = new Audio(files[currentIndex]);
-      currentAudio.volume = 0.2;
-      currentAudio.onerror = (e) => {
-        console.error("Audio playback error:", e);
-        handleEnded();
-      };
-      currentAudio.addEventListener("ended", handleEnded);
+      const newAudio = new Audio(files[currentIndex]);
+      newAudio.volume = 0.2;
 
-      audioRef.current = currentAudio;
-      currentAudioIndexRef.current = currentIndex;
-    } else if (currentAudioIndexRef.current !== currentIndex) {
-      // Song changed, create new Audio object
-      currentAudio.pause();
-      currentAudio.removeEventListener("ended", handleEnded);
+      newAudio.addEventListener("ended", () => {
+        // Advance to the next song and loop back to the start
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % files.length);
+      });
 
-      currentAudio = new Audio(files[currentIndex]);
-      currentAudio.volume = 0.2;
-      currentAudio.onerror = (e) => {
-        console.error("Audio playback error:", e);
-        handleEnded();
-      };
-      currentAudio.addEventListener("ended", handleEnded);
+      audioRef.current = newAudio;
+    } else {
+      // Load new audio when index changes
+      currentAudio.src = files[currentIndex];
+      currentAudio.load();
 
-      audioRef.current = currentAudio;
-      currentAudioIndexRef.current = currentIndex;
-
-      // If the player is supposed to be playing, start the new track
       if (isPlaying) {
         currentAudio.play();
       }
     }
 
-    if (isPlaying) {
-      if (currentAudio.paused) {
-        currentAudio.play();
-      }
-    } else {
-      currentAudio.pause();
-    }
-
     return () => {
-      // Cleanup when component unmounts
-      if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.removeEventListener("ended", handleEnded);
-      }
+      // Cleanup event listener on unmount
+      currentAudio?.pause();
+      currentAudio?.removeEventListener("ended", () => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % files.length);
+      });
     };
-  }, [isPlaying, currentIndex]);
+  }, [currentIndex, isPlaying]);
+
+  useEffect(() => {
+    const currentAudio = audioRef.current;
+
+    if (currentAudio) {
+      if (isPlaying) {
+        currentAudio.play();
+      } else {
+        currentAudio.pause();
+      }
+    }
+  }, [isPlaying]);
 
   // Automatically play the music when the component mounts
   useEffect(() => {
