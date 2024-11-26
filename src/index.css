@@ -75,6 +75,7 @@
   height: 19px;
   transform-origin: right center;
   transform: rotate(0deg);
+  transition: 0.3s;
 }
 
 .speedometer-tick::before {

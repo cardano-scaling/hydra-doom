@@ -136,11 +136,12 @@ const DoomCanvas: React.FC = () => {
 
   return (
     <>
-      <Card className="h-[40rem] relative">
+      <Card className="relative">
         <canvas
           id="canvas"
           ref={canvasRef}
-          className={cx("w-full h-full", { "opacity-0": isLoading || isError })}
+          className={cx("w-full", { "opacity-0": isLoading || isError })}
+          style={{ aspectRatio: "1028/805" }}
         />
         {(isLoading || isError) && (
           <div className="absolute inset-0 flex items-center justify-center text-yellow-400 text-4xl text-center px-4 w-4/5 mx-auto">
