@@ -15,12 +15,11 @@ import {
   TxComplete,
   Credential as Cred,
 } from "lucid-cardano";
-import { NETWORK_ID as CONSTANTS_NETWORK_ID } from "../constants";
 
 const NETWORK_ID =
   typeof process !== "undefined"
     ? Number(process.env.NETWORK_ID)
-    : CONSTANTS_NETWORK_ID;
+    : Number(import.meta.env.VITE_NETWORK_ID);
 const tx_parser = await Lucid.new(
   undefined,
   NETWORK_ID === 1 ? "Mainnet" : "Preprod",
