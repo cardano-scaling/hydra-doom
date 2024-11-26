@@ -128,7 +128,7 @@ global.playerConnected = async () => {
   if (!RECORD_STATS) return;
   try {
     // NOTE: We ignore ourselves for now, so the game doesn't enter "lobby" prematurely
-    if playerCount > 1 {
+    if (playerCount > 1) {
       await fetch("http://localhost:8000/player_joined", { method: "POST" });
     }
   } catch (e) {
