@@ -126,9 +126,11 @@ global.playerConnected = async () => {
   playerCount++;
   console.log(`Player joined, now ${playerCount} players`);
   if (!RECORD_STATS) return;
-  // NOTE: might need to ignore ourselves joining, so we don't inflate the player metrics
   try {
-    await fetch("http://localhost:8000/player_joined", { method: "POST" });
+    // NOTE: We ignore ourselves for now, so the game doesn't enter "lobby" prematurely
+    if playerCount > 1 {
+      await fetch("http://localhost:8000/player_joined", { method: "POST" });
+    }
   } catch (e) {
     console.warn("Failed to record player joined: ", e);
   }
