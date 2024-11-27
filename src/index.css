@@ -66,3 +66,25 @@
   height: 2px;
   background: #d1d5db;
 }
+
+.speedometer-tick {
+  position: absolute;
+  bottom: -2px;
+  left: 30px;
+  width: 113px;
+  height: 19px;
+  transform-origin: right center;
+  transform: rotate(0deg);
+  transition: 0.3s;
+}
+
+.speedometer-tick::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 23px;
+  width: 113px;
+  height: 19px;
+  background: url("speedometer-tick.png");
+  background-size: cover;
+}

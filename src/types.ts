@@ -6,26 +6,22 @@ export interface PlayerStats {
   [key: string]: number;
 }
 
-export interface PlayerPlayTime {
-  [key: string]: number[];
-}
-
 export interface GameStatistics {
+  active_bots: number;
   active_games: number;
-  bytes: number;
-  items_leaderboard: LeaderboardEntry[];
-  items: PlayerStats;
-  kills_leaderboard: LeaderboardEntry[];
-  kills: PlayerStats;
-  player_play_time: PlayerPlayTime;
-  secrets_leaderboard: LeaderboardEntry[];
-  secrets: PlayerStats;
+  active_players: number;
+  as_of: { secs_since_epoch: number; nanos_since_epoch: number };
+  bytes_per_second: number;
+  kills_per_minute: number;
+  suicides_per_minute: number;
+  total_bots: number;
+  total_bytes: number;
   total_games: number;
-  total_items: number;
   total_kills: number;
-  total_play_time: number;
-  total_secrets: number;
-  transactions: number;
+  total_players: number;
+  total_suicides: number;
+  total_txs: number;
+  txs_per_second: number;
 }
 
 export interface NewGameResponse {
@@ -114,4 +110,9 @@ export interface Keys {
   publicKeyHashBytes: Uint8Array;
   publicKeyHashHex: string;
   address: string;
+}
+
+export interface Region {
+  name: string;
+  value: string;
 }

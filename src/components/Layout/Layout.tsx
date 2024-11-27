@@ -4,7 +4,7 @@ import MainBackground from "../MainBackground";
 
 const Layout: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <main className="relative min-h-screen">
+    <main className="relative min-h-screen pb-8">
       <div className="z-20 relative flex flex-col items-center">
         <Logos />
         {children}

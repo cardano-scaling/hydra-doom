@@ -1,6 +1,5 @@
 import speedometer from "../../assets/images/speedometer.png";
-import speedometerTick from "../../assets/images/speedometer-tick.png";
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useMemo } from "react";
 import { mapRange } from "../../utils/speedometer";
 
 interface SpeedometerProps {
@@ -9,56 +8,27 @@ interface SpeedometerProps {
 }
 
 const Speedometer: FC<SpeedometerProps> = ({ maxSpeed, transactions }) => {
-  const [recentQueries, setRecentQueries] = useState<
-    { timestamp: number; transactions: number }[]
-  >([]);
-  const [value, setValue] = useState(0);
-
-  useEffect(() => {
-    if (
-      transactions &&
-      transactions !== recentQueries[recentQueries.length - 1]?.transactions
-    ) {
-      let newRecentQueries;
-      const item = {
-        timestamp: performance.now(),
-        transactions: transactions,
-      };
-      if (recentQueries.length === 5) {
-        newRecentQueries = [...recentQueries.slice(1), item];
-        const last = recentQueries[0];
-        const difference = transactions - last.transactions;
-        const timeDifference = (performance.now() - last.timestamp) / 1000;
-        setValue(Math.round(difference / timeDifference));
-      } else {
-        newRecentQueries = [...recentQueries, item];
-      }
-
-      setRecentQueries(newRecentQueries);
-    }
-  }, [recentQueries, transactions]);
-
   const degree = useMemo(
-    () => mapRange(value, 0, maxSpeed, 0, 180),
-    [maxSpeed, value],
+    () => mapRange(transactions, 0, maxSpeed, 0, 180),
+    [maxSpeed, transactions],
   );
 
   return (
     <div className="w-max text-white">
       <div className="relative mb-3">
-        <div className="absolute -bottom-1 left-9">{value}</div>
+        <div className="absolute -bottom-1 left-9">0</div>
         <img src={speedometer} alt="Speedometer" className="w-72" />
-        <img
-          alt="Speedometer tick"
-          className="absolute w-28 bottom-0 left-14"
-          src={speedometerTick}
-          style={{ transform: `rotate(${degree}deg)` }}
+        <div
+          className="speedometer-tick"
+          style={{
+            transform: `rotate(${degree}deg)`,
+          }}
         />
         <div className="absolute -bottom-1 right-9">
-          {Math.max(maxSpeed, value)}
+          {Math.max(maxSpeed, transactions)}
         </div>
       </div>
-      <div className="text-center">0</div>
+      <div className="text-center">{transactions}</div>
     </div>
   );
 };

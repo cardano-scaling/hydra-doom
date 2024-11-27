@@ -15,15 +15,21 @@ export class HydraMultiplayerClient extends HydraMultiplayer {
     filterAddress,
     url,
     module,
+    networkId = 0,
   }: {
     key: Keys;
     adminPkh: string;
     filterAddress?: string;
     url: string;
     module: EmscriptenModule;
+    networkId: number;
   }) {
-    super({ key, url, module, filterAddress });
-    this.outboundScript = getNativeScript(key.publicKeyHashHex, adminPkh, 0);
+    super({ key, url, module, filterAddress, networkId });
+    this.outboundScript = getNativeScript(
+      key.publicKeyHashHex,
+      adminPkh,
+      networkId,
+    );
   }
 
   public override async selectUTxO(): Promise<void> {
@@ -59,7 +65,7 @@ export class HydraMultiplayerClient extends HydraMultiplayer {
     const txBodyByHand =
       `a3` + // Prefix
       `0081825820${this.latestUTxO!.txHash}0${this.latestUTxO!.outputIndex}` + // One input
-      `0181a300581d70${this.outboundScript.hash}018200a0028201d818${lengthLengthTag}${datumLengthHex}${datum}` + // Output to (player || admin) native script
+      `0181a300581d${this.networkId === 0 ? "70" : "71"}${this.outboundScript.hash}018200a0028201d818${lengthLengthTag}${datumLengthHex}${datum}` + // Output to (player || admin) native script
       `0200`; // No fee
 
     const txId = toHex(blake2b(fromHex(txBodyByHand), { dkLen: 256 / 8 }));

@@ -14,8 +14,8 @@ const GlobalTPS: FC<GlobalTPSProps> = ({
   size = "md",
   titleAlign = "center",
 }) => {
-  const { globalQuery } = useAppContext();
-  const transactions = globalQuery?.data?.transactions ?? 0;
+  const { globalStats } = useAppContext();
+  const transactions = globalStats?.txs_per_second ?? 0;
 
   return (
     <div>
@@ -39,7 +39,10 @@ const GlobalTPS: FC<GlobalTPSProps> = ({
           "pt-4 pb-2 px-6": size === "lg",
         })}
       >
-        <Speedometer maxSpeed={GLOBAL_MAX_SPEED} transactions={transactions} />
+        <Speedometer
+          maxSpeed={GLOBAL_MAX_SPEED}
+          transactions={Math.round(transactions)}
+        />
       </Card>
     </div>
   );

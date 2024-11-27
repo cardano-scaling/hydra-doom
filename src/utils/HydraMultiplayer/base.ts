@@ -22,6 +22,7 @@ export abstract class HydraMultiplayer {
   latestUTxO: UTxO | null = null;
   packetQueue: Packet[] = [];
   module: EmscriptenModule;
+  networkId: number;
 
   gameId?: string;
 
@@ -38,14 +39,17 @@ export abstract class HydraMultiplayer {
     url,
     filterAddress,
     module,
+    networkId = 0,
   }: {
     key: Keys;
     url: string;
     module: EmscriptenModule;
     filterAddress?: string;
+    networkId?: number;
   }) {
     this.key = key;
     this.module = module;
+    this.networkId = networkId;
 
     this.hydra = new Hydra(url, filterAddress, 100);
     this.hydra.onTxSeen = this.onTxSeen.bind(this);

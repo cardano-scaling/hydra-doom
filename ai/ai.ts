@@ -6,6 +6,7 @@ import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
 
+const NETWORK_ID = Number(process.env.NETWORK_ID);
 // TODO: support multiple bots
 const HYDRA_NODE = "http://localhost:4001/";
 const bot_index = 0;
@@ -23,7 +24,10 @@ while (true) {
 
 // TODO: should we generate this key, like the UI does? no reason we need to keep it around
 let done = false;
-const lucid = await Lucid.new(undefined, "Preprod");
+const lucid = await Lucid.new(
+  undefined,
+  NETWORK_ID === 1 ? "Mainnet" : "Preprod",
+);
 
 const sessionKeyBech32 = lucid.utils.generatePrivateKey();
 const privateKeyBytes = bech32.decode(sessionKeyBech32).data;
@@ -76,6 +80,7 @@ global.HydraMultiplayer = new HydraMultiplayerClient({
   adminPkh: "",
   url: "http://localhost:4001",
   module: module,
+  networkId: NETWORK_ID,
 });
 
 // TODO: modify new-game transaction to record # of players

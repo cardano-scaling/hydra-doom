@@ -8,6 +8,8 @@ import LoginModal from "../LoginModal/LoginModal";
 import { useAppContext } from "../../context/useAppContext";
 import { EGameType } from "../../types";
 import { useSessionReferenceKeyCache } from "../../utils/localStorage";
+import GlobalTPS from "../GlobalTPS";
+import GlobalTotals from "../GlobalTotals";
 
 interface InitialViewProps {
   startGame: () => void;
@@ -116,7 +118,13 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
         alt="Hydra"
         className="w-full max-w-5xl relative -bottom-14 -mt-14 z-10 pointer-events-none"
       />
-      <div className="flex flex-col gap-6 items-center">{renderButtons()}</div>
+      <div className="flex flex-col gap-6 items-center mb-10">
+        {renderButtons()}
+      </div>
+      <div className="grid grid-cols-2 gap-56 w-full max-w-4xl">
+        <GlobalTotals />
+        <GlobalTPS />
+      </div>
       {isWelcomeModalOpen && (
         <Modal
           isOpen={isWelcomeModalOpen}
