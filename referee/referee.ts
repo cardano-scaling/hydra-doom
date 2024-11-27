@@ -93,12 +93,14 @@ const module = await createModule({
   },
 });
 global.Module = module;
-global.HydraMultiplayer = new HydraMultiplayerServer({
+
+const hydra = new HydraMultiplayerServer({
   key: keys,
   address: keys.address,
   url: HYDRA_NODE,
   module,
 });
+global.HydraMultiplayer = hydra;
 
 let playerCount = 0;
 global.gameStarted = async () => {
@@ -208,6 +210,14 @@ try {
   console.warn("Failed to fetch and parse node utxos: ", e);
 }
 
+// Log a new game or player joined transaction if we see it
+hydra.onNewGame = (gameId, players, bots, ephemeralKey) => {
+  console.log("New game: ", gameId, players, bots, ephemeralKey);
+};
+hydra.onPlayerJoin = (gameId, ephemeralKeys) => {
+  console.log("Join: ", gameId, ephemeralKeys);
+};
+
 const args = [
   "-server",
   "-altdeath",
@@ -220,7 +230,7 @@ const args = [
   "-extratics",
   "1",
   "-nodes",
-  "2",
+  "3",
   "-nodraw",
   "-nomouse",
   "-nograbmouse",

@@ -1,18 +1,10 @@
-import {
-  Constr,
-  Data,
-  fromHex,
-  toHex,
-  TxComplete,
-  TxHash,
-  UTxO,
-} from "lucid-cardano";
+import { Constr, Data, fromHex, toHex, TxHash, UTxO } from "lucid-cardano";
 import { Hydra } from ".././hydra";
 
 import * as ed25519 from "@noble/ed25519";
 import { sha512 } from "@noble/hashes/sha512";
 import { EmscriptenModule } from "../../types";
-import { Keys } from "../../hooks/useKeys";
+import { Keys } from "../../types";
 ed25519.etc.sha512Sync = (...m) => sha512(ed25519.etc.concatBytes(...m));
 
 export abstract class HydraMultiplayer {
@@ -23,6 +15,16 @@ export abstract class HydraMultiplayer {
   packetQueue: Packet[] = [];
   module: EmscriptenModule;
   networkId: number;
+
+  gameId?: string;
+
+  onNewGame?: (
+    gameId: string,
+    players: number,
+    bots: number,
+    ephemeralKey: string,
+  ) => void;
+  onPlayerJoin?: (gameId: string, ephemeralKeys: string[]) => void;
 
   constructor({
     key,
@@ -74,15 +76,32 @@ export abstract class HydraMultiplayer {
     this.packetQueue = [];
   }
 
-  public onTxSeen(_txId: TxHash, tx: TxComplete): void {
-    // TODO: tolerate other txs here
+  public onTxSeen(txId: TxHash, tx: any): void {
     try {
-      const output = tx.txComplete.body().outputs().get(0);
-      const packetsRaw = output?.datum()?.as_data()?.get().to_bytes();
-      if (!packetsRaw) {
+      const body = tx[0];
+      const outputs = body["1"];
+      const output = outputs[0];
+      const datumRaw: Uint8Array = output["2"][1].value;
+      if (!datumRaw) {
         return;
       }
-      const packets = decodePackets(packetsRaw);
+      const packets = decodePackets(datumRaw);
+      if (!packets) {
+        // We failed to decode packets, so this might be a new game or join game tx
+        const game = decodeGame(datumRaw);
+        if (this.gameId) {
+          this.onPlayerJoin?.(this.gameId, game.players);
+        } else {
+          this.gameId = txId;
+          this.onNewGame?.(
+            txId,
+            Number(game.playerCount),
+            Number(game.botCount),
+            game.players[0],
+          );
+        }
+        return;
+      }
       for (const packet of packets) {
         if (packet.to == this.myIP) {
           const buf = this.module._malloc!(packet.data.length);
@@ -118,14 +137,74 @@ function encodePackets(packets: Packet[]): string {
   );
 }
 
-function decodePackets(raw: Uint8Array): Packet[] {
+function decodePackets(raw: Uint8Array): Packet[] | undefined {
   const packets = Data.from(toHex(raw)) as Constr<Data>[];
-  return packets.map((packet) => {
-    const [to, from, data] = packet.fields;
-    return {
-      to: Number(to),
-      from: Number(from),
-      data: fromHex(data as string),
-    };
-  });
+  return packets instanceof Array
+    ? packets.map((packet) => {
+        const [to, from, data] = packet.fields;
+        return {
+          to: Number(to),
+          from: Number(from),
+          data: fromHex(data as string),
+        };
+      })
+    : undefined;
+}
+
+interface Game {
+  referee_key_hash: string;
+  playerCount: bigint;
+  botCount: bigint;
+  players: string[];
+  state: "Lobby" | "Running" | "Cheated" | "Finished" | "Aborted";
+  winner?: string;
+  cheater?: string;
+}
+
+function decodeGame(raw: Uint8Array): Game {
+  const game = Data.from(toHex(raw)) as Constr<Data>;
+  const [
+    referee_payment,
+    playerCountRaw,
+    botCountRaw,
+    player_payments,
+    stateTag,
+    winnerRaw,
+    cheaterRaw,
+  ] = game.fields;
+  const referee_key_hash = (referee_payment as Constr<Data>)
+    .fields[0] as string;
+  const playerCount = playerCountRaw as bigint;
+  const botCount = botCountRaw as bigint;
+  const players = (player_payments as Constr<Data>[]).map(
+    (player) => player.fields[0] as string,
+  );
+  let state: Game["state"] = "Aborted";
+  switch ((stateTag as Constr<Data>).index) {
+    case 0:
+      state = "Lobby";
+      break;
+    case 1:
+      state = "Running";
+      break;
+    case 2:
+      state = "Cheated";
+      break;
+    case 3:
+      state = "Finished";
+      break;
+    default:
+      state = "Aborted";
+  }
+  const winner = winnerRaw as Constr<Data>;
+  const cheater = cheaterRaw as Constr<Data>;
+  return {
+    referee_key_hash: referee_key_hash,
+    playerCount,
+    botCount,
+    players,
+    state: state,
+    winner: winner.index == 0 ? (winner.fields[0] as string) : undefined,
+    cheater: cheater.index == 0 ? (cheater.fields[0] as string) : undefined,
+  };
 }
