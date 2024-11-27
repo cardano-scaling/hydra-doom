@@ -229,6 +229,7 @@ try {
   }
 } catch (e) {
   console.warn("Failed to fetch and parse node utxos: ", e);
+  throw e;
 }
 
 // Log a new game or player joined transaction if we see it
