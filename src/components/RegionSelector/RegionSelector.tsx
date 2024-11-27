@@ -2,6 +2,7 @@ import { ChangeEventHandler, FC } from "react";
 import { REGIONS } from "../../constants";
 import { useAppContext } from "../../context/useAppContext";
 import { FaStar } from "react-icons/fa6";
+import cx from "classnames";
 
 const RegionSelector: FC = () => {
   const { region, setRegion, bestRegion } = useAppContext();
@@ -24,7 +25,10 @@ const RegionSelector: FC = () => {
               <label className="flex gap-4 items-center cursor-pointer">
                 <input
                   checked={value === region?.value}
-                  className="h-6 w-6"
+                  className={cx(
+                    "appearance-none w-7 h-7 rounded-full border-4 border-gray-500 transition-all duration-200 cursor-pointer",
+                    "checked:bg-yellow-400 checked:shadow-[0_0_6px_2px_rgba(255,223,0,0.08),0_0_15px_4px_rgba(255,223,0,0.15)]",
+                  )}
                   name="region"
                   onChange={handleChangeRegion}
                   type="radio"
