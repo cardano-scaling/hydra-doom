@@ -1,9 +1,8 @@
 import { fromHex, toHex, UTxO, C } from "lucid-cardano";
 
 import { blake2b } from "@noble/hashes/blake2b";
-import { EmscriptenModule } from "../../types";
+import { EmscriptenModule, Keys } from "../../types";
 import { HydraMultiplayer } from "./base";
-import { Keys } from "../../hooks/useKeys";
 
 export class HydraMultiplayerClient extends HydraMultiplayer {
   // outboundScript is ANY(player, admin) native script

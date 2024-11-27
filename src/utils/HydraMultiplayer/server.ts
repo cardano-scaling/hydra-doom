@@ -1,8 +1,7 @@
 import { fromHex, toHex, UTxO } from "lucid-cardano";
 import { HydraMultiplayer } from "./base";
-import { EmscriptenModule } from "../../types";
+import { EmscriptenModule, Keys } from "../../types";
 import { blake2b } from "@noble/hashes/blake2b";
-import { Keys } from "../../hooks/useKeys";
 
 export class HydraMultiplayerServer extends HydraMultiplayer {
   address: string;
