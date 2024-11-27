@@ -1,12 +1,4 @@
-import {
-  Constr,
-  Data,
-  fromHex,
-  toHex,
-  TxComplete,
-  TxHash,
-  UTxO,
-} from "lucid-cardano";
+import { Constr, Data, fromHex, toHex, TxHash, UTxO } from "lucid-cardano";
 import { Hydra } from ".././hydra";
 
 import * as ed25519 from "@noble/ed25519";
@@ -84,10 +76,12 @@ export abstract class HydraMultiplayer {
     this.packetQueue = [];
   }
 
-  public onTxSeen(txId: TxHash, tx: TxComplete): void {
+  public onTxSeen(txId: TxHash, tx: any): void {
     try {
-      const output = tx.txComplete.body().outputs().get(0);
-      const datumRaw = output?.datum()?.as_data()?.get().to_bytes();
+      const body = tx[0];
+      const outputs = body["1"];
+      const output = outputs[0];
+      const datumRaw: Uint8Array = output["2"][1].value;
       if (!datumRaw) {
         return;
       }

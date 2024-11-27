@@ -7,6 +7,7 @@ import {
   OutRef,
   ProtocolParameters,
   toHex,
+  fromHex,
   Transaction,
   TxHash,
   Unit,
@@ -15,6 +16,7 @@ import {
   TxComplete,
   Credential as Cred,
 } from "lucid-cardano";
+import { decode } from "cbor-x";
 
 const NETWORK_ID =
   typeof process !== "undefined"
@@ -45,7 +47,7 @@ export class Hydra {
   utxos: { [txRef: string]: UTxO };
   tombstones: { [txRef: string]: boolean };
 
-  onTxSeen?: (txId: TxHash, tx: TxComplete) => void;
+  onTxSeen?: (txId: TxHash, tx: any) => void;
   onTxConfirmed?: (txid: TxHash) => void;
   onTxInvalid?: (txid: TxHash) => void;
 
@@ -119,29 +121,9 @@ export class Hydra {
               this.tx_timings[txid].seen = seenTime;
               // console.log(`seen ${txid} after ${seenTime}ms`);
             }
-            const tx = tx_parser.fromTx(data.transaction.cborHex);
-            for (const input of tx.txComplete.body().inputs().to_js_value()) {
-              const ref = `${input.transaction_id}#${input.index}`;
-              if (this.utxos[ref]) {
-                delete this.utxos[ref];
-              } else {
-                this.tombstones[ref] = true;
-              }
-            }
-            let idx = 0;
-            for (const output of tx.txComplete.body().outputs().to_js_value()) {
-              const ref = `${tx.toHash()}#${idx}`;
-              if (!this.tombstones[ref]) {
-                this.utxos[ref] = hydraUtxoToLucidUtxo(
-                  tx.toHash(),
-                  idx,
-                  output,
-                );
-              }
-              idx++;
-            }
+            const cbor = fromHex(data.transaction.cborHex);
+            const tx = decode(cbor);
             this.onTxSeen?.(txid, tx);
-            tx.txComplete.free();
           }
           break;
         case "TxInvalid":

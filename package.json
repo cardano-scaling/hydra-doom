@@ -17,6 +17,7 @@
     "@noble/hashes": "^1.5.0",
     "@tanstack/react-query": "^5.55.4",
     "bech32-buffer": "^0.2.1",
+    "cbor-x": "^1.6.0",
     "classnames": "^2.5.1",
     "lodash": "^4.17.21",
     "lucid-cardano": "^0.10.10",
