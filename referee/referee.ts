@@ -115,7 +115,7 @@ global.gameStarted = async () => {
   console.log(`Game started with ${actors.length} connected players or bots`);
   // Fill in the rest of the actors with the admin key
   while (actors.length < expectedPlayers + expectedBots) {
-    actors.push(adminKey);
+    actors.push(keys.publicKeyHashHex);
   }
 
   console.log("Updating game state to 'Running'.");
@@ -160,6 +160,9 @@ global.playerDisconnected = async () => {
   console.log(`Player or bot disconnected, now ${playersInGame} players/bots`);
   if (playersInGame <= expectedBots) {
     // Only bots left, so we can end the game
+    console.log(
+      "All human players disconnected, or one of the AIs lost connection, ending game",
+    );
     done = true;
   }
   if (!RECORD_STATS) return;
@@ -240,7 +243,7 @@ hydra.onNewGame = async (newGameId, playerCount, botCount, ephemeralKey) => {
   expectedPlayers = playerCount;
   expectedBots = botCount;
   if (expectedBots > 0) {
-    actors.push(adminKey);
+    actors.push(keys.publicKeyHashHex);
   }
   actors.push(ephemeralKey);
   await Promise.all([
@@ -257,7 +260,7 @@ hydra.onNewGame = async (newGameId, playerCount, botCount, ephemeralKey) => {
 };
 hydra.onPlayerJoin = async (gameId, ephemeralKeys) => {
   const newPlayer = ephemeralKeys[ephemeralKeys.length - 1];
-  console.log(`Player joined ${gameId}, ${newPlayer}`);
+  console.log(`Observed player join for game ${gameId}, ${newPlayer}`);
   actors.push(newPlayer);
   await sendEvent(gameId, {
     type: "player_joined",
