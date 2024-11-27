@@ -246,17 +246,15 @@ hydra.onNewGame = async (newGameId, playerCount, botCount, ephemeralKey) => {
     actors.push(keys.publicKeyHashHex);
   }
   actors.push(ephemeralKey);
-  await Promise.all([
-    sendEvent(gameId, {
-      type: "new_game",
-      game_id: gameId,
-    }),
-    sendEvent(gameId, {
-      type: "player_joined",
-      game_id: gameId,
-      key: ephemeralKey,
-    }),
-  ]);
+  await sendEvent(gameId, {
+    type: "new_game",
+    game_id: gameId,
+  });
+  await sendEvent(gameId, {
+    type: "player_joined",
+    game_id: gameId,
+    key: ephemeralKey,
+  });
 };
 hydra.onPlayerJoin = async (gameId, ephemeralKeys) => {
   const newPlayer = ephemeralKeys[ephemeralKeys.length - 1];
