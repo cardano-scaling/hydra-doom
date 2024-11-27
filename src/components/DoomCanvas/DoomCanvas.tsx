@@ -12,6 +12,7 @@ import { useUrls } from "../../hooks/useUrls";
 import { C, fromHex } from "lucid-cardano";
 import { HydraMultiplayerClient } from "../../utils/HydraMultiplayer/client.js";
 import cx from "classnames";
+import { NETWORK_ID } from "../../constants.js";
 
 const DoomCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -117,6 +118,7 @@ const DoomCanvas: React.FC = () => {
         url: data.ip,
         module: Module,
         filterAddress: adminAddress.to_bech32(undefined),
+        networkId: NETWORK_ID,
       });
 
       adminAddress.free();
