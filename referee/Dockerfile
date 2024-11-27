@@ -10,6 +10,7 @@ USER node
 
 WORKDIR /usr/src
 COPY ./referee ./app
+COPY keep-node-alive.sh ./app/run.sh
 COPY ./referee/tsconfig.docker.json ./app/tsconfig.json
 COPY ./src/utils/HydraMultiplayer ./app/utils/HydraMultiplayer
 COPY ./src/utils/hydra.ts ./app/utils/hydra.ts
@@ -18,4 +19,4 @@ COPY ./public/ ./public/
 
 
 WORKDIR /usr/src/app
-CMD ["run.sh"]
+CMD ["run.sh", "referee.ts"]

@@ -1,6 +1,6 @@
 FROM node:20-alpine AS base
 
-RUN apk add 
+RUN apk add
 
 WORKDIR /usr/src/app
 RUN --mount=type=bind,source=ai/package.json,target=package.json \
@@ -9,6 +9,7 @@ RUN --mount=type=bind,source=ai/package.json,target=package.json \
 USER node
 
 WORKDIR /usr/src
+COPY keep-node-alive.sh ./app/run.sh
 COPY ./ai ./app
 COPY ./ai/tsconfig.docker.json ./app/tsconfig.json
 COPY ./src/utils/HydraMultiplayer ./app/utils/HydraMultiplayer
@@ -18,4 +19,4 @@ COPY ./public/ ./public/
 
 
 WORKDIR /usr/src/app
-CMD ["npx", "-y", "tsx", "ai.ts"]
+CMD ["run.sh", "ai.ts"]
