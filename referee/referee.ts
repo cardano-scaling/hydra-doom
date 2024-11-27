@@ -102,9 +102,21 @@ const hydra = new HydraMultiplayerServer({
 });
 global.HydraMultiplayer = hydra;
 
-let playerCount = 0;
+// NOTE: a lot of this code is brittle, because we're relying on the timing of transactions to match the game
+// There's not another clean way to map the ephemeral key to doom's notion of "player" index without a bunch of refactoring
+// That being said, for the purposes of the tournament, it should be a non-issue
+let expectedPlayers = 0;
+let expectedBots = 0;
+let timeout = 60_000;
+let gameId = "";
+const actors = [];
+
 global.gameStarted = async () => {
-  console.log(`Game started with ${playerCount} players`);
+  console.log(`Game started with ${actors.length} connected players or bots`);
+  // Fill in the rest of the actors with the admin key
+  while (actors.length < expectedPlayers + expectedBots) {
+    actors.push(adminKey);
+  }
 
   console.log("Updating game state to 'Running'.");
   try {
@@ -118,30 +130,36 @@ global.gameStarted = async () => {
   try {
     await Promise.all([
       fetch("http://localhost:8000/start_game", { method: "POST" }),
-      sendEvent("a0", { type: "game_started", game_id: "a0", keys: [] }),
+      sendEvent(gameId, {
+        type: "game_started",
+        game_id: gameId,
+        keys: actors,
+      }),
     ]);
   } catch (e) {
     console.warn("Failed to record game start: ", e);
   }
 };
+
+let playersInGame = 0;
 global.playerConnected = async () => {
-  playerCount++;
-  console.log(`Player joined, now ${playerCount} players`);
+  // NOTE: technically a subtle race condition here, but it won't be relevant for the event
+  playersInGame++;
+  console.log(
+    `Player or bot joined (${actors[playersInGame - 1]}), now ${playersInGame} players/bots`,
+  );
   if (!RECORD_STATS) return;
   try {
-    // NOTE: We ignore ourselves for now, so the game doesn't enter "lobby" prematurely
-    if (playerCount > 1) {
-      await fetch("http://localhost:8000/player_joined", { method: "POST" });
-    }
+    await fetch("http://localhost:8000/player_joined", { method: "POST" });
   } catch (e) {
     console.warn("Failed to record player joined: ", e);
   }
 };
 global.playerDisconnected = async () => {
-  playerCount--;
-  console.log(`Player left, now ${playerCount} players`);
-  if (playerCount === 1) {
-    // We're the last player, so quit
+  playersInGame--;
+  console.log(`Player or bot disconnected, now ${playersInGame} players/bots`);
+  if (playersInGame <= expectedBots) {
+    // Only bots left, so we can end the game
     done = true;
   }
   if (!RECORD_STATS) return;
@@ -152,18 +170,18 @@ global.playerDisconnected = async () => {
   }
 };
 global.kill = async (killer, victim) => {
-  console.log(`Player ${killer} killed ${victim}`);
+  console.log(
+    `Player ${killer} (${actors[killer]}) killed ${victim} (${actors[victim]})`,
+  );
   if (!RECORD_STATS) return;
-  // TODO: map from player idx to ephemeral key
-  // TODO: ddz leaderboards
   try {
     await Promise.all([
       fetch("http://localhost:8000/player_killed", { method: "POST" }),
-      sendEvent("a0", {
+      sendEvent(gameId, {
         type: "kill",
-        game_id: "a0",
-        killer: "addr1abc",
-        victim: "addr1def",
+        game_id: gameId,
+        killer: actors[killer],
+        victim: actors[victim],
       }),
     ]);
   } catch (e) {
@@ -177,11 +195,11 @@ global.suicide = async (player) => {
   try {
     await Promise.all([
       fetch("http://localhost:8000/player_suicided", { method: "POST" }),
-      sendEvent("a0", {
+      sendEvent(gameId, {
         type: "kill",
-        game_id: "a0",
-        killer: "addr1def",
-        victim: "addr1def",
+        game_id: gameId,
+        killer: actors[player],
+        victim: actors[player],
       }),
     ]);
   } catch (e) {
@@ -211,12 +229,47 @@ try {
 }
 
 // Log a new game or player joined transaction if we see it
-hydra.onNewGame = (gameId, players, bots, ephemeralKey) => {
-  console.log("New game: ", gameId, players, bots, ephemeralKey);
+hydra.onTxSeen = () => {
+  timeout = 60_000;
 };
-hydra.onPlayerJoin = (gameId, ephemeralKeys) => {
-  console.log("Join: ", gameId, ephemeralKeys);
+hydra.onNewGame = async (newGameId, playerCount, botCount, ephemeralKey) => {
+  console.log(
+    `Observed new game: ${newGameId} with ${playerCount} players and ${botCount} bots, by ${ephemeralKey}`,
+  );
+  gameId = newGameId;
+  expectedPlayers = playerCount;
+  expectedBots = botCount;
+  if (expectedBots > 0) {
+    actors.push(adminKey);
+  }
+  actors.push(ephemeralKey);
+  await Promise.all([
+    sendEvent(gameId, {
+      type: "new_game",
+      game_id: gameId,
+    }),
+    sendEvent(gameId, {
+      type: "player_joined",
+      game_id: gameId,
+      key: ephemeralKey,
+    }),
+  ]);
 };
+hydra.onPlayerJoin = async (gameId, ephemeralKeys) => {
+  const newPlayer = ephemeralKeys[ephemeralKeys.length - 1];
+  console.log(`Player joined ${gameId}, ${newPlayer}`);
+  actors.push(newPlayer);
+  await sendEvent(gameId, {
+    type: "player_joined",
+    game_id: gameId,
+    key: newPlayer,
+  });
+};
+
+// Wait until the game starts
+while (!gameId) {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+}
 
 const args = [
   "-server",
@@ -226,11 +279,9 @@ const args = [
   "-merge",
   "dm_iog.wad",
   "iog_assets.wad",
-  "-ai",
-  "-extratics",
-  "1",
+  expectedBots > 0 ? "-ai" : "-drone",
   "-nodes",
-  "3",
+  (expectedPlayers + expectedBots).toString(),
   "-nodraw",
   "-nomouse",
   "-nograbmouse",
@@ -255,6 +306,11 @@ try {
 
 while (!done) {
   await new Promise((resolve) => setTimeout(resolve, 1000));
+  timeout -= 1000;
+  if (timeout <= 0) {
+    console.log("Game timed out.");
+    done = true;
+  }
 }
 
 console.log("Game finished.");

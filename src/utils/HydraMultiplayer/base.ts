@@ -25,6 +25,7 @@ export abstract class HydraMultiplayer {
     ephemeralKey: string,
   ) => void;
   onPlayerJoin?: (gameId: string, ephemeralKeys: string[]) => void;
+  onTxSeen?: (txId: TxHash, tx: any) => void; // refresh timeout timers
 
   constructor({
     key,
@@ -44,7 +45,7 @@ export abstract class HydraMultiplayer {
     this.networkId = networkId;
 
     this.hydra = new Hydra(url, filterAddress, 100);
-    this.hydra.onTxSeen = this.onTxSeen.bind(this);
+    this.hydra.onTxSeen = this.observeTx.bind(this);
 
     this.SendPacket = this.SendPacket.bind(this);
     this.setIP = this.setIP.bind(this);
@@ -76,7 +77,7 @@ export abstract class HydraMultiplayer {
     this.packetQueue = [];
   }
 
-  public onTxSeen(txId: TxHash, tx: any): void {
+  public observeTx(txId: TxHash, tx: any): void {
     try {
       const body = tx[0];
       const outputs = body["1"];
@@ -108,6 +109,7 @@ export abstract class HydraMultiplayer {
           this.module.HEAPU8!.set(packet.data, buf);
           this.module._ReceivePacket!(packet.from, buf, packet.data.length);
           this.module._free!(buf);
+          this.onTxSeen?.(txId, tx);
         }
       }
     } catch (err) {
