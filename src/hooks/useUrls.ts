@@ -10,12 +10,12 @@ const healthUrl = (region: string) => {
 };
 
 const useUrls = () => {
-  const { region } = useAppContext();
+  const { region, players, bots } = useAppContext();
 
   if (IS_LOCAL) {
     return {
       newGame: (address: string) =>
-        `http://localhost:3000/new_game?address=${address}`,
+        `http://localhost:3000/new_game?address=${address}&player_count=${players}&bot_count=${bots}`,
       addPlayer: (address: string, code: string) =>
         `http://localhost:3000/add_player?address=${address}&id=${code}`,
       share: (code?: string) =>
@@ -24,7 +24,7 @@ const useUrls = () => {
   } else {
     return {
       newGame: (address: string) =>
-        `https://api.${region?.value}.hydra-doom.sundae.fi/new_game?address=${address}`,
+        `https://api.${region?.value}.hydra-doom.sundae.fi/new_game?address=${address}&player_count=${players}&bot_count=${bots}`,
       addPlayer: (address: string, code: string) =>
         `https://api.${region?.value}.hydra-doom.sundae.fi/add_player?address=${address}&id=${code}`,
       share: (code?: string) =>

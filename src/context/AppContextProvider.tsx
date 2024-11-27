@@ -9,7 +9,7 @@ import {
 } from "../types";
 import useBestRegion from "../hooks/useBestRegion";
 import useKeys from "../hooks/useKeys";
-import { MAX_PLAYERS, REGIONS } from "../constants";
+import { REGIONS } from "../constants";
 import { useQuery } from "@tanstack/react-query";
 import { useSessionReferenceKeyCache } from "../utils/localStorage";
 import { checkSignin, fetchGlobalStats } from "../utils/requests";
@@ -25,8 +25,8 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
   });
   const [accountData, setAccountData] = useState<Account>();
   const [region, setRegion] = useState<Region | null>(null);
-  const [players, setPlayers] = useState(1);
-  const bots = MAX_PLAYERS - players;
+  const [players, setPlayers] = useState(2);
+  const [bots, setBots] = useState(0);
 
   const { data: userData, isLoading: isLoadingUserData } =
     useQuery<AuthResponse>({
@@ -71,6 +71,7 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
       players,
       region,
       setAccountData,
+      setBots,
       setGameData,
       setPlayers,
       setRegion,

@@ -19,8 +19,15 @@ const SetNameModal: FC<SetNameModalProps> = ({
   submit,
   title,
 }) => {
-  const { setGameData, gameData, accountData, players, setPlayers, bots } =
-    useAppContext();
+  const {
+    accountData,
+    bots,
+    gameData,
+    players,
+    setBots,
+    setGameData,
+    setPlayers,
+  } = useAppContext();
 
   useEffect(() => {
     const petName = accountData ? accountData.auth_name : generateRandomName();
@@ -39,8 +46,14 @@ const SetNameModal: FC<SetNameModalProps> = ({
     setGameData((prev) => ({ ...prev, petName: generateRandomName() }));
   };
 
-  const handleSliderChange = (event) => {
-    setPlayers(Number(event.target.value));
+  const handleSelectPlayers = (event) => {
+    const value = Number(event.target.value);
+    setPlayers(value);
+    if (bots > value - 1) setBots(value - 1);
+  };
+
+  const handleSelectBots = (event) => {
+    setBots(Number(event.target.value));
   };
 
   const isButtonDisabled =
@@ -102,31 +115,61 @@ const SetNameModal: FC<SetNameModalProps> = ({
         {title !== "Join Multiplayer" && (
           <>
             <div className="border-2 border-white px-6 pt-8 pb-6 relative">
-              <label className="absolute -top-5 left-6 bg-[#1D1715] text-white px-2 text-3xl">
+              <div className="absolute -top-5 left-6 bg-[#1D1715] text-white px-2 text-3xl">
                 Number of Players
-              </label>
-              <input
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-slider"
-                max={MAX_PLAYERS}
-                min="1"
-                onChange={handleSliderChange}
-                type="range"
-                value={players}
-              />
-              <div className="flex justify-between text-base text-gray-400 mb-6">
+              </div>
+              <div className="flex justify-between">
                 {Array.from({ length: MAX_PLAYERS }, (_, i) => i + 1).map(
-                  (i) => (
-                    <span key={i}>{i}</span>
-                  ),
+                  (value) => {
+                    if (value === 1) return null;
+                    return (
+                      <label
+                        className="flex items-center gap-2"
+                        htmlFor={`players-${value}`}
+                        key={value}
+                      >
+                        <input
+                          checked={players === value}
+                          className="h-6 w-6 cursor-pointer"
+                          id={`players-${value}`}
+                          onChange={handleSelectPlayers}
+                          type="radio"
+                          value={value}
+                        />
+                        {value}
+                      </label>
+                    );
+                  },
                 )}
               </div>
-              <div className="flex justify-between text-3xl">
-                <p className="">
-                  Players: <span className="font-semibold">{players}</span>
-                </p>
-                <p className="">
-                  Bots: <span className="font-semibold">{bots}</span>
-                </p>
+            </div>
+            <div className="border-2 border-white px-6 pt-8 pb-6 relative">
+              <div className="absolute -top-5 left-6 bg-[#1D1715] text-white px-2 text-3xl">
+                Number of Bots
+              </div>
+              <div className="flex justify-between">
+                {Array.from({ length: MAX_PLAYERS }, (_, i) => i).map(
+                  (value) => (
+                    <label
+                      className="flex items-center gap-2"
+                      htmlFor={`bots-${value}`}
+                      key={value}
+                    >
+                      <input
+                        checked={bots === value}
+                        className="h-6 w-6 peer disabled:cursor-not-allowed disabled:opacity-50"
+                        disabled={value > players - 1}
+                        id={`bots-${value}`}
+                        onChange={handleSelectBots}
+                        type="radio"
+                        value={value}
+                      />
+                      <span className="peer-disabled:cursor-not-allowed peer-disabled:opacity-50 cursor-pointer">
+                        {value}
+                      </span>
+                    </label>
+                  ),
+                )}
               </div>
             </div>
             <RegionSelector />
