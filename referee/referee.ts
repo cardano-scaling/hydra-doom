@@ -220,7 +220,7 @@ try {
   if (Object.keys(data).length > 1) {
     console.log("Cleaning up old game state");
     try {
-      await fetch("http://localhost:8080/game/cleanup", {
+      await fetch("http://localhost:8000/game/cleanup", {
         method: "POST",
       });
     } catch (e) {
@@ -317,7 +317,7 @@ while (!done) {
 console.log("Game finished.");
 try {
   console.log("Ending game. Marking game as 'Aborted'.");
-  await fetch("http://localhost:8080/game/end_game", {
+  await fetch("http://localhost:8000/game/end_game", {
     method: "POST",
   });
 } catch (e) {
