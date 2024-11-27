@@ -95,8 +95,8 @@ export abstract class HydraMultiplayer {
           this.gameId = txId;
           this.onNewGame?.(
             txId,
-            game.human_players,
-            game.bots,
+            Number(game.playerCount),
+            Number(game.botCount),
             game.players[0],
           );
         }
@@ -153,8 +153,8 @@ function decodePackets(raw: Uint8Array): Packet[] | undefined {
 
 interface Game {
   referee_key_hash: string;
-  human_players: number; // TODO:
-  bots: number; // TODO:
+  playerCount: bigint;
+  botCount: bigint;
   players: string[];
   state: "Lobby" | "Running" | "Cheated" | "Finished" | "Aborted";
   winner?: string;
@@ -163,10 +163,19 @@ interface Game {
 
 function decodeGame(raw: Uint8Array): Game {
   const game = Data.from(toHex(raw)) as Constr<Data>;
-  const [referee_payment, player_payments, stateTag, winnerRaw, cheaterRaw] =
-    game.fields;
+  const [
+    referee_payment,
+    playerCountRaw,
+    botCountRaw,
+    player_payments,
+    stateTag,
+    winnerRaw,
+    cheaterRaw,
+  ] = game.fields;
   const referee_key_hash = (referee_payment as Constr<Data>)
     .fields[0] as string;
+  const playerCount = playerCountRaw as bigint;
+  const botCount = botCountRaw as bigint;
   const players = (player_payments as Constr<Data>[]).map(
     (player) => player.fields[0] as string,
   );
@@ -191,8 +200,8 @@ function decodeGame(raw: Uint8Array): Game {
   const cheater = cheaterRaw as Constr<Data>;
   return {
     referee_key_hash: referee_key_hash,
-    human_players: 2,
-    bots: 1,
+    playerCount,
+    botCount,
     players,
     state: state,
     winner: winner.index == 0 ? (winner.fields[0] as string) : undefined,
