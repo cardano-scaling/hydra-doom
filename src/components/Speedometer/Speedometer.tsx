@@ -15,9 +15,9 @@ const Speedometer: FC<SpeedometerProps> = ({ maxSpeed, transactions }) => {
 
   return (
     <div className="w-max text-white">
-      <div className="relative mb-3">
+      <div className="relative mb-4">
         <div className="absolute -bottom-1 left-9">0</div>
-        <img src={speedometer} alt="Speedometer" className="w-72" />
+        <img src={speedometer} alt="Speedometer" className="w-[288px]" />
         <div
           className="speedometer-tick"
           style={{

@@ -120,7 +120,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
       <div className="flex flex-col gap-6 items-center mb-10">
         {renderButtons()}
       </div>
-      <div className="grid grid-cols-2 gap-56 w-full max-w-4xl">
+      <div className="grid grid-cols-2 gap-52 w-full max-w-5xl">
         <GlobalTotals />
         <GlobalTPS />
       </div>
