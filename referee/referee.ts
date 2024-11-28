@@ -105,17 +105,21 @@ global.HydraMultiplayer = hydra;
 // NOTE: a lot of this code is brittle, because we're relying on the timing of transactions to match the game
 // There's not another clean way to map the ephemeral key to doom's notion of "player" index without a bunch of refactoring
 // That being said, for the purposes of the tournament, it should be a non-issue
-let expectedPlayers = 0;
+let expectedHumans = 0;
 let expectedBots = 0;
 let timeout = 60_000;
 let gameId = "";
 const actors = [];
+const players = [];
+const isHuman = [];
 
 global.gameStarted = async () => {
-  console.log(`Game started with ${actors.length} connected players or bots`);
+  console.log(`Game started with ${players.length} connected players or bots`);
   // Fill in the rest of the actors with the admin key
-  while (actors.length < expectedPlayers + expectedBots) {
-    actors.push(keys.publicKeyHashHex);
+  while (players.length < expectedHumans + expectedBots) {
+    actors.push(keys.publicKeyHashHex); // TODO: give each bot their own key? have htem join the game?
+    players.push(keys.publicKeyHashHex);
+    isHuman.push(false);
   }
 
   console.log("Updating game state to 'Running'.");
@@ -133,7 +137,7 @@ global.gameStarted = async () => {
       sendEvent(gameId, {
         type: "game_started",
         game_id: gameId,
-        keys: actors,
+        keys: players,
       }),
     ]);
   } catch (e) {
@@ -141,24 +145,30 @@ global.gameStarted = async () => {
   }
 };
 
-let playersInGame = 0;
+let actorsInGame = 0;
 global.playerConnected = async () => {
   // NOTE: technically a subtle race condition here, but it won't be relevant for the event
-  playersInGame++;
-  console.log(
-    `Player or bot joined (${actors[playersInGame - 1]}), now ${playersInGame} players/bots`,
-  );
-  if (!RECORD_STATS) return;
-  try {
-    await fetch("http://localhost:8000/player_joined", { method: "POST" });
-  } catch (e) {
-    console.warn("Failed to record player joined: ", e);
+  actorsInGame++;
+  if (actorsInGame == 1 && expectedBots == 0) {
+    console.log(`Observer joined`);
+  } else {
+    console.log(
+      `Player or bot joined (${actors[actorsInGame - 1]}), now ${actorsInGame} connected actors`,
+    );
+    if (!RECORD_STATS) return;
+    try {
+      await fetch("http://localhost:8000/player_joined", { method: "POST" });
+    } catch (e) {
+      console.warn("Failed to record player joined: ", e);
+    }
   }
 };
 global.playerDisconnected = async () => {
-  playersInGame--;
-  console.log(`Player or bot disconnected, now ${playersInGame} players/bots`);
-  if (playersInGame <= expectedBots) {
+  actorsInGame--;
+  console.log(
+    `Player or bot disconnected, now ${actorsInGame} connected actors`,
+  );
+  if (actorsInGame <= expectedBots) {
     // Only bots left, so we can end the game
     console.log(
       "All human players disconnected, or one of the AIs lost connection, ending game",
@@ -174,7 +184,7 @@ global.playerDisconnected = async () => {
 };
 global.kill = async (killer, victim) => {
   console.log(
-    `Player ${killer} (${actors[killer]}) killed ${victim} (${actors[victim]})`,
+    `Player ${killer} (${players[killer]}) killed ${victim} (${players[victim]})`,
   );
   if (!RECORD_STATS) return;
   try {
@@ -183,8 +193,8 @@ global.kill = async (killer, victim) => {
       sendEvent(gameId, {
         type: "kill",
         game_id: gameId,
-        killer: actors[killer],
-        victim: actors[victim],
+        killer: players[killer],
+        victim: players[victim],
       }),
     ]);
   } catch (e) {
@@ -236,20 +246,30 @@ try {
 hydra.onTxSeen = () => {
   timeout = 60_000;
 };
-hydra.onNewGame = async (newGameId, playerCount, botCount, ephemeralKey) => {
+hydra.onNewGame = async (newGameId, humanCount, botCount, ephemeralKey) => {
   console.log(
-    `Observed new game: ${newGameId} with ${playerCount} players and ${botCount} bots, by ${ephemeralKey}`,
+    `Observed new game: ${newGameId} with ${humanCount} human players and ${botCount} bots, by ${ephemeralKey}`,
   );
   gameId = newGameId;
-  expectedPlayers = playerCount;
+  expectedHumans = humanCount;
   expectedBots = botCount;
-  if (expectedBots > 0) {
-    actors.push(keys.publicKeyHashHex);
-  }
+  // The first actor to connect will always be this process
+  actors.push(keys.publicKeyHashHex);
+  // then the player who starts the game is expected to connect
   actors.push(ephemeralKey);
+  // If there's at least one ai, this process will serve as the first player
+  if (expectedBots > 0) {
+    players.push(keys.publicKeyHashHex);
+    isHuman.push(false);
+  }
+  // and then the player who started the game
+  players.push(ephemeralKey);
+  isHuman.push(true);
   await sendEvent(gameId, {
     type: "new_game",
     game_id: gameId,
+    humans: humanCount,
+    bots: botCount,
   });
   await sendEvent(gameId, {
     type: "player_joined",
@@ -261,6 +281,8 @@ hydra.onPlayerJoin = async (gameId, ephemeralKeys) => {
   const newPlayer = ephemeralKeys[ephemeralKeys.length - 1];
   console.log(`Observed player join for game ${gameId}, ${newPlayer}`);
   actors.push(newPlayer);
+  players.push(newPlayer);
+  isHuman.push(true);
   await sendEvent(gameId, {
     type: "player_joined",
     game_id: gameId,
@@ -283,7 +305,7 @@ const args = [
   "iog_assets.wad",
   expectedBots > 0 ? "-ai" : "-drone",
   "-nodes",
-  (expectedPlayers + expectedBots).toString(),
+  (expectedHumans + expectedBots).toString(),
   "-nodraw",
   "-nomouse",
   "-nograbmouse",

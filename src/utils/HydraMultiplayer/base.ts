@@ -82,7 +82,7 @@ export abstract class HydraMultiplayer {
       const body = tx[0];
       const outputs = body["1"];
       const output = outputs[0];
-      const datumRaw: Uint8Array = output["2"][1].value;
+      const datumRaw: Uint8Array | undefined = output?.["2"]?.[1]?.value;
       if (!datumRaw) {
         return;
       }
