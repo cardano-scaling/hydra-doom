@@ -19,4 +19,4 @@ COPY ./public/ ./public/
 
 
 WORKDIR /usr/src/app
-CMD ["sh","/run.sh", "ai.ts"]
+CMD ["sh","./run.sh", "ai.ts"]
