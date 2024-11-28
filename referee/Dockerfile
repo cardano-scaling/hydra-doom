@@ -19,4 +19,4 @@ COPY ./public/ ./public/
 
 
 WORKDIR /usr/src/app
-CMD ["run.sh", "referee.ts"]
+CMD ["sh", "/run.sh", "referee.ts"]
