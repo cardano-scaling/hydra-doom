@@ -8,6 +8,9 @@ export const REGIONS = [
   { name: "Virginia, NA", value: "us-east-1" },
   { name: "Frankfurt, Europe", value: "eu-central-1" },
   { name: "Oregon, NA", value: "us-west-2" },
+  { name: "Singapore", value: "ap-southeast-1" },
+  { name: "São Paulo, SA", value: "sa-east-1" },
+  { name: "Cape Town, Africa", value: "af-south-1" },
 ];
 export const TIC_RATE_MAGIC = 35; // 35 is the ticrate in DOOM WASM they use to calculate time.
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
