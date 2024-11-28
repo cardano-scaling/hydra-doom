@@ -19,6 +19,7 @@ while (true) {
   const data = await response.json();
   if (Object.keys(data).length > 1) {
     // Wait 5 seconds to allow the player to join
+    console.log("Game UTxO seen, waiting 5 seconds");
     await new Promise((resolve) => setTimeout(resolve, 5000));
     break;
   }
