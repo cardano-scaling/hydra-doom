@@ -57,16 +57,22 @@ const module = await createModule({
   },
   noInitialRun: true,
   preRun: function (mod: any) {
-    const files = ["freedoom2.wad", "default.cfg", "iog_assets.wad", "dm_iog.wad"];
+    const files = [
+      "freedoom2.wad",
+      "default.cfg",
+      "iog_assets.wad",
+      "dm_iog.wad",
+    ];
     files.forEach((file) => {
       mod.FS!.createPreloadedFile("/", file, "../public/" + file, true, true);
     });
   },
   canvas: null as any,
   print: (text: string) => {
-    console.log("stdout:", text);
+    // Silencing prints for now
   },
   printErr: (text: string) => {
+    // Leaving error messages
     console.error("stderr:", text);
   },
   onExit: () => {
