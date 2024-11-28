@@ -14,10 +14,9 @@ const bot_index = 0;
 // Wait until we see a player join
 // TODO: make this more robust? check if we are actually supposed to join?
 while (true) {
-  console.log("Waiting for a game to start...");
   await new Promise((resolve) => setTimeout(resolve, 1000));
   const response = await fetch(`${HYDRA_NODE}snapshot/utxo`);
-  const data = response.json();
+  const data = await response.json();
   if (Object.keys(data).length > 1) {
     break;
   }
