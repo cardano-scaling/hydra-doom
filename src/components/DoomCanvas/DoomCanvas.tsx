@@ -125,6 +125,7 @@ const DoomCanvas: React.FC = () => {
     }
     // Dynamically load websockets-doom.js
     const loadDoom = async () => {
+      console.log("JSHy");
       const args = getArgs({ code, petName, type });
       const module = await createModule(Module);
       module.callMain(args);
