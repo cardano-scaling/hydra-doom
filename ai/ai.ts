@@ -1,27 +1,15 @@
 // Run as a node process to run an AI agent
 
 import { HydraMultiplayerClient } from "utils/HydraMultiplayer/client";
-import { Lucid, toHex, fromHex } from "lucid-cardano";
+import { Lucid, toHex } from "lucid-cardano";
 import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
-import { readFile } from "fs/promises";
 
 const NETWORK_ID = Number(process.env.NETWORK_ID);
 // TODO: support multiple bots
 const HYDRA_NODE = "http://localhost:4001/";
 const bot_index = 0;
-
-// Get adminPkh
-const adminKeyFile = process.env.ADMIN_KEY_FILE ?? "admin.sk";
-const adminKey = JSON.parse((await readFile(adminKeyFile)).toString());
-const privateAdminKeyBytes = adminKey.cborHex.slice(4);
-const publicAdminKeyBytes =
-  await ed25519.getPublicKeyAsync(privateAdminKeyBytes);
-const publicAdminKeyHashBytes = blake2b(publicAdminKeyBytes, {
-  dkLen: 224 / 8,
-});
-const adminPkh = toHex(publicAdminKeyHashBytes);
 
 // Wait until we see a player join
 // TODO: make this more robust? check if we are actually supposed to join?
@@ -30,6 +18,8 @@ while (true) {
   const response = await fetch(`${HYDRA_NODE}snapshot/utxo`);
   const data = await response.json();
   if (Object.keys(data).length > 1) {
+    // Wait 5 seconds to allow the player to join
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     break;
   }
 }
@@ -61,6 +51,12 @@ const keys = {
   }),
 };
 console.log(`Bot ${bot_index} Address: ${keys.address}`);
+
+const response = await fetch(
+  `http://localhost:8000/add_player?address=${keys.address}`,
+);
+const data = await response.json();
+const adminPkh: string = data.admin_pkh;
 
 const { default: createModule } = await import("../websockets-doom.js");
 const module = await createModule({
