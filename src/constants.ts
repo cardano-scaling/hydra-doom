@@ -5,12 +5,12 @@ export const GLOBAL_MAX_SPEED = 30 * 100;
 export const HANDLE_CACHE_KEY = "player-handle-cache";
 export const MAX_SPEED = 40;
 export const REGIONS = [
-  { name: "Virginia, NA", value: "us-east-1" },
-  { name: "Frankfurt, Europe", value: "eu-central-1" },
-  { name: "Oregon, NA", value: "us-west-2" },
-  { name: "Singapore", value: "ap-southeast-1" },
-  { name: "São Paulo, SA", value: "sa-east-1" },
-  { name: "Cape Town, Africa", value: "af-south-1" },
+  { name: "Virginia, NA", value: "us-east-1", prefix: "a" },
+  { name: "Frankfurt, Europe", value: "eu-central-1", prefix: "b" },
+  { name: "Oregon, NA", value: "us-west-2", prefix: "c" },
+  { name: "Singapore", value: "ap-southeast-1", prefix: "d" },
+  { name: "São Paulo, SA", value: "sa-east-1", prefix: "e" },
+  { name: "Cape Town, Africa", value: "af-south-1", prefix: "f" },
 ];
 export const TIC_RATE_MAGIC = 35; // 35 is the ticrate in DOOM WASM they use to calculate time.
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;

@@ -55,6 +55,6 @@
   left: 23px;
   width: 113px;
   height: 19px;
-  background: url("speedometer-tick.png");
+  background: url("/speedometer-tick.png");
   background-size: cover;
 }

@@ -13,8 +13,11 @@ import { REGIONS } from "../constants";
 import { useQuery } from "@tanstack/react-query";
 import { useSessionReferenceKeyCache } from "../utils/localStorage";
 import { checkSignin, fetchGlobalStats } from "../utils/requests";
+import { getRegionWithPrefix } from "../utils/game";
 
 const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
+  const pathSegments = window.location.pathname.split("/").filter(Boolean);
+  const code = pathSegments[1];
   const [sessionReference, setSessionReference] = useSessionReferenceKeyCache();
   const keys = useKeys();
   const { bestRegion } = useBestRegion(REGIONS);
@@ -55,8 +58,13 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [setSessionReference, userData]);
 
   useEffect(() => {
-    if (bestRegion) setRegion(bestRegion);
-  }, [bestRegion]);
+    const newRegion = getRegionWithPrefix(gameData.code[0]);
+    if (newRegion) setRegion(newRegion);
+  }, [gameData.code]);
+
+  useEffect(() => {
+    if (bestRegion && !code) setRegion(bestRegion);
+  }, [bestRegion, code]);
 
   const value = useMemo(
     () => ({

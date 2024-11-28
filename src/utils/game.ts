@@ -1,3 +1,4 @@
+import { REGIONS } from "../constants";
 import { EGameType, GameData } from "../types";
 
 export const getArgs = ({ type, petName }: GameData) => {
@@ -26,4 +27,8 @@ export const getArgs = ({ type, petName }: GameData) => {
   if (petName) args.push("-pet", petName);
 
   return args;
+};
+
+export const getRegionWithPrefix = (prefix: string) => {
+  return REGIONS.find((r) => prefix === r.prefix);
 };
