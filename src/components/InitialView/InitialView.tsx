@@ -94,7 +94,6 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
           <Button className="w-96 h-16" onClick={handleClickJoinMultiplayer}>
             Join Game
           </Button>
-          <Button className="w-96 h-16">Watch</Button>
         </>
       );
     }
