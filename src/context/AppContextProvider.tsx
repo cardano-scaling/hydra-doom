@@ -25,8 +25,8 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
   });
   const [accountData, setAccountData] = useState<Account>();
   const [region, setRegion] = useState<Region | null>(null);
-  const [players, setPlayers] = useState(2);
-  const [bots, setBots] = useState(0);
+  const [players, setPlayers] = useState(1);
+  const [bots, setBots] = useState(2);
 
   const { data: userData, isLoading: isLoadingUserData } =
     useQuery<AuthResponse>({

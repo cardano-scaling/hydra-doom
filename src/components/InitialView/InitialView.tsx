@@ -77,7 +77,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
             <div className="flex items-center gap-6 justify-center mb-8">
               <div className="text-3xl">
                 Logged In as:{" "}
-                <span className="bg-yellow-400 px-2">
+                <span className="text-white text-shadow-custom">
                   {accountData.auth_name}
                 </span>
               </div>

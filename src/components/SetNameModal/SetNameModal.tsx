@@ -123,29 +123,26 @@ const SetNameModal: FC<SetNameModalProps> = ({
               </div>
               <div className="flex justify-between">
                 {Array.from({ length: MAX_PLAYERS }, (_, i) => i + 1).map(
-                  (value) => {
-                    if (value === 1) return null;
-                    return (
-                      <label
-                        className="flex items-center gap-2"
-                        htmlFor={`players-${value}`}
-                        key={value}
-                      >
-                        <input
-                          checked={players === value}
-                          className={cx(
-                            "appearance-none w-7 h-7 rounded-full border-4 border-gray-500 transition-all duration-200 cursor-pointer",
-                            "checked:bg-yellow-400 checked:shadow-[0_0_6px_2px_rgba(255,223,0,0.08),0_0_15px_4px_rgba(255,223,0,0.15)]",
-                          )}
-                          id={`players-${value}`}
-                          onChange={handleSelectPlayers}
-                          type="radio"
-                          value={value}
-                        />
-                        {value}
-                      </label>
-                    );
-                  },
+                  (value) => (
+                    <label
+                      className="flex items-center gap-2"
+                      htmlFor={`players-${value}`}
+                      key={value}
+                    >
+                      <input
+                        checked={players === value}
+                        className={cx(
+                          "appearance-none w-7 h-7 rounded-full border-4 border-gray-500 transition-all duration-200 cursor-pointer",
+                          "checked:bg-yellow-400 checked:shadow-[0_0_6px_2px_rgba(255,223,0,0.08),0_0_15px_4px_rgba(255,223,0,0.15)]",
+                        )}
+                        id={`players-${value}`}
+                        onChange={handleSelectPlayers}
+                        type="radio"
+                        value={value}
+                      />
+                      {value}
+                    </label>
+                  ),
                 )}
               </div>
             </div>
