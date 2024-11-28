@@ -91,16 +91,7 @@ const getNativeScript = (
   adminPkh: string,
   networkId: number,
 ): { cbor: string; address: string; hash: string } => {
-  console.log(
-    "playerPkh",
-    playerPkh,
-    "adminPkh",
-    adminPkh,
-    "networkId",
-    networkId,
-  );
   const cbor = `8202828200581c${playerPkh}8200581c${adminPkh}`;
-  console.log("CBOR", cbor);
   const script = C.NativeScript.from_bytes(fromHex(cbor));
   const scriptHash = script.hash(C.ScriptHashNamespace.NativeScript);
   const scriptHashBytes = new Uint8Array([

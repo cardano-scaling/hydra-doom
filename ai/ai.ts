@@ -5,11 +5,23 @@ import { Lucid, toHex, fromHex } from "lucid-cardano";
 import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
+import { readFile } from "fs/promises";
 
 const NETWORK_ID = Number(process.env.NETWORK_ID);
 // TODO: support multiple bots
 const HYDRA_NODE = "http://localhost:4001/";
 const bot_index = 0;
+
+// Get adminPkh
+const adminKeyFile = process.env.ADMIN_KEY_FILE ?? "admin.sk";
+const adminKey = JSON.parse((await readFile(adminKeyFile)).toString());
+const privateAdminKeyBytes = adminKey.cborHex.slice(4);
+const publicAdminKeyBytes =
+  await ed25519.getPublicKeyAsync(privateAdminKeyBytes);
+const publicAdminKeyHashBytes = blake2b(publicAdminKeyBytes, {
+  dkLen: 224 / 8,
+});
+const adminPkh = toHex(publicAdminKeyHashBytes);
 
 // Wait until we see a player join
 // TODO: make this more robust? check if we are actually supposed to join?
@@ -83,7 +95,7 @@ const module = await createModule({
 global.Module = module;
 global.HydraMultiplayer = new HydraMultiplayerClient({
   key: keys,
-  adminPkh: "",
+  adminPkh: adminPkh,
   url: "http://localhost:4001",
   module: module,
   networkId: NETWORK_ID,
