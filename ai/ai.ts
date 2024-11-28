@@ -54,7 +54,7 @@ const keys = {
 console.log(`Bot ${bot_index} Address: ${keys.address}`);
 
 const response = await fetch(
-  `http://localhost:8000/add_player?address=${keys.address}`,
+  `http://localhost:8000/game/add_player?address=${keys.address}`,
 );
 const data = await response.json();
 const adminPkh: string = data.admin_pkh;
