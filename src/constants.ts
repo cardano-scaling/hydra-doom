@@ -15,5 +15,5 @@ export const REGIONS = [
 export const TIC_RATE_MAGIC = 35; // 35 is the ticrate in DOOM WASM they use to calculate time.
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export const API_KEY = import.meta.env.VITE_API_KEY;
-export const SESSION_REFERENCE_KEY = "session-reference";
+export const SESSION_ID_KEY = "session-id";
 export const MAX_PLAYERS = 4;

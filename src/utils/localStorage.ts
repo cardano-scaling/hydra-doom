@@ -1,5 +1,5 @@
 import { useLocalStorage } from "usehooks-ts";
-import { SESSION_REFERENCE_KEY } from "../constants";
+import { SESSION_ID_KEY } from "../constants";
 
-export const useSessionReferenceKeyCache = () =>
-  useLocalStorage<string>(SESSION_REFERENCE_KEY, "");
+export const useSessionIdKeyCache = () =>
+  useLocalStorage<string>(SESSION_ID_KEY, "");

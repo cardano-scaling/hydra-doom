@@ -32,3 +32,26 @@ export const fetchGlobalStats = async (
   }
   return response.json();
 };
+
+export const authRefresh = async ({
+  newReference,
+  sessionId,
+}: {
+  newReference: string;
+  sessionId: string;
+}): Promise<AuthResponse> => {
+  const response = await fetch(`${API_BASE_URL}/auth/refresh/${API_KEY}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      new_reference: newReference,
+      session_id: sessionId,
+    }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to refresh auth");
+  }
+  return response.json();
+};
