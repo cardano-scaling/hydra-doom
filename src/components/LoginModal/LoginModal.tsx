@@ -36,7 +36,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
 }) => {
   const [, setSessionReference] = useSessionReferenceKeyCache();
   const { keys, setAccountData } = useAppContext();
-  const { sessionKeyBech32 } = keys || {};
+  const { publicKeyHashHex } = keys || {};
   const [isWaitingSigning, setIsWaitingSigning] = useState(false);
 
   const { data: providers, isLoading: isLoadingProviders } = useQuery<string[]>(
@@ -47,9 +47,9 @@ const LoginModal: React.FC<LoginModalProps> = ({
   );
 
   const { data: userData } = useQuery<AuthResponse>({
-    queryKey: ["signinCheck", sessionKeyBech32],
-    queryFn: () => checkSignin(sessionKeyBech32 ?? ""),
-    enabled: !!sessionKeyBech32 && isWaitingSigning,
+    queryKey: ["signinCheck", publicKeyHashHex],
+    queryFn: () => checkSignin(publicKeyHashHex ?? ""),
+    enabled: !!publicKeyHashHex && isWaitingSigning,
     refetchInterval: 1000,
   });
 
@@ -59,11 +59,11 @@ const LoginModal: React.FC<LoginModalProps> = ({
       close();
       showActionButtons();
       setAccountData(userData.account);
-      if (sessionKeyBech32) setSessionReference(sessionKeyBech32);
+      if (publicKeyHashHex) setSessionReference(publicKeyHashHex);
     }
   }, [
     close,
-    sessionKeyBech32,
+    publicKeyHashHex,
     setAccountData,
     setSessionReference,
     showActionButtons,
@@ -72,15 +72,15 @@ const LoginModal: React.FC<LoginModalProps> = ({
   ]);
 
   const handleLogin = (provider: string) => {
-    if (!sessionKeyBech32) return;
-    const redirectUrl = `${API_BASE_URL}/auth/init/${API_KEY}/${provider}/?reference=${sessionKeyBech32}`;
+    if (!publicKeyHashHex) return;
+    const redirectUrl = `${API_BASE_URL}/auth/init/${API_KEY}/${provider}/?reference=${publicKeyHashHex}`;
     window.open(redirectUrl, "_blank")?.focus();
     setIsWaitingSigning(true);
   };
 
   const renderContent = () => {
     if (isWaitingSigning) return <p>Waiting for you to sign-in...</p>;
-    if (isLoadingProviders || !sessionKeyBech32) return <p>Loading...</p>;
+    if (isLoadingProviders || !publicKeyHashHex) return <p>Loading...</p>;
     if (!providers?.length) return <p>No providers available.</p>;
 
     return (
