@@ -11,15 +11,16 @@ import useBestRegion from "../hooks/useBestRegion";
 import useKeys from "../hooks/useKeys";
 import { REGIONS } from "../constants";
 import { useQuery } from "@tanstack/react-query";
-import { useSessionReferenceKeyCache } from "../utils/localStorage";
-import { checkSignin, fetchGlobalStats } from "../utils/requests";
+import { useSessionIdKeyCache } from "../utils/localStorage";
+import { authRefresh, fetchGlobalStats } from "../utils/requests";
 import { getRegionWithPrefix } from "../utils/game";
 
 const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const pathSegments = window.location.pathname.split("/").filter(Boolean);
   const code = pathSegments[1];
-  const [sessionReference, setSessionReference] = useSessionReferenceKeyCache();
+  const [sessionId, setSessionId] = useSessionIdKeyCache();
   const keys = useKeys();
+  const { publicKeyHashHex } = keys || {};
   const { bestRegion } = useBestRegion(REGIONS);
   const [gameData, setGameData] = useState({
     code: "",
@@ -31,12 +32,16 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const [players, setPlayers] = useState(1);
   const [bots, setBots] = useState(2);
 
-  const { data: userData, isLoading: isLoadingUserData } =
-    useQuery<AuthResponse>({
-      queryKey: ["signinCheck", sessionReference],
-      queryFn: () => checkSignin(sessionReference),
-      enabled: !accountData && !!sessionReference,
-    });
+  const {
+    data: userData,
+    isError,
+    isLoading: isLoadingUserData,
+  } = useQuery<AuthResponse>({
+    queryKey: ["authRefresh", publicKeyHashHex, sessionId],
+    queryFn: () =>
+      authRefresh({ newReference: publicKeyHashHex ?? "", sessionId }),
+    enabled: !accountData && !!sessionId && !!publicKeyHashHex,
+  });
 
   const { data: globalStats, isLoading: isLoadingGlobalStats } =
     useQuery<GameStatistics>({
@@ -47,15 +52,16 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
     });
 
   useEffect(() => {
+    if (isError) setSessionId("");
+  }, [isError, setSessionId]);
+
+  useEffect(() => {
     if (userData) {
-      const { account, authenticated } = userData;
-      if (authenticated) {
-        setAccountData(account);
-      } else {
-        setSessionReference("");
-      }
+      const { account, session } = userData;
+      if (session?.session_id) setSessionId(session.session_id);
+      if (account) setAccountData(account);
     }
-  }, [setSessionReference, userData]);
+  }, [setSessionId, userData]);
 
   useEffect(() => {
     const newRegion = getRegionWithPrefix(gameData.code[0]);

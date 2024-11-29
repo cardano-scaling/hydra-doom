@@ -7,7 +7,7 @@ import SetNameModal from "../SetNameModal";
 import LoginModal from "../LoginModal/LoginModal";
 import { useAppContext } from "../../context/useAppContext";
 import { EGameType } from "../../types";
-import { useSessionReferenceKeyCache } from "../../utils/localStorage";
+import { useSessionIdKeyCache } from "../../utils/localStorage";
 import GlobalTPS from "../GlobalTPS";
 import GlobalTotals from "../GlobalTotals";
 
@@ -18,7 +18,7 @@ interface InitialViewProps {
 const InitialView: FC<InitialViewProps> = ({ startGame }) => {
   const { setGameData, accountData, isLoadingUserData, setAccountData } =
     useAppContext();
-  const [, setSessionReference] = useSessionReferenceKeyCache();
+  const [, setSessionId] = useSessionIdKeyCache();
   const pathSegments = window.location.pathname.split("/").filter(Boolean);
   const code = pathSegments[1];
   const [modalTitle, setModalTitle] = useState("Join Multiplayer");
@@ -62,7 +62,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
 
   const onLogout = () => {
     setAccountData(undefined);
-    setSessionReference("");
+    setSessionId("");
   };
 
   const renderButtons = () => {

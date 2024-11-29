@@ -12,7 +12,7 @@ import {
 } from "react-icons/fa6";
 import { useAppContext } from "../../context/useAppContext";
 import { AuthResponse } from "../../types";
-import { useSessionReferenceKeyCache } from "../../utils/localStorage";
+import { useSessionIdKeyCache } from "../../utils/localStorage";
 import { checkSignin, fetchAuthProviders } from "../../utils/requests";
 
 interface LoginModalProps {
@@ -34,7 +34,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
   isOpen,
   showActionButtons,
 }) => {
-  const [, setSessionReference] = useSessionReferenceKeyCache();
+  const [, setSessionId] = useSessionIdKeyCache();
   const { keys, setAccountData } = useAppContext();
   const { publicKeyHashHex } = keys || {};
   const [isWaitingSigning, setIsWaitingSigning] = useState(false);
@@ -55,21 +55,20 @@ const LoginModal: React.FC<LoginModalProps> = ({
 
   useEffect(() => {
     if (userData?.authenticated) {
+      const { account, session } = userData;
       setIsWaitingSigning(false);
       close();
       showActionButtons();
-      setAccountData(userData.account);
-      if (publicKeyHashHex) setSessionReference(publicKeyHashHex);
+      if (account) setAccountData(account);
+      if (session?.session_id) setSessionId(session.session_id);
     }
-  }, [
-    close,
-    publicKeyHashHex,
-    setAccountData,
-    setSessionReference,
-    showActionButtons,
-    userData?.account,
-    userData?.authenticated,
-  ]);
+  }, [close, setAccountData, setSessionId, showActionButtons, userData]);
+
+  const handleClose = () => {
+    if (!isWaitingSigning) {
+      close();
+    }
+  };
 
   const handleLogin = (provider: string) => {
     if (!publicKeyHashHex) return;
@@ -99,7 +98,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} close={close}>
+    <Modal isOpen={isOpen} close={handleClose}>
       <div className="text-center text-4xl flex flex-col gap-8">
         <h1 className="text-5xl uppercase">Tournament Login</h1>
         <p className="mb-4">

@@ -97,8 +97,8 @@ export interface Session {
 }
 export interface AuthResponse {
   authenticated: boolean;
-  account: Account;
-  session: Session;
+  account: Account | null;
+  session: Session | null;
 }
 
 export interface Keys {
