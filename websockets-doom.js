@@ -506,7 +506,7 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 449194: $0 => {
+ 449210: $0 => {
   var str = UTF8ToString($0) + "\n\n" + "Abort/Retry/Ignore/AlwaysIgnore? [ariA] :";
   var reply = window.prompt(str, "i");
   if (reply === null) {
@@ -514,7 +514,7 @@ var ASM_CONSTS = {
   }
   return allocate(intArrayFromString(reply), "i8", ALLOC_NORMAL);
  },
- 449419: () => {
+ 449435: () => {
   if (typeof (AudioContext) !== "undefined") {
    return true;
   } else if (typeof (webkitAudioContext) !== "undefined") {
@@ -522,7 +522,7 @@ var ASM_CONSTS = {
   }
   return false;
  },
- 449566: () => {
+ 449582: () => {
   if ((typeof (navigator.mediaDevices) !== "undefined") && (typeof (navigator.mediaDevices.getUserMedia) !== "undefined")) {
    return true;
   } else if (typeof (navigator.webkitGetUserMedia) !== "undefined") {
@@ -530,7 +530,7 @@ var ASM_CONSTS = {
   }
   return false;
  },
- 449800: $0 => {
+ 449816: $0 => {
   if (typeof (Module["SDL2"]) === "undefined") {
    Module["SDL2"] = {};
   }
@@ -552,11 +552,11 @@ var ASM_CONSTS = {
   }
   return SDL2.audioContext === undefined ? -1 : 0;
  },
- 450293: () => {
+ 450309: () => {
   var SDL2 = Module["SDL2"];
   return SDL2.audioContext.sampleRate;
  },
- 450361: ($0, $1, $2, $3) => {
+ 450377: ($0, $1, $2, $3) => {
   var SDL2 = Module["SDL2"];
   var have_microphone = function(stream) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -597,7 +597,7 @@ var ASM_CONSTS = {
    }, have_microphone, no_microphone);
   }
  },
- 452013: ($0, $1, $2, $3) => {
+ 452029: ($0, $1, $2, $3) => {
   var SDL2 = Module["SDL2"];
   SDL2.audio.scriptProcessorNode = SDL2.audioContext["createScriptProcessor"]($1, 0, $0);
   SDL2.audio.scriptProcessorNode["onaudioprocess"] = function(e) {
@@ -609,7 +609,7 @@ var ASM_CONSTS = {
   };
   SDL2.audio.scriptProcessorNode["connect"](SDL2.audioContext["destination"]);
  },
- 452423: ($0, $1) => {
+ 452439: ($0, $1) => {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.capture.currentCaptureBuffer.numberOfChannels;
   for (var c = 0; c < numChannels; ++c) {
@@ -628,7 +628,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 453028: ($0, $1) => {
+ 453044: ($0, $1) => {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.audio.currentOutputBuffer["numberOfChannels"];
   for (var c = 0; c < numChannels; ++c) {
@@ -641,7 +641,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 453508: $0 => {
+ 453524: $0 => {
   var SDL2 = Module["SDL2"];
   if ($0) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -679,7 +679,7 @@ var ASM_CONSTS = {
    SDL2.audioContext = undefined;
   }
  },
- 454680: ($0, $1, $2) => {
+ 454696: ($0, $1, $2) => {
   var w = $0;
   var h = $1;
   var pixels = $2;
@@ -750,7 +750,7 @@ var ASM_CONSTS = {
   }
   SDL2.ctx.putImageData(SDL2.image, 0, 0);
  },
- 456149: ($0, $1, $2, $3, $4) => {
+ 456165: ($0, $1, $2, $3, $4) => {
   var w = $0;
   var h = $1;
   var hot_x = $2;
@@ -787,19 +787,19 @@ var ASM_CONSTS = {
   stringToUTF8(url, urlBuf, url.length + 1);
   return urlBuf;
  },
- 457138: $0 => {
+ 457154: $0 => {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = UTF8ToString($0);
   }
  },
- 457221: () => {
+ 457237: () => {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = "none";
   }
  },
- 457290: () => window.innerWidth,
- 457320: () => window.innerHeight,
- 457351: ($0, $1) => {
+ 457306: () => window.innerWidth,
+ 457336: () => window.innerHeight,
+ 457367: ($0, $1) => {
   alert(UTF8ToString($0) + "\n\n" + UTF8ToString($1));
  }
 };
@@ -8658,9 +8658,9 @@ var _asyncify_start_rewind = a0 => (_asyncify_start_rewind = wasmExports["asynci
 
 var _asyncify_stop_rewind = () => (_asyncify_stop_rewind = wasmExports["asyncify_stop_rewind"])();
 
-var ___start_em_js = Module["___start_em_js"] = 447888;
+var ___start_em_js = Module["___start_em_js"] = 447904;
 
-var ___stop_em_js = Module["___stop_em_js"] = 449194;
+var ___stop_em_js = Module["___stop_em_js"] = 449210;
 
 function intArrayFromBase64(s) {
  if (typeof ENVIRONMENT_IS_NODE != "undefined" && ENVIRONMENT_IS_NODE) {
