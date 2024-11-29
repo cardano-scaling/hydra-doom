@@ -41,6 +41,7 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
     queryFn: () =>
       authRefresh({ newReference: publicKeyHashHex ?? "", sessionId }),
     enabled: !accountData && !!sessionId && !!publicKeyHashHex,
+    retry: false,
   });
 
   const { data: globalStats, isLoading: isLoadingGlobalStats } =
