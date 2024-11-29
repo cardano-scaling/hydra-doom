@@ -26,6 +26,7 @@ export abstract class HydraMultiplayer {
   ) => void;
   onPlayerJoin?: (gameId: string, ephemeralKeys: string[]) => void;
   onTxSeen?: (txId: TxHash, tx: any) => void; // refresh timeout timers
+  onPacket?: (tx: any, packet: Packet) => void;
 
   constructor({
     key,
@@ -60,7 +61,8 @@ export abstract class HydraMultiplayer {
     from: number,
     data: Uint8Array,
   ): Promise<void> {
-    this.packetQueue.push({ to, from, data });
+    const ephemeralKey = this.key.publicKeyHashBytes;
+    this.packetQueue.push({ to, from, ephemeralKey, data });
     await this.sendPacketQueue();
   }
 
@@ -104,6 +106,7 @@ export abstract class HydraMultiplayer {
         return;
       }
       for (const packet of packets) {
+        this.onPacket?.(tx, packet);
         if (packet.to == this.myIP) {
           const buf = this.module._malloc!(packet.data.length);
           this.module.HEAPU8!.set(packet.data, buf);
@@ -124,17 +127,23 @@ export abstract class HydraMultiplayer {
   protected abstract buildTx(datum: string): [UTxO, string];
 }
 
-interface Packet {
+export interface Packet {
   to: number;
   from: number;
+  ephemeralKey: Uint8Array;
   data: Uint8Array;
 }
 
 function encodePackets(packets: Packet[]): string {
   return Data.to(
     packets.map(
-      ({ to, from, data }) =>
-        new Constr(0, [BigInt(to), BigInt(from), toHex(data)]),
+      ({ to, from, ephemeralKey, data }) =>
+        new Constr(0, [
+          BigInt(to),
+          BigInt(from),
+          toHex(ephemeralKey),
+          toHex(data),
+        ]),
     ),
   );
 }
@@ -143,10 +152,11 @@ function decodePackets(raw: Uint8Array): Packet[] | undefined {
   const packets = Data.from(toHex(raw)) as Constr<Data>[];
   return packets instanceof Array
     ? packets.map((packet) => {
-        const [to, from, data] = packet.fields;
+        const [to, from, ephemeralKey, data] = packet.fields;
         return {
           to: Number(to),
           from: Number(from),
+          ephemeralKey: fromHex(ephemeralKey as string),
           data: fromHex(data as string),
         };
       })
