@@ -349,7 +349,7 @@ try {
 try {
   await Promise.all([
     fetch("http://localhost:8000/end_game", { method: "POST" }),
-    sendEvent("a0", { type: "game_finished", game_id: "a0" }),
+    sendEvent(gameId, { type: "game_finished" }),
   ]);
 } catch (e) {
   console.warn("Failed to record game finished: ", e);
