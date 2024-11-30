@@ -93,7 +93,7 @@ global.HydraMultiplayer = hydra;
 let shouldPlay = false;
 
 hydra.onNewGame = async (newGameId, _humanCount, botCount, _ephemeralKey) => {
-  if (botCount >= bot_index) {
+  if (botCount > bot_index) {
     console.log(`Bot ${bot_index} joining game ${newGameId}`);
     shouldPlay = true;
   }
