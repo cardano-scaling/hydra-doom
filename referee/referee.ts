@@ -233,6 +233,7 @@ hydra.onTxSeen = () => {
   timeout = 60_000;
 };
 hydra.onPacket = (packet: Packet) => {
+  console.log("Packet: ", packet);
   if (!players[packet.from]) {
     console.log(
       `Saw a new packet from ${packet.from} with ephemeral key ${packet.ephemeralKey}`,

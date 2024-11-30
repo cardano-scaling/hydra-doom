@@ -88,6 +88,7 @@ export abstract class HydraMultiplayer {
       if (!datumRaw) {
         return;
       }
+      console.log("DatumRaw: ", toHex(datumRaw));
       const packets = decodePackets(datumRaw);
       if (!packets) {
         // We failed to decode packets, so this might be a new game or join game tx
