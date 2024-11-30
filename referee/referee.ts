@@ -149,11 +149,16 @@ global.gameStarted = async () => {
 };
 
 global.playerConnected = async (addr: number, player: number) => {
+  if (players[addr].connected) {
+    console.log(
+      `Duplicate connection from ${addr} / ${players[addr].playerNumber} / ${players[addr].ephemeralKey}?`,
+    );
+  }
   players[addr].playerNumber = player;
   players[addr].connected = true;
   const playerCount = Object.values(players).filter((p) => p.connected).length;
   console.log(
-    `Player joined ${players[addr].ephemeralKey}, now ${playerCount} connected actors`,
+    `Player joined ${addr} with ephemeral key ${players[addr].ephemeralKey}, now ${playerCount} connected actors`,
   );
   if (!RECORD_STATS) return;
   try {
@@ -229,6 +234,9 @@ hydra.onTxSeen = () => {
 };
 hydra.onPacket = (packet: Packet) => {
   if (!players[packet.from]) {
+    console.log(
+      `Saw a new packet from ${packet.from} with ephemeral key ${packet.ephemeralKey}`,
+    );
     players[packet.from] = {
       ephemeralKey: toHex(packet.ephemeralKey),
       connected: false,
@@ -265,6 +273,14 @@ hydra.onPlayerJoin = async (gameId, ephemeralKeys) => {
   });
 };
 
+// Mark us as waiting for a new game
+try {
+  console.log("Server started.");
+  await fetch("http://localhost:8000/start_server", { method: "POST" });
+} catch (e) {
+  console.warn("Failed to record server start: ", e);
+}
+
 // Wait until the game starts
 while (!gameId) {
   await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -294,13 +310,6 @@ try {
   module.callMain(args);
 } catch (e) {
   console.error(e);
-}
-
-try {
-  console.log("Server started.");
-  await fetch("http://localhost:8000/start_server", { method: "POST" });
-} catch (e) {
-  console.warn("Failed to record server start: ", e);
 }
 
 while (!done) {
