@@ -116,3 +116,13 @@ export interface Region {
   name: string;
   value: string;
 }
+
+export interface SessionStatsInterface {
+  death: number;
+  game_finished: number;
+  game_started: number;
+  kill: number;
+  new_game: number;
+  player_joined: number;
+  suicide: number;
+}

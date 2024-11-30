@@ -1,9 +1,9 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import Card from "../Card";
 import cx from "classnames";
 
 export interface StatsCardProps {
-  data: { label: string; value: string | number }[];
+  data: { label: string; value: ReactNode }[];
   size?: "sm" | "md" | "lg";
   title?: string;
   titleAlign?: "left" | "center" | "right";
@@ -48,8 +48,8 @@ const StatsCard: FC<StatsCardProps> = ({
           <tbody>
             {data.map((item) => (
               <tr key={item.label}>
-                <td>{item.label}</td>
-                <td className="text-yellow-400">{item.value}</td>
+                <td className="py-1">{item.label}</td>
+                <td className="text-yellow-400 py-0.5">{item.value}</td>
               </tr>
             ))}
           </tbody>
