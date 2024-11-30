@@ -271,7 +271,7 @@ hydra.onNewGame = async (newGameId, humanCount, botCount, ephemeralKey) => {
   });
 };
 hydra.onPlayerJoin = async (gameId, ephemeralKeys) => {
-  if (gameId || done) {
+  if (done) {
     console.log("Game is already done, ignoring player join");
     return;
   }

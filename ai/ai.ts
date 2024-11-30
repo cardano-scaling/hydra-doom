@@ -1,36 +1,32 @@
 // Run as a node process to run an AI agent
 
 import { HydraMultiplayerClient } from "utils/HydraMultiplayer/client";
-import { Lucid, toHex } from "lucid-cardano";
+import { Lucid, toHex, fromHex } from "lucid-cardano";
 import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
+import { readFile } from "node:fs/promises";
 
 const NETWORK_ID = Number(process.env.NETWORK_ID);
-// TODO: support multiple bots
 const HYDRA_NODE = "http://localhost:4001/";
-const bot_index = 0;
+const bot_index = Number(process.env.BOT_INDEX ?? 1);
 
-// Wait until we see a player join
-// TODO: make this more robust? check if we are actually supposed to join?
-while (true) {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  const response = await fetch(`${HYDRA_NODE}snapshot/utxo`);
-  const data = await response.json();
-  if (Object.keys(data).length > 1) {
-    // Wait 5 seconds to allow the player to join
-    console.log("Game UTxO seen, waiting 5 seconds");
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-    break;
-  }
-}
-
-// TODO: should we generate this key, like the UI does? no reason we need to keep it around
 let done = false;
 const lucid = await Lucid.new(
   undefined,
   NETWORK_ID === 1 ? "Mainnet" : "Preprod",
 );
+
+const adminKeyFile = process.env.ADMIN_KEY_FILE ?? "admin.sk";
+const adminKey = JSON.parse((await readFile(adminKeyFile)).toString());
+const adminPrivateKeyBytes = adminKey.cborHex.slice(4);
+
+const adminPublicKeyBytes =
+  await ed25519.getPublicKeyAsync(adminPrivateKeyBytes);
+const adminPublicKeyHashBytes = blake2b(adminPublicKeyBytes, {
+  dkLen: 224 / 8,
+});
+const adminPublicKeyHashHex = toHex(adminPublicKeyHashBytes);
 
 const sessionKeyBech32 = lucid.utils.generatePrivateKey();
 const privateKeyBytes = bech32.decode(sessionKeyBech32).data;
@@ -52,12 +48,6 @@ const keys = {
   }),
 };
 console.log(`Bot ${bot_index} Address: ${keys.address}`);
-
-const response = await fetch(
-  `http://localhost:8000/game/add_player?address=${keys.address}`,
-);
-const data = await response.json();
-const adminPkh: string = data.admin_pkh;
 
 const { default: createModule } = await import("../websockets-doom.js");
 const module = await createModule({
@@ -89,17 +79,31 @@ const module = await createModule({
     done = true;
   },
 });
+
 global.Module = module;
-global.HydraMultiplayer = new HydraMultiplayerClient({
+const hydra = new HydraMultiplayerClient({
   key: keys,
-  adminPkh: adminPkh,
+  adminPkh: adminPublicKeyHashHex,
   url: "http://localhost:4001",
   module: module,
   networkId: NETWORK_ID,
 });
+global.HydraMultiplayer = hydra;
 
-// TODO: modify new-game transaction to record # of players
-// TODO: watch for new-game transaction to decide if we're participating in this game
+let shouldPlay = false;
+
+hydra.onNewGame = async (newGameId, _humanCount, botCount, _ephemeralKey) => {
+  if (botCount >= bot_index) {
+    console.log(`Bot ${bot_index} joining game ${newGameId}`);
+    shouldPlay = true;
+  }
+};
+
+while (!shouldPlay) {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+}
+
+await fetch(`http://localhost:8000/game/add_player?address=${keys.address}`);
 
 // TODO: generate a fun pet name
 const args = [
