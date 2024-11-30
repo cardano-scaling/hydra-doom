@@ -98,6 +98,10 @@ hydra.onNewGame = async (newGameId, _humanCount, botCount, _ephemeralKey) => {
     shouldPlay = true;
   }
 };
+let timeout = 10_000;
+hydra.onTxSeen = async (tx) => {
+  timeout = 10_000;
+};
 
 while (!shouldPlay) {
   await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -134,6 +138,10 @@ try {
 
 while (!done) {
   await new Promise((resolve) => setTimeout(resolve, 1000));
+  timeout -= 1000;
+  if (timeout <= 0) {
+    done = true;
+  }
 }
 
 process.exit(0);
