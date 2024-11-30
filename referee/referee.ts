@@ -116,6 +116,12 @@ type Player = {
   connected: boolean;
 };
 const players: { [addr: number]: Player } = {};
+// Prepopulate with the server, since we don't send out syn packets
+players[1] = {
+  ephemeralKey: keys.publicKeyHashHex,
+  connected: false,
+  playerNumber: -1,
+};
 
 global.gameStarted = async () => {
   const connectedPlayers = Object.values(players)
@@ -149,7 +155,7 @@ global.gameStarted = async () => {
 };
 
 global.playerConnected = async (addr: number, player: number) => {
-  if (players[addr].connected) {
+  if (players[addr]?.connected) {
     console.log(
       `Duplicate connection from ${addr} / ${players[addr].playerNumber} / ${players[addr].ephemeralKey}?`,
     );
@@ -232,7 +238,7 @@ try {
 hydra.onTxSeen = () => {
   timeout = 60_000;
 };
-hydra.onPacket = (packet: Packet) => {
+hydra.onPacket = (_tx: any, packet: Packet) => {
   console.log("Packet: ", packet);
   if (!players[packet.from]) {
     console.log(
