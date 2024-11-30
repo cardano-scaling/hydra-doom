@@ -264,6 +264,14 @@ hydra.onNewGame = async (newGameId, humanCount, botCount, ephemeralKey) => {
     humans: humanCount,
     bots: botCount,
   });
+  if (botCount > 0) {
+    // TODO: should we have the referee call join_game?
+    await sendEvent(gameId, {
+      type: "player_joined",
+      game_id: gameId,
+      key: keys.publicKeyHashHex,
+    });
+  }
   await sendEvent(gameId, {
     type: "player_joined",
     game_id: gameId,
