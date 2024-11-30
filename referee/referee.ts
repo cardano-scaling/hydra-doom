@@ -108,6 +108,7 @@ global.HydraMultiplayer = hydra;
 // That being said, for the purposes of the tournament, it should be a non-issue
 let expectedHumans = 0;
 let expectedBots = 0;
+let isQualifier = false;
 let timeout = 60_000;
 let gameId = "";
 type Player = {
@@ -206,6 +207,7 @@ global.kill = async (killer, victim) => {
         game_id: gameId,
         killer: killerPlayer.ephemeralKey,
         victim: victimPlayer.ephemeralKey,
+        is_qualifier: isQualifier,
       }),
     ]);
   } catch (e) {
@@ -258,11 +260,13 @@ hydra.onNewGame = async (newGameId, humanCount, botCount, ephemeralKey) => {
   gameId = newGameId;
   expectedHumans = humanCount;
   expectedBots = botCount;
+  isQualifier = humanCount === 1 && botCount > 0;
   await sendEvent(gameId, {
     type: "new_game",
     game_id: gameId,
     humans: humanCount,
     bots: botCount,
+    is_qualifier: isQualifier,
   });
   if (botCount > 0) {
     // TODO: should we have the referee call join_game?
@@ -270,12 +274,14 @@ hydra.onNewGame = async (newGameId, humanCount, botCount, ephemeralKey) => {
       type: "player_joined",
       game_id: gameId,
       key: keys.publicKeyHashHex,
+      is_qualifier: isQualifier,
     });
   }
   await sendEvent(gameId, {
     type: "player_joined",
     game_id: gameId,
     key: ephemeralKey,
+    is_qualifier: isQualifier,
   });
 };
 hydra.onPlayerJoin = async (gameId, ephemeralKeys) => {
@@ -289,6 +295,7 @@ hydra.onPlayerJoin = async (gameId, ephemeralKeys) => {
     type: "player_joined",
     game_id: gameId,
     key: newPlayer,
+    is_qualifier: isQualifier,
   });
 };
 
@@ -352,7 +359,11 @@ try {
 try {
   await Promise.all([
     fetch("http://localhost:8000/end_game", { method: "POST" }),
-    sendEvent(gameId, { type: "game_finished", game_id: gameId }),
+    sendEvent(gameId, {
+      type: "game_finished",
+      game_id: gameId,
+      is_qualifier: isQualifier,
+    }),
   ]);
 } catch (e) {
   console.warn("Failed to record game finished: ", e);
