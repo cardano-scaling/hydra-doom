@@ -159,6 +159,7 @@ global.playerConnected = async (addr: number, player: number) => {
     console.log(
       `Duplicate connection from ${addr} / ${players[addr].playerNumber} / ${players[addr].ephemeralKey}?`,
     );
+    return;
   }
   players[addr].playerNumber = player;
   players[addr].connected = true;
@@ -239,7 +240,6 @@ hydra.onTxSeen = () => {
   timeout = 60_000;
 };
 hydra.onPacket = (_tx: any, packet: Packet) => {
-  console.log("Packet: ", packet);
   if (!players[packet.from]) {
     console.log(
       `Saw a new packet from ${packet.from} with ephemeral key ${packet.ephemeralKey}`,
