@@ -271,6 +271,10 @@ hydra.onNewGame = async (newGameId, humanCount, botCount, ephemeralKey) => {
   });
 };
 hydra.onPlayerJoin = async (gameId, ephemeralKeys) => {
+  if (gameId || done) {
+    console.log("Game is already done, ignoring player join");
+    return;
+  }
   const newPlayer = ephemeralKeys[ephemeralKeys.length - 1];
   console.log(`Observed player join for game ${gameId}, ${newPlayer}`);
   await sendEvent(gameId, {
