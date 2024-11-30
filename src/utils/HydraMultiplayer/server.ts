@@ -22,14 +22,6 @@ export class HydraMultiplayerServer extends HydraMultiplayer {
     super({ key, url, module, networkId });
     this.address = address;
   }
-  public override async SendPacket(
-    to: number,
-    from: number,
-    data: Uint8Array,
-  ): Promise<void> {
-    this.packetQueue.push({ to, from, data });
-    await this.sendPacketQueue();
-  }
 
   public override async selectUTxO(): Promise<void> {
     if (this.latestUTxO) {

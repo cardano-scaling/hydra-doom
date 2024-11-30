@@ -41,15 +41,6 @@ export class HydraMultiplayerClient extends HydraMultiplayer {
     this.latestUTxO = utxos.find((u) => !u.datumHash)!;
   }
 
-  public override async SendPacket(
-    to: number,
-    from: number,
-    data: Uint8Array,
-  ): Promise<void> {
-    this.packetQueue.push({ to, from, data });
-    await this.sendPacketQueue();
-  }
-
   protected override buildTx(datum: string): [UTxO, string] {
     if (!this.latestUTxO) {
       throw new Error("No latest UTxO");
