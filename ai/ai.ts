@@ -94,6 +94,7 @@ let shouldPlay = false;
 
 hydra.onNewGame = async (newGameId, _humanCount, botCount, _ephemeralKey) => {
   if (botCount > bot_index) {
+    await new Promise((resolve) => setTimeout(resolve, 1000 * bot_index));
     console.log(`Bot ${bot_index} joining game ${newGameId}`);
     shouldPlay = true;
   }

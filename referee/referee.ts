@@ -277,12 +277,14 @@ hydra.onNewGame = async (newGameId, humanCount, botCount, ephemeralKey) => {
       is_qualifier: isQualifier,
     });
   }
-  await sendEvent(gameId, {
-    type: "player_joined",
-    game_id: gameId,
-    key: ephemeralKey,
-    is_qualifier: isQualifier,
-  });
+  if (humanCount > 0) {
+    await sendEvent(gameId, {
+      type: "player_joined",
+      game_id: gameId,
+      key: ephemeralKey,
+      is_qualifier: isQualifier,
+    });
+  }
 };
 hydra.onPlayerJoin = async (gameId, ephemeralKeys) => {
   if (done) {
