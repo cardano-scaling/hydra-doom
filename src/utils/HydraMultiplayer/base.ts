@@ -17,6 +17,7 @@ export abstract class HydraMultiplayer {
   networkId: number;
 
   gameId?: string;
+  players?: string[];
 
   onNewGame?: (
     gameId: string,
@@ -93,9 +94,13 @@ export abstract class HydraMultiplayer {
         // We failed to decode packets, so this might be a new game or join game tx
         const game = decodeGame(datumRaw);
         if (this.gameId) {
-          this.onPlayerJoin?.(this.gameId, game.players);
+          if (this.players?.toString() !== game.players.toString()) {
+            this.players = game.players;
+            this.onPlayerJoin?.(this.gameId, game.players);
+          }
         } else {
           this.gameId = txId;
+          this.players = game.players;
           this.onNewGame?.(
             txId,
             Number(game.playerCount),
