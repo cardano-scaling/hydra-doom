@@ -37,7 +37,8 @@ async function sendEvent(gameId, data) {
   const command = new PutRecordsCommand(record);
   for (let i = 0; i < 3; i++) {
     try {
-      return kinesis.send(command);
+      await kinesis.send(command);
+      return;
     } catch (e) {
       console.warn("Failed to send event, retrying: ", e);
     }
