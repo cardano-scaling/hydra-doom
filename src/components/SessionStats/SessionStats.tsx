@@ -67,7 +67,7 @@ const SessionStats: FC<Pick<StatsCardProps, "size" | "titleAlign">> = ({
     <StatsCard
       data={formattedStats}
       size={size}
-      title="Session Stats"
+      title="Player Stats"
       titleAlign={titleAlign}
     />
   );
