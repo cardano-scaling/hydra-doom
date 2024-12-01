@@ -17,8 +17,10 @@ const kinesis = new KinesisClient({ region: "us-east-1" }); // TODO: env variabl
 const encoder = new TextEncoder();
 
 async function sendEvent(gameId, data) {
+  const event_id = `${gameId}-${crypto.randomUUID()}`;
   const dataRaw = encoder.encode(
     JSON.stringify({
+      event_id,
       timestamp: new Date().valueOf(),
       data,
     }),
@@ -33,7 +35,13 @@ async function sendEvent(gameId, data) {
     StreamName: "hydra-doom-event-queue",
   };
   const command = new PutRecordsCommand(record);
-  return kinesis.send(command);
+  for (let i = 0; i < 3; i++) {
+    try {
+      return kinesis.send(command);
+    } catch (e) {
+      console.warn("Failed to send event, retrying: ", e);
+    }
+  }
 }
 
 let done = false;
