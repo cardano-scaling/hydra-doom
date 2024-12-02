@@ -3,6 +3,7 @@ import React, {
   FC,
   SetStateAction,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import cx from "classnames";
@@ -90,6 +91,10 @@ const LoginModal: React.FC<LoginModalProps> = ({
     readRules: false,
   });
   const [showSelection, setShowSelection] = useState<boolean>(false);
+  const requiredTou = useMemo(
+    () => (API_BASE_URL.includes("staging") ? { privacy: tou.privacy } : tou),
+    [tou],
+  );
 
   const { data: providers, isLoading: isLoadingProviders } = useQuery<string[]>(
     {
@@ -141,39 +146,43 @@ const LoginModal: React.FC<LoginModalProps> = ({
     return (
       <div className="text-left flex flex-col gap-4">
         <h1 className="text-5xl uppercase">Tournament Consent</h1>
-        {/**
-         * Read the Rules
-         */}
-        <CheckBoxInput
-          consent="readRules"
-          label="I confirm that I read, understand and agree to the Hydra Doom Tournament Official Contest Rules."
-          tou={tou}
-          setTou={setTou}
-        />
+        {API_BASE_URL.includes("staging") ? null : (
+          <>
+            {/**
+             * Read the Rules
+             */}
+            <CheckBoxInput
+              consent="readRules"
+              label="I confirm that I read, understand and agree to the Hydra Doom Tournament Official Contest Rules."
+              tou={tou}
+              setTou={setTou}
+            />
 
-        {/**
-         * Are old enough to play
-         */}
-        <CheckBoxInput
-          consent="oldEnough"
-          label="I confirm that I am 18 years of age or older."
-          tou={tou}
-          setTou={setTou}
-        />
+            {/**
+             * Are old enough to play
+             */}
+            <CheckBoxInput
+              consent="oldEnough"
+              label="I confirm that I am 18 years of age or older."
+              tou={tou}
+              setTou={setTou}
+            />
 
-        {/**
-         * Not an IOG Employee.
-         */}
-        <CheckBoxInput
-          consent="nonEmployee"
-          label="I confirm that I am not an employee of Input Output Global, Inc. or
-            its subsidiaries, affiliates or other disqualifying entities (as
-            more fully described in the Hydra Doom Tournament Official Contest
-            Rules), or an immediate family member or person living in the same
-            household of the foregoing."
-          tou={tou}
-          setTou={setTou}
-        />
+            {/**
+             * Not an IOG Employee.
+             */}
+            <CheckBoxInput
+              consent="nonEmployee"
+              label="I confirm that I am not an employee of Input Output Global, Inc. or
+                its subsidiaries, affiliates or other disqualifying entities (as
+                more fully described in the Hydra Doom Tournament Official Contest
+                Rules), or an immediate family member or person living in the same
+                household of the foregoing."
+              tou={tou}
+              setTou={setTou}
+            />
+          </>
+        )}
 
         {/**
          * Privacy consent
@@ -191,7 +200,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
         <Button
           className="place-self-center my-8 w-96 h-16 flex items-center gap-4 capitalize"
           onClick={() => setShowSelection(true)}
-          disabled={Object.values(tou).includes(false)}
+          disabled={Object.values(requiredTou).includes(false)}
         >
           Continue
         </Button>

@@ -150,7 +150,7 @@ const DoomCanvas: React.FC = () => {
             {isLoading && !isError
               ? "Loading..."
               : type === EGameType.HOST
-                ? "We're spinning up more servers to meet demand, please try again later."
+                ? "We're spinning up more servers to meet demand, please try again shortly."
                 : "Oops! You can't join this game right now. It may have already started or hasn't begun yet. Please try again later or check for a new game to join!"}
           </div>
         )}
