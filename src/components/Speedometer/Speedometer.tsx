@@ -25,7 +25,10 @@ const Speedometer: FC<SpeedometerProps> = ({ maxSpeed, transactions }) => {
           }}
         />
         <div className="absolute -bottom-1 right-9">
-          {Math.max(maxSpeed, transactions)}
+          {Intl.NumberFormat("en-US", {
+            notation: "compact",
+            maximumFractionDigits: 4,
+          }).format(Math.max(maxSpeed, transactions))}
         </div>
       </div>
       <div className="text-center">{transactions}</div>

@@ -13,6 +13,7 @@ export interface GameStatistics {
   as_of: { secs_since_epoch: number; nanos_since_epoch: number };
   bytes_per_second: number;
   kills_per_minute: number;
+  peak_txs_per_second: number;
   suicides_per_minute: number;
   total_bots: number;
   total_bytes: number;

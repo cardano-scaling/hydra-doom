@@ -1,5 +1,4 @@
 import { FC } from "react";
-import { GLOBAL_MAX_SPEED } from "../../constants";
 import Card from "../Card";
 import Speedometer from "../Speedometer";
 import cx from "classnames";
@@ -16,6 +15,7 @@ const GlobalTPS: FC<GlobalTPSProps> = ({
 }) => {
   const { globalStats } = useAppContext();
   const transactions = globalStats?.txs_per_second ?? 0;
+  const maxTransactions = globalStats?.peak_txs_per_second ?? 0;
 
   return (
     <div>
@@ -40,7 +40,7 @@ const GlobalTPS: FC<GlobalTPSProps> = ({
         })}
       >
         <Speedometer
-          maxSpeed={GLOBAL_MAX_SPEED}
+          maxSpeed={maxTransactions}
           transactions={Math.round(transactions)}
         />
       </Card>
