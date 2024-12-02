@@ -28,7 +28,7 @@ const GlobalTotals: FC<Pick<StatsCardProps, "size" | "titleAlign">> = ({
         { label: "Games (all-time):", value: formatNumber(total_games) },
         { label: "Games (active):", value: formatNumber(active_games) },
         { label: "Players (all-time):", value: formatNumber(total_players) },
-        { label: "Player (active):", value: formatNumber(active_players) },
+        { label: "Players (active):", value: formatNumber(active_players) },
         { label: "Bots:", value: formatNumber(total_bots) },
         { label: "Kills:", value: formatNumber(total_kills) },
       ]}

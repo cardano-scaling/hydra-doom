@@ -10,3 +10,4 @@ result*
 *.sk
 *.vk
 treefmt.toml
+.DS_Store
