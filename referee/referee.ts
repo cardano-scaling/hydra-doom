@@ -271,7 +271,7 @@ hydra.onNewGame = async (newGameId, humanCount, botCount, ephemeralKey) => {
   expectedBots = botCount;
   const tournamentOpen = 1733238000000; // Dec 3, 2024, 3pm GMT
   isQualifier =
-    new Date().valueOf() > 1733238000000 && humanCount === 1 && botCount > 0;
+    new Date().valueOf() > tournamentOpen && humanCount === 1 && botCount > 0;
   await sendEvent(gameId, {
     type: "new_game",
     game_id: gameId,

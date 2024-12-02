@@ -90,12 +90,17 @@ const hydra = new HydraMultiplayerClient({
 });
 global.HydraMultiplayer = hydra;
 
+let gameId;
 let shouldPlay = false;
 
-hydra.onNewGame = async (newGameId, _humanCount, botCount, _ephemeralKey) => {
+hydra.onNewGame = async (newGameId, humanCount, botCount, _ephemeralKey) => {
+  console.log(
+    `Saw new game ${newGameId}, with ${humanCount} humans and ${botCount} bots, deciding whether to join...`,
+  );
   if (botCount > bot_index) {
     await new Promise((resolve) => setTimeout(resolve, 1000 * bot_index));
     console.log(`Bot ${bot_index} joining game ${newGameId}`);
+    gameId = newGameId;
     shouldPlay = true;
   }
 };
@@ -131,16 +136,18 @@ const args = [
   "default.cfg",
 ];
 try {
-  console.log("Attemping to join the game");
+  console.log("Attempting to join the game");
   module.callMain(args);
 } catch (e) {
   console.error(e);
 }
 
 while (!done) {
+  console.log(`Game ${gameId} is still running...`);
   await new Promise((resolve) => setTimeout(resolve, 1000));
   timeout -= 1000;
   if (timeout <= 0) {
+    console.log(`Game ${gameId} timed out, restarting`);
     done = true;
   }
 }
