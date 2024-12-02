@@ -29,7 +29,7 @@ interface AppContextInterface {
 export const AppContext = createContext<AppContextInterface>({
   accountData: undefined,
   bestRegion: null,
-  bots: 2,
+  bots: 1,
   gameData: { petName: "", code: "", type: EGameType.SOLO },
   globalStats: undefined,
   isLoadingGlobalStats: false,
