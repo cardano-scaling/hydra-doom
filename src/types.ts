@@ -119,11 +119,22 @@ export interface Region {
 }
 
 export interface SessionStatsInterface {
-  death: number;
-  game_finished: number;
-  game_started: number;
-  kill: number;
-  new_game: number;
-  player_joined: number;
-  suicide: number;
+  overview: {
+    kill: number;
+    death: number;
+    suicide: number;
+    new_game: number;
+    game_started: number;
+    game_finished: number;
+    player_joined: number;
+  };
+  qualifier: {
+    kill: number;
+    death: number;
+    suicide: number;
+    new_game: number;
+    game_started: number;
+    game_finished: number;
+    player_joined: number;
+  };
 }

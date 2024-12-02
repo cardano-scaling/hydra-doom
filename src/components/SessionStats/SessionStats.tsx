@@ -24,7 +24,9 @@ const SessionStats: FC<Pick<StatsCardProps, "size" | "titleAlign">> = ({
     refetchInterval: 6000, // 6 seconds
   });
 
-  const { death = 0, game_started = 0, kill = 0 } = data || {};
+  const death = data?.overview.death || 0;
+  const game_started = data?.overview.game_started || 0;
+  const kill = data?.overview.kill || 0;
 
   const stats = [
     {
