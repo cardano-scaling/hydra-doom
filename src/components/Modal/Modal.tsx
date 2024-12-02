@@ -57,7 +57,7 @@ const Modal: FC<ModalProps> = ({ isOpen, close, children }) => {
                   alt="Noise"
                   className="absolute inset-0 w-full h-full object-cover z-10 opacity-20"
                 />
-                <div className="relative z-20 text-shadow-custom max-h-screen overflow-y-auto">
+                <div className="relative z-20 py-4 text-shadow-custom max-h-screen overflow-y-auto">
                   {children}
                 </div>
               </div>

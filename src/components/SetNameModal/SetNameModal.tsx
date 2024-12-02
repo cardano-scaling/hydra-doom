@@ -25,6 +25,7 @@ const SetNameModal: FC<SetNameModalProps> = ({
     bots,
     gameData,
     players,
+    region,
     setBots,
     setGameData,
     setPlayers,
@@ -60,7 +61,9 @@ const SetNameModal: FC<SetNameModalProps> = ({
   };
 
   const isButtonDisabled =
-    (title === "Join Multiplayer" && !gameData.code) || !gameData.petName;
+    (title === "Join Multiplayer" && !gameData.code) ||
+    !gameData.petName ||
+    (title === "New Game" && !region);
 
   return (
     <Modal isOpen={isOpen} close={close}>
