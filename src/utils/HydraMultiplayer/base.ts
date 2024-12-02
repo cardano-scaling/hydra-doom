@@ -93,12 +93,7 @@ export abstract class HydraMultiplayer {
       if (!packets) {
         // We failed to decode packets, so this might be a new game or join game tx
         const game = decodeGame(datumRaw);
-        if (this.gameId) {
-          if (this.players?.toString() !== game.players.toString()) {
-            this.players = game.players;
-            this.onPlayerJoin?.(this.gameId, game.players);
-          }
-        } else {
+        if (game.players.length == 1) {
           this.gameId = txId;
           this.players = game.players;
           this.onNewGame?.(
@@ -107,6 +102,11 @@ export abstract class HydraMultiplayer {
             Number(game.botCount),
             game.players[0],
           );
+        } else {
+          if (this.players?.toString() !== game.players.toString()) {
+            this.players = game.players;
+            this.onPlayerJoin?.(this.gameId!, game.players);
+          }
         }
         return;
       }
