@@ -17,7 +17,7 @@ import { getRegionWithPrefix } from "../utils/game";
 
 const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const pathSegments = window.location.pathname.split("/").filter(Boolean);
-  const code = pathSegments[1];
+  const code = pathSegments[2];
   const [sessionId, setSessionId] = useSessionIdKeyCache();
   const keys = useKeys();
   const { publicKeyHashHex } = keys || {};

@@ -24,17 +24,20 @@ const SessionStats: FC<Pick<StatsCardProps, "size" | "titleAlign">> = ({
     refetchInterval: 6000, // 6 seconds
   });
 
-  const death = data?.overview.death || 0;
-  const game_started = data?.overview.game_started || 0;
-  const kill = data?.overview.kill || 0;
+  const overviewStatsData = {
+    death: data?.overview.death || 0,
+    game_started: data?.overview.game_started || 0,
+    kill: data?.overview.kill || 0,
+  };
 
-  const stats = [
+  const overViewStats = [
     {
       id: "games-played",
       label: "Games Played:",
-      value: game_started,
-      showStar: game_started > 0,
-      starColor: game_started >= 4 ? "text-yellow-400" : "text-white",
+      value: overviewStatsData.game_started,
+      showStar: overviewStatsData.game_started > 0,
+      starColor:
+        overviewStatsData.game_started >= 4 ? "text-yellow-400" : "text-white",
       tooltip: (
         <Tooltip anchorSelect="#games-played">
           <div>Pass qualifier: 1</div>
@@ -45,9 +48,10 @@ const SessionStats: FC<Pick<StatsCardProps, "size" | "titleAlign">> = ({
     {
       id: "kills",
       label: "Kills:",
-      value: kill,
-      showStar: kill >= 25,
-      starColor: kill >= 50 ? "text-yellow-400" : "text-white",
+      value: overviewStatsData.kill,
+      showStar: overviewStatsData.kill >= 25,
+      starColor:
+        overviewStatsData.kill >= 50 ? "text-yellow-400" : "text-white",
       tooltip: (
         <Tooltip anchorSelect="#kills">
           <div>Pass qualifier: 25</div>
@@ -58,13 +62,74 @@ const SessionStats: FC<Pick<StatsCardProps, "size" | "titleAlign">> = ({
     {
       id: "deaths",
       label: "Deaths:",
-      value: death,
+      value: overviewStatsData.death,
       showStar: false,
       starColor: null,
     },
   ];
 
-  const formattedStats = stats.map(
+  const formattedOverviewStats = overViewStats.map(
+    ({ label, value, showStar, tooltip }) => {
+      const formattedValue = formatNumber(value);
+      return {
+        label,
+        value: showStar ? (
+          <div className="flex items-center gap-4 w-fit">
+            <div className="w-5">{formattedValue}</div>
+            {tooltip}
+          </div>
+        ) : (
+          formattedValue
+        ),
+      };
+    },
+  );
+
+  const qualifierStatsData = {
+    death: data?.qualifier.death || 0,
+    game_started: data?.qualifier.game_started || 0,
+    kill: data?.qualifier.kill || 0,
+  };
+
+  const qualifierStats = [
+    {
+      id: "games-played",
+      label: "Games Played:",
+      value: qualifierStatsData.game_started,
+      showStar: qualifierStatsData.game_started > 0,
+      starColor:
+        qualifierStatsData.game_started >= 4 ? "text-yellow-400" : "text-white",
+      tooltip: (
+        <Tooltip anchorSelect="#games-played">
+          <div>Pass qualifier: 1</div>
+          <div>Achievement: 4</div>
+        </Tooltip>
+      ),
+    },
+    {
+      id: "kills",
+      label: "Kills:",
+      value: qualifierStatsData.kill,
+      showStar: qualifierStatsData.kill >= 25,
+      starColor:
+        qualifierStatsData.kill >= 50 ? "text-yellow-400" : "text-white",
+      tooltip: (
+        <Tooltip anchorSelect="#kills">
+          <div>Pass qualifier: 25</div>
+          <div>Achievement: 50</div>
+        </Tooltip>
+      ),
+    },
+    {
+      id: "deaths",
+      label: "Deaths:",
+      value: qualifierStatsData.death,
+      showStar: false,
+      starColor: null,
+    },
+  ];
+
+  const formattedQualifierStats = qualifierStats.map(
     ({ label, value, showStar, starColor, tooltip, id }) => {
       const formattedValue = formatNumber(value);
       return {
@@ -85,12 +150,20 @@ const SessionStats: FC<Pick<StatsCardProps, "size" | "titleAlign">> = ({
   if (!accountData) return null;
 
   return (
-    <StatsCard
-      data={formattedStats}
-      size={size}
-      title="Player Stats"
-      titleAlign={titleAlign}
-    />
+    <div className="flex flex-col gap-4">
+      <StatsCard
+        data={formattedOverviewStats}
+        size={size}
+        title="Overall Player Stats"
+        titleAlign={titleAlign}
+      />
+      <StatsCard
+        data={formattedQualifierStats}
+        size={size}
+        title="Tournament Stats"
+        titleAlign={titleAlign}
+      />
+    </div>
   );
 };
 

@@ -28,7 +28,7 @@ const useUrls = () => {
       addPlayer: (address: string, code: string) =>
         `https://api.${region?.value}.hydra-doom.sundae.fi/add_player?address=${address}&id=${code}`,
       share: (code?: string) =>
-        code ? `${window.location.origin}/join/${code}` : "",
+        code ? `${window.location.origin}/#/join/${code}` : "",
     };
   }
 };
