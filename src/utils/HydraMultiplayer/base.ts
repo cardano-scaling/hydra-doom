@@ -1,10 +1,12 @@
-import { Constr, Data, fromHex, toHex, TxHash, UTxO } from "lucid-cardano";
+import type { TxHash, UTxO } from "lucid-cardano";
+import { Data, Core } from "@blaze-cardano/sdk";
 import { Hydra } from ".././hydra";
 
 import * as ed25519 from "@noble/ed25519";
 import { sha512 } from "@noble/hashes/sha512";
 import { EmscriptenModule } from "../../types";
 import { Keys } from "../../types";
+import { fromHex, toHex } from "../helpers";
 ed25519.etc.sha512Sync = (...m) => sha512(ed25519.etc.concatBytes(...m));
 
 export abstract class HydraMultiplayer {
@@ -154,7 +156,7 @@ function encodePackets(packets: Packet[]): string {
 }
 
 function decodePackets(raw: Uint8Array): Packet[] | undefined {
-  const packets = Data.from(toHex(raw)) as Constr<Data>[];
+  const packets = Core.PlutusData.fromCbor(Core.HexBlob(toHex(raw)));
   return packets instanceof Array
     ? packets.map((packet) => {
         const [to, from, ephemeralKey, data] = packet.fields;
@@ -179,7 +181,7 @@ interface Game {
 }
 
 function decodeGame(raw: Uint8Array): Game {
-  const game = Data.from(toHex(raw)) as Constr<Data>;
+  const game = Core.PlutusData.fromCbor(Core.HexBlob(toHex(raw)));
   const [
     referee_payment,
     playerCountRaw,
@@ -188,7 +190,7 @@ function decodeGame(raw: Uint8Array): Game {
     stateTag,
     winnerRaw,
     cheaterRaw,
-  ] = game.fields;
+  ] = game[0].fields;
   const referee_key_hash = (referee_payment as Constr<Data>)
     .fields[0] as string;
   const playerCount = playerCountRaw as bigint;
