@@ -1,13 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { IoMdVolumeHigh, IoMdVolumeOff } from "react-icons/io";
 
-import song1 from "../../assets/music/blue-screen-of-death.mp3";
-import song2 from "../../assets/music/demons-prowl.mp3";
-import song3 from "../../assets/music/dooms-fate.mp3";
-import song4 from "../../assets/music/mark-of-malice.mp3";
-import song5 from "../../assets/music/unnamed.mp3";
+import song1 from "../../assets/music/doom-newm.mp3";
 
-const files = [song1, song2, song3, song4, song5];
+const files = [song1];
 
 const MusicPlayer: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
