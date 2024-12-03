@@ -1,21 +1,18 @@
 // Run as a node process to run an AI agent
 
 import { HydraMultiplayerClient } from "utils/HydraMultiplayer/client";
-import { Lucid, toHex, fromHex } from "lucid-cardano";
 import * as bech32 from "bech32-buffer";
+import { Core } from "@blaze-cardano/sdk";
 import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
 import { readFile } from "node:fs/promises";
+import { fromHex, toHex } from "utils/helpers.js";
 
 const NETWORK_ID = Number(process.env.NETWORK_ID);
 const HYDRA_NODE = "http://localhost:4001/";
 const bot_index = Number(process.env.BOT_INDEX ?? 1);
 
 let done = false;
-const lucid = await Lucid.new(
-  undefined,
-  NETWORK_ID === 1 ? "Mainnet" : "Preprod",
-);
 
 const adminKeyFile = process.env.ADMIN_KEY_FILE ?? "admin.sk";
 const adminKey = JSON.parse((await readFile(adminKeyFile)).toString());
@@ -28,24 +25,25 @@ const adminPublicKeyHashBytes = blake2b(adminPublicKeyBytes, {
 });
 const adminPublicKeyHashHex = toHex(adminPublicKeyHashBytes);
 
-const sessionKeyBech32 = lucid.utils.generatePrivateKey();
-const privateKeyBytes = bech32.decode(sessionKeyBech32).data;
+const privateKeyBytes = ed25519.utils.randomPrivateKey();
 
 const publicKeyBytes = await ed25519.getPublicKeyAsync(privateKeyBytes);
 const publicKeyHashBytes = blake2b(publicKeyBytes, { dkLen: 224 / 8 });
 const publicKeyHashHex = toHex(publicKeyHashBytes);
 const keys = {
-  sessionKeyBech32,
   privateKeyBytes,
   privateKeyHex: toHex(privateKeyBytes),
   publicKeyBytes,
   publicKeyHex: toHex(publicKeyBytes),
   publicKeyHashBytes,
   publicKeyHashHex,
-  address: lucid.utils.credentialToAddress({
-    type: "Key",
-    hash: publicKeyHashHex,
-  }),
+  address: Core.addressFromCredential(
+    NETWORK_ID === 1 ? Core.NetworkId.Mainnet : Core.NetworkId.Testnet,
+    Core.Credential.fromCore({
+      type: Core.CredentialType.KeyHash,
+      hash: Core.Hash28ByteBase16(publicKeyHashHex),
+    }),
+  ).toBech32(),
 };
 console.log(`Bot ${bot_index} Address: ${keys.address}`);
 

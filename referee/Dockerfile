@@ -13,7 +13,8 @@ COPY ./referee ./app
 COPY keep-node-alive.sh ./app/run.sh
 COPY ./referee/tsconfig.docker.json ./app/tsconfig.json
 COPY ./src/utils/HydraMultiplayer ./app/utils/HydraMultiplayer
-COPY ./src/utils/hydra.ts ./app/utils/hydra.ts
+COPY ./src/utils/hydra-node.ts ./app/utils/hydra.ts
+COPY ./src/utils/helpers.ts ./app/utils/helpers.ts
 COPY ./websockets-doom.js ./websockets-doom.js
 COPY ./public/ ./public/
 
