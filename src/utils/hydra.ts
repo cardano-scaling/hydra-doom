@@ -165,7 +165,7 @@ export class Hydra {
           break;
         case "TxInvalid":
           {
-            // console.error("TxInvalid", data);
+            console.error("TxInvalid", data);
             const txid = data.transaction.txId;
             if (this.tx_timings[txid]?.sent) {
               const invTime = now - this.tx_timings[txid].sent;
