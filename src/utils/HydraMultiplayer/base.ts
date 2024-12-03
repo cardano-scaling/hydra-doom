@@ -159,7 +159,6 @@ function encodePackets(packets: Packet[]): string {
 
 function decodePackets(raw: Uint8Array): Packet[] | undefined {
   try {
-    console.log("Decoding packets", toHex(raw));
     const packets = Data.from(
       Core.PlutusData.fromCbor(Core.HexBlob(toHex(raw))),
       PacketArray,
@@ -190,7 +189,6 @@ interface Game {
 }
 
 function decodeGame(raw: Uint8Array): TGame {
-  console.log("Decoding game", toHex(raw));
   const game = Data.from(
     Core.PlutusData.fromCbor(Core.HexBlob(toHex(raw))),
     Game,
