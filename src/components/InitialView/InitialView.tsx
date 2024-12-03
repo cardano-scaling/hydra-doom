@@ -102,9 +102,11 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
 
     return (
       <>
-        <Button className="w-96 h-16" onClick={handleTournamentLogin}>
-          Tournament Login
-        </Button>
+        {Date.now() > 1733238000000 && (
+          <Button className="w-96 h-16" onClick={handleTournamentLogin}>
+            Tournament Login
+          </Button>
+        )}
         <Button className="w-96 h-16" onClick={showActionButtons}>
           Free Play
         </Button>
