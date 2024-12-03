@@ -1,6 +1,6 @@
 export const IS_LOCAL = !!import.meta.env.VITE_IS_LOCAL;
 export const CABINET_KEY = import.meta.env.VITE_CABINET_KEY;
-export const NETWORK_ID = Number(import.meta.env.VITE_NETWORK_ID || 0);
+export const NETWORK_ID = Number(import.meta.env.VITE_NETWORK_ID || 1);
 export const HANDLE_CACHE_KEY = "player-handle-cache";
 export const MAX_SPEED = 40;
 export const REGIONS = [
