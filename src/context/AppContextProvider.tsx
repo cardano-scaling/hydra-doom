@@ -16,7 +16,7 @@ import { authRefresh, fetchGlobalStats } from "../utils/requests";
 import { getRegionWithPrefix } from "../utils/game";
 
 const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
-  const pathSegments = window.location.pathname.split("/").filter(Boolean);
+  const pathSegments = window.location.hash.split("/").filter(Boolean);
   const code = pathSegments[2];
   const [sessionId, setSessionId] = useSessionIdKeyCache();
   const keys = useKeys();

@@ -19,12 +19,13 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
   const { setGameData, accountData, isLoadingUserData, setAccountData } =
     useAppContext();
   const [, setSessionId] = useSessionIdKeyCache();
-  const pathSegments = window.location.pathname.split("/").filter(Boolean);
+  const pathSegments = window.location.hash.split("/").filter(Boolean);
   const code = pathSegments[2];
   const [modalTitle, setModalTitle] = useState("Join Multiplayer");
   const [isNameModalOpen, setIsNameModalOpen] = useState(
     pathSegments[1] === EGameType.JOIN,
   );
+
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [displayActionButtons, setDisplayActionButtons] = useState(false);
