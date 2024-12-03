@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { EGameType, EmscriptenModule, NewGameResponse } from "../../types";
 import { useAppContext } from "../../context/useAppContext";
 import { getArgs } from "../../utils/game";
@@ -25,13 +31,17 @@ const DoomCanvas: React.FC = () => {
   const urlClipboard = useClipboard({ copiedTimeout: 1500 });
   const { newGame, addPlayer, share } = useUrls();
   const [isLoading, setIsLoading] = useState(true);
+  const mutationKey = useMemo(
+    () => ["fetchGameData", address, code, type],
+    [address, code, type],
+  );
 
   const {
     mutate: fetchGameData,
     data,
     isError,
   } = useMutation<NewGameResponse>({
-    mutationKey: ["fetchGameData", address, code, type],
+    mutationKey,
     mutationFn: async () => {
       if (type === EGameType.SOLO) {
         return { game_id: "solo" };
