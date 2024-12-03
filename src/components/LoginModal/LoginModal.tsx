@@ -93,7 +93,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
   });
   const [showSelection, setShowSelection] = useState<boolean>(false);
   const requiredTou = useMemo(
-    () => (shouldShowAllTou ? { privacy: tou.privacy } : tou),
+    () => (!shouldShowAllTou ? { privacy: tou.privacy } : tou),
     [tou, shouldShowAllTou],
   );
 
@@ -147,7 +147,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
     return (
       <div className="text-left flex flex-col gap-4">
         <h1 className="text-5xl uppercase">Tournament Consent</h1>
-        {shouldShowAllTou ? null : (
+        {shouldShowAllTou ? (
           <>
             {/**
              * Read the Rules
@@ -183,7 +183,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
               setTou={setTou}
             />
           </>
-        )}
+        ) : null}
 
         {/**
          * Privacy consent
