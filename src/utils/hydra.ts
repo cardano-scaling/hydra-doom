@@ -235,6 +235,7 @@ export class Hydra {
     const txId = txParsed.body().hash();
     this.tx_timings[txId] = { sent: performance.now() };
     this.tx_count++;
+
     this.connection.send(
       JSON.stringify({
         tag: "NewTx",
