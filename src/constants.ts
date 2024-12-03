@@ -12,7 +12,9 @@ export const REGIONS = [
   { name: "Cape Town, Africa", value: "af-south-1", prefix: "f" },
 ];
 export const TIC_RATE_MAGIC = 35; // 35 is the ticrate in DOOM WASM they use to calculate time.
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-export const API_KEY = import.meta.env.VITE_API_KEY;
+// Mainnet api key, change to env variables when we have access.
+export const API_BASE_URL = "https://rewardengine.dripdropz.io/api/v1";
+// Mainnet api key, change to env variables when we have access.
+export const API_KEY = "d93212b3-dbdc-40d0-befd-f90508c6232d";
 export const SESSION_ID_KEY = "session-id";
 export const MAX_PLAYERS = 4;
