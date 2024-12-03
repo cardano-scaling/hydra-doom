@@ -158,20 +158,24 @@ function encodePackets(packets: Packet[]): string {
 }
 
 function decodePackets(raw: Uint8Array): Packet[] | undefined {
-  const packets = Data.from(
-    Core.PlutusData.fromCbor(Core.HexBlob(toHex(raw))),
-    PacketArray,
-  );
-  return packets instanceof Array
-    ? packets.map(({ to, from, ephemeralKey, data }) => {
-        return {
-          to: Number(to),
-          from: Number(from),
-          ephemeralKey: fromHex(ephemeralKey as string),
-          data: fromHex(data as string),
-        };
-      })
-    : undefined;
+  try {
+    const packets = Data.from(
+      Core.PlutusData.fromCbor(Core.HexBlob(toHex(raw))),
+      PacketArray,
+    );
+    return packets instanceof Array
+      ? packets.map(({ to, from, ephemeralKey, data }) => {
+          return {
+            to: Number(to),
+            from: Number(from),
+            ephemeralKey: fromHex(ephemeralKey as string),
+            data: fromHex(data as string),
+          };
+        })
+      : undefined;
+  } catch (err) {
+    return undefined;
+  }
 }
 
 interface Game {
