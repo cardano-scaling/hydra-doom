@@ -87,12 +87,12 @@ const getNativeScript = (
   const cbor = `8202828200581c${playerPkh}8200581c${adminPkh}`;
   const script = Core.NativeScript.fromCbor(Core.HexBlob(cbor));
   const scriptHash = script.hash();
-  const scriptHashBytes = new Uint8Array([
-    0b01110000 | networkId,
-    ...Buffer.from(scriptHash),
-  ]);
-  const address = Core.Address.fromBytes(
-    Core.HexBlob(Buffer.from(scriptHashBytes).toString("hex")),
+  const address = Core.addressFromCredential(
+    networkId,
+    Core.Credential.fromCore({
+      hash: scriptHash,
+      type: Core.CredentialType.ScriptHash,
+    }),
   );
   const stringAddress = address.toBech32();
   const stringScriptHash = scriptHash;
