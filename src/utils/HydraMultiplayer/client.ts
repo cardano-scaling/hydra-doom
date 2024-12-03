@@ -1,8 +1,7 @@
-import type { UTxO } from "lucid-cardano";
 import { Core } from "@blaze-cardano/sdk";
 import { blake2b } from "@noble/hashes/blake2b";
 
-import { EmscriptenModule, Keys } from "../../types";
+import { EmscriptenModule, Keys, UTxO } from "../../types";
 import { HydraMultiplayer } from "./base";
 import { fromHex, toHex } from "../helpers";
 

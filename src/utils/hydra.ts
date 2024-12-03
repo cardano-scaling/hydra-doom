@@ -1,6 +1,11 @@
 /// A broker for communicating with Hydra over websockets
-import type {
+import { Core } from "@blaze-cardano/sdk";
+import { decode } from "cbor-x";
+
+import { fromHex, toHex } from "./helpers";
+import {
   Address,
+  Credential,
   DatumHash,
   Delegation,
   OutRef,
@@ -9,17 +14,12 @@ import type {
   TxHash,
   Unit,
   UTxO,
-  Credential as Cred,
-} from "lucid-cardano";
-import { Core } from "@blaze-cardano/sdk";
-import { decode } from "cbor-x";
+} from "../types";
 
-import { fromHex, toHex } from "./helpers";
-
-const NETWORK_ID =
-  typeof process !== "undefined"
-    ? Number(process.env.NETWORK_ID)
-    : Number(import.meta.env.VITE_NETWORK_ID);
+// const NETWORK_ID =
+//   typeof process !== "undefined"
+//     ? Number(process.env.NETWORK_ID)
+//     : Number(import.meta.env.VITE_NETWORK_ID);
 // const tx_parser = await Lucid.new(
 //   undefined,
 //   NETWORK_ID === 1 ? "Mainnet" : "Preprod",
@@ -243,7 +243,7 @@ export class Hydra {
     return ret;
   }
   public async getUtxosWithUnit(
-    addressOrCredential: Address | Cred,
+    addressOrCredential: Address | Credential,
     unit: Unit,
   ): Promise<UTxO[]> {
     // we only support address for now

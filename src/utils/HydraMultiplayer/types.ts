@@ -1,12 +1,10 @@
 import { Data, Static } from "@blaze-cardano/sdk";
 
 export const PacketSchema = Data.Object({
-  Packet: Data.Object({
-    to: Data.Integer(),
-    from: Data.Integer(),
-    ephemeralKey: Data.Bytes(),
-    data: Data.Bytes(),
-  }),
+  to: Data.Integer(),
+  from: Data.Integer(),
+  ephemeralKey: Data.Bytes(),
+  data: Data.Bytes(),
 });
 
 export type TPacket = Static<typeof PacketSchema>;

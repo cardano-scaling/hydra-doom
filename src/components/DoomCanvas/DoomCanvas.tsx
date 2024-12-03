@@ -94,6 +94,9 @@ const DoomCanvas: React.FC = () => {
       postRun: () => {
         setIsLoading(false);
       },
+      locateFile: (path) => {
+        return path;
+      },
       canvas: canvas,
       print: (text: string) => {
         console.log("stdout:", text);

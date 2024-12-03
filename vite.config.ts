@@ -25,8 +25,8 @@ export default defineConfig({
         process: true,
       },
     }),
-    topLevelAwait(),
     wasm(),
+    topLevelAwait(),
   ],
   optimizeDeps: {
     esbuildOptions: {
@@ -45,7 +45,7 @@ export default defineConfig({
     "import.meta.env.REGION": JSON.stringify(process.env.REGION),
     "import.meta.env.CABINET_KEY": JSON.stringify(process.env.CABINET_KEY),
     "import.meta.env.PERSISTENT_SESSION": JSON.stringify(
-      process.env.PERSISTENT_SESSION,
+      process.env.PERSISTENT_SESSION
     ),
   },
 });

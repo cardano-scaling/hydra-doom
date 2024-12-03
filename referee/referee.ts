@@ -2,12 +2,13 @@
 
 import { readFile } from "node:fs/promises";
 import { HydraMultiplayerServer } from "utils/HydraMultiplayer/server";
-import { Lucid, toHex, fromHex } from "lucid-cardano";
+import { Core } from "@blaze-cardano/sdk";
 import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
 import { KinesisClient, PutRecordsCommand } from "@aws-sdk/client-kinesis";
 import { Packet } from "utils/HydraMultiplayer/base.js";
+import { fromHex, toHex } from "utils/helpers.js";
 
 const NETWORK_ID = Number(process.env.NETWORK_ID);
 const HYDRA_NODE = "http://localhost:4001/";
@@ -46,10 +47,10 @@ async function sendEvent(gameId, data) {
 }
 
 let done = false;
-const lucid = await Lucid.new(
-  undefined,
-  NETWORK_ID === 1 ? "Mainnet" : "Preprod",
-);
+// const lucid = await Lucid.new(
+//   undefined,
+//   NETWORK_ID === 1 ? "Mainnet" : "Preprod",
+// );
 const adminKeyFile = process.env.ADMIN_KEY_FILE ?? "admin.sk";
 const adminKey = JSON.parse((await readFile(adminKeyFile)).toString());
 const privateKeyBytes = adminKey.cborHex.slice(4);
@@ -66,10 +67,13 @@ const keys = {
   publicKeyHex: toHex(publicKeyBytes),
   publicKeyHashBytes,
   publicKeyHashHex,
-  address: lucid.utils.credentialToAddress({
-    type: "Key",
-    hash: publicKeyHashHex,
-  }),
+  address: Core.addressFromCredential(
+    NETWORK_ID === 1 ? Core.NetworkId.Mainnet : Core.NetworkId.Testnet,
+    Core.Credential.fromCore({
+      hash: Core.Hash28ByteBase16(publicKeyHashHex),
+      type: Core.CredentialType.KeyHash,
+    }),
+  ).toBech32(),
 };
 console.log("Address: ", keys.address);
 

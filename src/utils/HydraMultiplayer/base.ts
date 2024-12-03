@@ -1,10 +1,9 @@
-import type { TxHash, UTxO } from "lucid-cardano";
 import { Data, Core } from "@blaze-cardano/sdk";
 import * as ed25519 from "@noble/ed25519";
 import { sha512 } from "@noble/hashes/sha512";
 
 import { Hydra } from ".././hydra";
-import { EmscriptenModule } from "../../types";
+import { EmscriptenModule, TxHash, UTxO } from "../../types";
 import { Keys } from "../../types";
 import { fromHex, toHex } from "../helpers";
 import { Packet as DatumPacket, Game, PacketArray, TGame } from "./types";
@@ -146,12 +145,10 @@ function encodePackets(packets: Packet[]): string {
   const packetData = packets.map((data) =>
     Data.to(
       {
-        Packet: {
-          to: BigInt(data.to),
-          from: BigInt(data.from),
-          ephemeralKey: toHex(data.ephemeralKey),
-          data: toHex(data.data),
-        },
+        to: BigInt(data.to),
+        from: BigInt(data.from),
+        ephemeralKey: toHex(data.ephemeralKey),
+        data: toHex(data.data),
       },
       DatumPacket,
     ),
@@ -166,8 +163,7 @@ function decodePackets(raw: Uint8Array): Packet[] | undefined {
     PacketArray,
   );
   return packets instanceof Array
-    ? packets.map((packet) => {
-        const [to, from, ephemeralKey, data] = packet.fields;
+    ? packets.map(({ to, from, ephemeralKey, data }) => {
         return {
           to: Number(to),
           from: Number(from),
