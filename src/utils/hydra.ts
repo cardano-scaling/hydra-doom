@@ -72,7 +72,7 @@ export class Hydra {
     this.connection = new WebSocket(
       websocketUrl +
         (websocketUrl.toString().endsWith("/") ? "" : "/") +
-        `?history=no`,
+        `?${filterAddress ? `address=${filterAddress}&` : ""}history=no`,
     );
     this.connection.onopen = () => {
       console.log("Connected to Hydra");
