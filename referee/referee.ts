@@ -15,7 +15,7 @@ const HYDRA_NODE = "http://localhost:4001/";
 const RECORD_STATS = true;
 
 const kinesis = new KinesisClient({
-  region: process.env.AWS_REGION ?? "us-east-1",
+  region: "us-east-1",
 });
 const encoder = new TextEncoder();
 
