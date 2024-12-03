@@ -123,7 +123,10 @@ const DoomCanvas: React.FC = () => {
     if (data?.ip && !!keys) {
       const adminAddress = Core.Address.fromBytes(
         Core.HexBlob.fromBytes(
-          new Uint8Array([0b1100000, ...Buffer.from(data.admin_pkh, "hex")]),
+          new Uint8Array([
+            0b0110_0000 | NETWORK_ID,
+            ...Buffer.from(data.admin_pkh, "hex"),
+          ]),
         ),
       );
 
