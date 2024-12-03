@@ -260,7 +260,7 @@ hydra.onTxSeen = () => {
 hydra.onPacket = (_tx: any, packet: Packet) => {
   if (!players[packet.from]) {
     console.log(
-      `Saw a new packet from ${packet.from} with ephemeral key ${packet.ephemeralKey}`,
+      `Saw a new packet from ${packet.from} with ephemeral key ${toHex(packet.ephemeralKey)}`,
     );
     players[packet.from] = {
       ephemeralKey: toHex(packet.ephemeralKey),
