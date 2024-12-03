@@ -38,7 +38,7 @@ export class HydraMultiplayerServer extends HydraMultiplayer {
     // If we want to ensure we don't spend the initial state utxo,
     // we need to add something identifying for the "admin UTxO" (perhaps a datum)
     this.latestUTxO = utxos[0]!;
-    console.log("UTxO Selected");
+    console.log("UTxO Selected", this.latestUTxO);
   }
   protected override buildTx(datum: string): [UTxO, string] {
     if (!this.latestUTxO) {

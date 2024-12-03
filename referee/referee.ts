@@ -369,7 +369,7 @@ while (true) {
   if (counter % 10000 === 0) {
     console.log("10k transactions...");
   }
-  await new Promise((resolve) => setTimeout(resolve, 1));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 }
 
 // while (!done) {
