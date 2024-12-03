@@ -39,6 +39,9 @@ jobs:
 
       - name: Build
         run: yarn build
+        env:
+          VITE_API_URL: https://rewardengine.dripdropz.io/api/v1
+          VITE_API_KEY: d93212b3-dbdc-40d0-befd-f90508c6232d
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
