@@ -10,10 +10,10 @@ export const fetchAuthProviders = async (): Promise<string[]> => {
 };
 
 export const checkSignin = async (
-  sessionKeyBech32: string,
+  publicKeyHex: string,
 ): Promise<AuthResponse> => {
   const response = await fetch(
-    `${API_BASE_URL}/auth/check/${API_KEY}/?reference=${sessionKeyBech32}`,
+    `${API_BASE_URL}/auth/check/${API_KEY}/?reference=${publicKeyHex}`,
   );
   if (!response.ok) {
     throw new Error("Failed to check sign-in status");

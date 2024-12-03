@@ -1,6 +1,5 @@
 import { ReactNode, useState } from "react";
 import Modal from "../Modal";
-import Leaderboard from "../Leaderboard";
 
 const links = [
   {
@@ -44,10 +43,6 @@ const links = [
         </p>
       </div>
     ),
-  },
-  {
-    title: "Leaderboard",
-    content: <Leaderboard />,
   },
 ];
 

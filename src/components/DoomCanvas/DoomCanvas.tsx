@@ -9,7 +9,7 @@ import { MdContentCopy } from "react-icons/md";
 import { ClipboardAPI, useClipboard } from "use-clipboard-copy";
 import createModule from "../../../websockets-doom.js";
 import { useUrls } from "../../hooks/useUrls";
-import { C, fromHex } from "lucid-cardano";
+import { Core } from "@blaze-cardano/sdk";
 import { HydraMultiplayerClient } from "../../utils/HydraMultiplayer/client.js";
 import cx from "classnames";
 import { NETWORK_ID } from "../../constants.js";
@@ -94,6 +94,9 @@ const DoomCanvas: React.FC = () => {
       postRun: () => {
         setIsLoading(false);
       },
+      locateFile: (path) => {
+        return path;
+      },
       canvas: canvas,
       print: (text: string) => {
         console.log("stdout:", text);
@@ -108,8 +111,10 @@ const DoomCanvas: React.FC = () => {
     window.Module = Module;
     // Initialize HydraMultiplayer
     if (data?.ip && !!keys) {
-      const adminAddress = C.Address.from_bytes(
-        new Uint8Array([0b1100000, ...fromHex(data.admin_pkh)]),
+      const adminAddress = Core.Address.fromBytes(
+        Core.HexBlob.fromBytes(
+          new Uint8Array([0b1100000, ...Buffer.from(data.admin_pkh, "hex")]),
+        ),
       );
 
       window.HydraMultiplayer = new HydraMultiplayerClient({
@@ -117,11 +122,9 @@ const DoomCanvas: React.FC = () => {
         adminPkh: data.admin_pkh,
         url: data.ip,
         module: Module,
-        filterAddress: adminAddress.to_bech32(undefined),
+        filterAddress: adminAddress.toBech32(),
         networkId: NETWORK_ID,
       });
-
-      adminAddress.free();
     }
     // Dynamically load websockets-doom.js
     const loadDoom = async () => {

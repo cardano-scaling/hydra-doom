@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "module": "ES2022",
+    "moduleResolution": "node",
     "target": "ES2022",
     "paths": {
       "utils/*": ["../src/utils/*"]

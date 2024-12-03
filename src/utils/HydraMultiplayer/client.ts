@@ -1,8 +1,9 @@
-import { fromHex, toHex, UTxO, C } from "lucid-cardano";
-
+import { Core } from "@blaze-cardano/sdk";
 import { blake2b } from "@noble/hashes/blake2b";
-import { EmscriptenModule, Keys } from "../../types";
+
+import { EmscriptenModule, Keys, UTxO } from "../../types";
 import { HydraMultiplayer } from "./base";
+import { fromHex, toHex } from "../helpers";
 
 export class HydraMultiplayerClient extends HydraMultiplayer {
   // outboundScript is ANY(player, admin) native script
@@ -83,19 +84,17 @@ const getNativeScript = (
   networkId: number,
 ): { cbor: string; address: string; hash: string } => {
   const cbor = `8202828200581c${playerPkh}8200581c${adminPkh}`;
-  const script = C.NativeScript.from_bytes(fromHex(cbor));
-  const scriptHash = script.hash(C.ScriptHashNamespace.NativeScript);
-  const scriptHashBytes = new Uint8Array([
-    0b01110000 | networkId,
-    ...scriptHash.to_bytes(),
-  ]);
-  const address = C.Address.from_bytes(scriptHashBytes);
-  const stringAddress = address.to_bech32(undefined);
-  const stringScriptHash = scriptHash.to_hex();
-
-  script.free();
-  scriptHash.free();
-  address.free();
+  const script = Core.NativeScript.fromCbor(Core.HexBlob(cbor));
+  const scriptHash = script.hash();
+  const address = Core.addressFromCredential(
+    networkId,
+    Core.Credential.fromCore({
+      hash: scriptHash,
+      type: Core.CredentialType.ScriptHash,
+    }),
+  );
+  const stringAddress = address.toBech32();
+  const stringScriptHash = scriptHash;
 
   return { cbor, address: stringAddress, hash: stringScriptHash };
 };

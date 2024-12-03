@@ -1,32 +1,30 @@
 /// A broker for communicating with Hydra over websockets
+import { Core } from "@blaze-cardano/sdk";
+import { decode } from "cbor-x";
+
+import { fromHex, toHex } from "./helpers";
 import {
   Address,
+  Credential,
   DatumHash,
   Delegation,
-  Lucid,
   OutRef,
   ProtocolParameters,
-  toHex,
-  fromHex,
   Transaction,
   TxHash,
   Unit,
   UTxO,
-  Utils,
-  TxComplete,
-  Credential as Cred,
-} from "lucid-cardano";
-import { decode } from "cbor-x";
+} from "../types";
 
-const NETWORK_ID =
-  typeof process !== "undefined"
-    ? Number(process.env.NETWORK_ID)
-    : Number(import.meta.env.VITE_NETWORK_ID);
-const tx_parser = await Lucid.new(
-  undefined,
-  NETWORK_ID === 1 ? "Mainnet" : "Preprod",
-);
-const utils = new Utils(tx_parser);
+// const NETWORK_ID =
+//   typeof process !== "undefined"
+//     ? Number(process.env.NETWORK_ID)
+//     : Number(import.meta.env.VITE_NETWORK_ID);
+// const tx_parser = await Lucid.new(
+//   undefined,
+//   NETWORK_ID === 1 ? "Mainnet" : "Preprod",
+// );
+// const utils = new Utils(tx_parser);
 
 export interface TransactionTiming {
   // Monotonic time when sent
@@ -194,8 +192,8 @@ export class Hydra {
   }
 
   public async submitTx(tx: Transaction): Promise<string> {
-    const txParsed = tx_parser.fromTx(tx);
-    const txId = txParsed.toHash();
+    const txParsed = Core.Transaction.fromCbor(Core.TxCBOR(tx));
+    const txId = txParsed.body().hash();
     this.tx_timings[txId] = { sent: performance.now() };
     this.tx_count++;
     this.connection.send(
@@ -245,7 +243,7 @@ export class Hydra {
     return ret;
   }
   public async getUtxosWithUnit(
-    addressOrCredential: Address | Cred,
+    addressOrCredential: Address | Credential,
     unit: Unit,
   ): Promise<UTxO[]> {
     // we only support address for now
@@ -294,7 +292,9 @@ export class Hydra {
   public async getDatum(datumHash: DatumHash): Promise<string> {
     for (const txRef in this.utxos) {
       if (this.utxos[txRef].datum) {
-        const hash = utils.datumToHash(this.utxos[txRef].datum!);
+        const hash = Core.Datum.fromCbor(Core.HexBlob(this.utxos[txRef].datum!))
+          .asInlineData()
+          ?.hash();
         if (hash === datumHash) {
           return this.utxos[txRef].datum!;
         }

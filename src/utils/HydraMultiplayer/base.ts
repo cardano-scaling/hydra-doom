@@ -1,10 +1,12 @@
-import { Constr, Data, fromHex, toHex, TxHash, UTxO } from "lucid-cardano";
-import { Hydra } from ".././hydra";
-
+import { Data, Core } from "@blaze-cardano/sdk";
 import * as ed25519 from "@noble/ed25519";
 import { sha512 } from "@noble/hashes/sha512";
-import { EmscriptenModule } from "../../types";
+
+import { Hydra } from ".././hydra";
+import { EmscriptenModule, TxHash, UTxO } from "../../types";
 import { Keys } from "../../types";
+import { fromHex, toHex } from "../helpers";
+import { Packet as DatumPacket, Game, PacketArray, TGame } from "./types";
 ed25519.etc.sha512Sync = (...m) => sha512(ed25519.etc.concatBytes(...m));
 
 export abstract class HydraMultiplayer {
@@ -140,24 +142,28 @@ export interface Packet {
 }
 
 function encodePackets(packets: Packet[]): string {
-  return Data.to(
-    packets.map(
-      ({ to, from, ephemeralKey, data }) =>
-        new Constr(0, [
-          BigInt(to),
-          BigInt(from),
-          toHex(ephemeralKey),
-          toHex(data),
-        ]),
+  const packetData = packets.map((data) =>
+    Data.to(
+      {
+        to: BigInt(data.to),
+        from: BigInt(data.from),
+        ephemeralKey: toHex(data.ephemeralKey),
+        data: toHex(data.data),
+      },
+      DatumPacket,
     ),
   );
+
+  return Data.to(packetData, PacketArray).toCbor();
 }
 
 function decodePackets(raw: Uint8Array): Packet[] | undefined {
-  const packets = Data.from(toHex(raw)) as Constr<Data>[];
+  const packets = Data.from(
+    Core.PlutusData.fromCbor(Core.HexBlob(toHex(raw))),
+    PacketArray,
+  );
   return packets instanceof Array
-    ? packets.map((packet) => {
-        const [to, from, ephemeralKey, data] = packet.fields;
+    ? packets.map(({ to, from, ephemeralKey, data }) => {
         return {
           to: Number(to),
           from: Number(from),
@@ -178,9 +184,13 @@ interface Game {
   cheater?: string;
 }
 
-function decodeGame(raw: Uint8Array): Game {
-  const game = Data.from(toHex(raw)) as Constr<Data>;
-  const [
+function decodeGame(raw: Uint8Array): TGame {
+  const game = Data.from(
+    Core.PlutusData.fromCbor(Core.HexBlob(toHex(raw))),
+    Game,
+  );
+
+  const {
     referee_payment,
     playerCountRaw,
     botCountRaw,
@@ -188,40 +198,18 @@ function decodeGame(raw: Uint8Array): Game {
     stateTag,
     winnerRaw,
     cheaterRaw,
-  ] = game.fields;
-  const referee_key_hash = (referee_payment as Constr<Data>)
-    .fields[0] as string;
+  } = game;
+
+  const referee_key_hash = referee_payment[0];
   const playerCount = playerCountRaw as bigint;
   const botCount = botCountRaw as bigint;
-  const players = (player_payments as Constr<Data>[]).map(
-    (player) => player.fields[0] as string,
-  );
-  let state: Game["state"] = "Aborted";
-  switch ((stateTag as Constr<Data>).index) {
-    case 0:
-      state = "Lobby";
-      break;
-    case 1:
-      state = "Running";
-      break;
-    case 2:
-      state = "Cheated";
-      break;
-    case 3:
-      state = "Finished";
-      break;
-    default:
-      state = "Aborted";
-  }
-  const winner = winnerRaw as Constr<Data>;
-  const cheater = cheaterRaw as Constr<Data>;
   return {
     referee_key_hash: referee_key_hash,
     playerCount,
     botCount,
-    players,
-    state: state,
-    winner: winner.index == 0 ? (winner.fields[0] as string) : undefined,
-    cheater: cheater.index == 0 ? (cheater.fields[0] as string) : undefined,
+    players: player_payments,
+    state: stateTag,
+    winner: winnerRaw[0],
+    cheater: cheaterRaw[0],
   };
 }

@@ -103,7 +103,6 @@ export interface AuthResponse {
 }
 
 export interface Keys {
-  sessionKeyBech32: string;
   privateKeyBytes: Uint8Array;
   privateKeyHex: string;
   publicKeyBytes: Uint8Array;
@@ -138,3 +137,63 @@ export interface SessionStatsInterface {
     player_joined: number;
   };
 }
+
+/**
+ * Lucid types
+ */
+export type Credential = {
+  type: "Key" | "Script";
+  hash: string;
+};
+export type ScriptType = "Native" | PlutusVersion;
+export type PlutusVersion = "PlutusV1" | "PlutusV2";
+export type PolicyId = string;
+export type Script = {
+  type: ScriptType;
+  script: string;
+};
+
+export type UTxO = {
+  txHash: TxHash;
+  outputIndex: number;
+  assets: Record<string, bigint>;
+  address: Address;
+  datumHash?: DatumHash | null;
+  datum?: string | null;
+  scriptRef?: Script | null;
+};
+
+export interface Delegation {
+  poolId: string | null;
+  rewards: bigint;
+}
+
+export interface OutRef {
+  txHash: string;
+  outputIndex: number;
+}
+
+export type Address = string;
+export type DatumHash = string;
+export type Transaction = string;
+export type TxHash = string;
+export type Unit = string;
+export type CostModel = Record<string, number>;
+export type CostModels = Record<PlutusVersion, CostModel>;
+export type ProtocolParameters = {
+  minFeeA: number;
+  minFeeB: number;
+  maxTxSize: number;
+  maxValSize: number;
+  keyDeposit: bigint;
+  poolDeposit: bigint;
+  priceMem: number;
+  priceStep: number;
+  maxTxExMem: bigint;
+  maxTxExSteps: bigint;
+  coinsPerUtxoByte: bigint;
+  collateralPercentage: number;
+  maxCollateralInputs: number;
+  costModels: CostModels;
+  minfeeRefscriptCostPerByte: number;
+};
