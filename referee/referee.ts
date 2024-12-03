@@ -15,10 +15,7 @@ const HYDRA_NODE = "http://localhost:4001/";
 const RECORD_STATS = true;
 
 const kinesis = new KinesisClient({
-  region:
-    process.env.AWS_REGION === "ap-southeast-1"
-      ? "ap-southeast-1"
-      : "us-east-1",
+  region: "us-east-1",
 });
 const encoder = new TextEncoder();
 
@@ -330,9 +327,9 @@ try {
 }
 
 // Wait until the game starts
-while (!gameId) {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-}
+// while (!gameId) {
+//  await new Promise((resolve) => setTimeout(resolve, 1000));
+// }
 
 const args = [
   "-server",
@@ -360,12 +357,18 @@ const args = [
 //   console.error(e);
 // }
 
+let counter = 0;
+console.log("Submitting as many txs as possible");
 while (true) {
   if (!hydra.hydra.isConnected()) {
     continue;
   }
   // According to https://www.doomworld.com/forum/topic/99810-how-much-data-does-online-dming-consume/ assumptions, the network packet is about 6 bytes
   await hydra.SendPacket(0, 0, new Uint8Array([0, 0, 0, 0, 0, 0]));
+  counter++;
+  if (counter % 10000 === 0) {
+    console.log("10k transactions...");
+  }
   await new Promise((resolve) => setTimeout(resolve, 1));
 }
 
