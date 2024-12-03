@@ -10,6 +10,8 @@ import { KinesisClient, PutRecordsCommand } from "@aws-sdk/client-kinesis";
 import { Packet } from "utils/HydraMultiplayer/base.js";
 import { fromHex, toHex } from "utils/helpers.js";
 
+
+
 const NETWORK_ID = Number(process.env.NETWORK_ID);
 const HYDRA_NODE = "http://localhost:4001/";
 const RECORD_STATS = true;

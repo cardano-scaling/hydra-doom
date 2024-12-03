@@ -206,16 +206,16 @@ function decodeGame(raw: Uint8Array): TGame {
     cheaterRaw,
   } = game;
 
-  const referee_key_hash = referee_payment[0];
+  const referee_key_hash = referee_payment.payment_key_hash;
   const playerCount = playerCountRaw as bigint;
   const botCount = botCountRaw as bigint;
   return {
     referee_key_hash: referee_key_hash,
     playerCount,
     botCount,
-    players: player_payments,
+    players: player_payments.map(p => p.payment_key_hash),
     state: stateTag,
-    winner: winnerRaw[0],
-    cheater: cheaterRaw[0],
+    winner: winnerRaw,
+    cheater: cheaterRaw,
   };
 }

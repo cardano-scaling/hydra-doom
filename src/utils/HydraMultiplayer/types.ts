@@ -16,10 +16,12 @@ export type TPacketArray = Static<typeof PacketArraySchema>;
 export const PacketArray = PacketArraySchema as unknown as TPacketArray;
 
 export const GameSchema = Data.Object({
-  referee_payment: Data.Array(Data.Bytes()),
+  referee_payment: Data.Object({
+    payment_key_hash: Data.Bytes()
+  }),
   playerCountRaw: Data.Integer(),
   botCountRaw: Data.Integer(),
-  player_payments: Data.Array(Data.Bytes()),
+  player_payments: Data.Array(Data.Object({ payment_key_hash: Data.Bytes() })),
   stateTag: Data.Enum([
     Data.Literal("Lobby"),
     Data.Literal("Running"),
@@ -27,8 +29,8 @@ export const GameSchema = Data.Object({
     Data.Literal("Finished"),
     Data.Literal("Aborted"),
   ]),
-  winnerRaw: Data.Tuple(Data.Bytes()),
-  cheaterRaw: Data.Tuple(Data.Bytes()),
+  winnerRaw: Data.Nullable(Data.Object({ payment_key_hash: Data.Bytes() })),
+  cheaterRaw: Data.Nullable(Data.Object({ payment_key_hash: Data.Bytes() })),
 });
 
 export type TGame = Static<typeof GameSchema>;
