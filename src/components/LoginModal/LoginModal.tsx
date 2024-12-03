@@ -80,6 +80,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
   isOpen,
   showActionButtons,
 }) => {
+  const shouldShowAllTou = Date.now() >= 1733238000000;
   const [, setSessionId] = useSessionIdKeyCache();
   const { keys, setAccountData } = useAppContext();
   const { publicKeyHashHex } = keys || {};
@@ -92,8 +93,8 @@ const LoginModal: React.FC<LoginModalProps> = ({
   });
   const [showSelection, setShowSelection] = useState<boolean>(false);
   const requiredTou = useMemo(
-    () => (API_BASE_URL.includes("staging") ? { privacy: tou.privacy } : tou),
-    [tou],
+    () => (shouldShowAllTou ? { privacy: tou.privacy } : tou),
+    [tou, shouldShowAllTou],
   );
 
   const { data: providers, isLoading: isLoadingProviders } = useQuery<string[]>(
@@ -146,7 +147,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
     return (
       <div className="text-left flex flex-col gap-4">
         <h1 className="text-5xl uppercase">Tournament Consent</h1>
-        {API_BASE_URL.includes("staging") ? null : (
+        {shouldShowAllTou ? null : (
           <>
             {/**
              * Read the Rules
