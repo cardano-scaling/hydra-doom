@@ -14,7 +14,9 @@ const NETWORK_ID = Number(process.env.NETWORK_ID);
 const HYDRA_NODE = "http://localhost:4001/";
 const RECORD_STATS = true;
 
-const kinesis = new KinesisClient({ region: "us-east-1" }); // TODO: env variable?
+const kinesis = new KinesisClient({
+  region: process.env.AWS_REGION ?? "us-east-1",
+});
 const encoder = new TextEncoder();
 
 async function sendEvent(gameId, data) {
