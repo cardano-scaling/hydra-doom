@@ -76,11 +76,9 @@ export abstract class HydraMultiplayer {
     await this.selectUTxO();
     const datum = encodePackets(this.packetQueue);
 
-    const [_, tx] = this.buildTx(datum);
+    const [newUTxO, tx] = this.buildTx(datum);
     await this.hydra.submitTx(tx);
-    // Refetch the latestUtxO everytime to determine if that's the issue
-    this.latestUTxO = null;
-    // this.latestUTxO = newUTxO;
+    this.latestUTxO = newUTxO;
     this.packetQueue = [];
   }
 
