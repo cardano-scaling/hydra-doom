@@ -115,6 +115,7 @@ const hydra = new HydraMultiplayerServer({
   address: keys.address,
   url: HYDRA_NODE,
   module,
+  networkId: NETWORK_ID,
 });
 global.HydraMultiplayer = hydra;
 
