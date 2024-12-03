@@ -83,48 +83,48 @@ export abstract class HydraMultiplayer {
   }
 
   public observeTx(txId: TxHash, tx: any): void {
-    try {
-      const body = tx[0];
-      const outputs = body["1"];
-      const output = outputs[0];
-      const datumRaw: Uint8Array | undefined = output?.["2"]?.[1]?.value;
-      if (!datumRaw) {
-        return;
-      }
-      const packets = decodePackets(datumRaw);
-      if (!packets) {
-        // We failed to decode packets, so this might be a new game or join game tx
-        const game = decodeGame(datumRaw);
-        if (game.players.length == 1) {
-          this.gameId = txId;
-          this.players = game.players;
-          this.onNewGame?.(
-            txId,
-            Number(game.playerCount),
-            Number(game.botCount),
-            game.players[0],
-          );
-        } else {
-          if (this.players?.toString() !== game.players.toString()) {
-            this.players = game.players;
-            this.onPlayerJoin?.(this.gameId!, game.players);
-          }
-        }
-        return;
-      }
-      for (const packet of packets) {
-        this.onPacket?.(tx, packet);
-        if (packet.to == this.myIP) {
-          const buf = this.module._malloc!(packet.data.length);
-          this.module.HEAPU8!.set(packet.data, buf);
-          this.module._ReceivePacket!(packet.from, buf, packet.data.length);
-          this.module._free!(buf);
-          this.onTxSeen?.(txId, tx);
-        }
-      }
-    } catch (err) {
-      console.warn(err);
-    }
+    // try {
+    //   const body = tx[0];
+    //   const outputs = body["1"];
+    //   const output = outputs[0];
+    //   const datumRaw: Uint8Array | undefined = output?.["2"]?.[1]?.value;
+    //   if (!datumRaw) {
+    //     return;
+    //   }
+    //   const packets = decodePackets(datumRaw);
+    //   if (!packets) {
+    //     // We failed to decode packets, so this might be a new game or join game tx
+    //     const game = decodeGame(datumRaw);
+    //     if (game.players.length == 1) {
+    //       this.gameId = txId;
+    //       this.players = game.players;
+    //       this.onNewGame?.(
+    //         txId,
+    //         Number(game.playerCount),
+    //         Number(game.botCount),
+    //         game.players[0],
+    //       );
+    //     } else {
+    //       if (this.players?.toString() !== game.players.toString()) {
+    //         this.players = game.players;
+    //         this.onPlayerJoin?.(this.gameId!, game.players);
+    //       }
+    //     }
+    //     return;
+    //   }
+    //   for (const packet of packets) {
+    //     this.onPacket?.(tx, packet);
+    //     if (packet.to == this.myIP) {
+    //       const buf = this.module._malloc!(packet.data.length);
+    //       this.module.HEAPU8!.set(packet.data, buf);
+    //       this.module._ReceivePacket!(packet.from, buf, packet.data.length);
+    //       this.module._free!(buf);
+    //       this.onTxSeen?.(txId, tx);
+    //     }
+    //   }
+    // } catch (err) {
+    //   console.warn(err);
+    // }
   }
 
   protected signData(data: string): string {

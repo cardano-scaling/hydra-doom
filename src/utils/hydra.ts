@@ -119,19 +119,6 @@ export class Hydra {
           break;
         case "TxValid":
           {
-            if (this.startTime === 0) {
-              this.startTime = performance.now();
-            }
-            this.tx_count += 1;
-            const endTime = performance.now();
-            if (endTime > this.startTime + 1000) {
-              console.log(
-                `Current Data: ${this.tx_count} Transactions | ${this.tx_count / ((endTime - this.startTime) / 1000)} TPS`,
-              );
-
-              this.startTime = performance.now();
-              this.tx_count = 0;
-            }
             // // Record seen time
             // if (this.tx_timings[txid]?.sent) {
             //   const seenTime = now - this.tx_timings[txid].sent;
@@ -235,7 +222,6 @@ export class Hydra {
     const txId = txParsed.body().hash();
     this.tx_timings[txId] = { sent: performance.now() };
     this.tx_count++;
-
     this.connection.send(
       JSON.stringify({
         tag: "NewTx",
