@@ -123,6 +123,7 @@ export abstract class HydraMultiplayer {
         }
       }
     } catch (err) {
+      console.warn("failed parsing tx", tx);
       console.warn(err);
     }
   }
