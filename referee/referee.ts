@@ -10,8 +10,6 @@ import { KinesisClient, PutRecordsCommand } from "@aws-sdk/client-kinesis";
 import { Packet } from "utils/HydraMultiplayer/base.js";
 import { fromHex, toHex } from "utils/helpers.js";
 
-
-
 const NETWORK_ID = Number(process.env.NETWORK_ID);
 const HYDRA_NODE = "http://localhost:4001/";
 const RECORD_STATS = true;
@@ -279,8 +277,6 @@ hydra.onNewGame = async (newGameId, humanCount, botCount, ephemeralKey) => {
   expectedHumans = humanCount;
   expectedBots = botCount;
   const tournamentOpen = 1733238000000; // Dec 3, 2024, 3pm GMT
-  isQualifier =
-    new Date().valueOf() > tournamentOpen && humanCount === 1 && botCount > 0;
   await sendEvent(gameId, {
     type: "new_game",
     game_id: gameId,
