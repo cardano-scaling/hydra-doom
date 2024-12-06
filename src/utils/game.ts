@@ -11,7 +11,7 @@ export const getArgs = ({ type, petName }: GameData) => {
     "dm_iog.wad",
     "iog_assets.wad",
     "-warp",
-    "1",
+    "30",
     "-dehlump",
     "-extratics",
     "1",
