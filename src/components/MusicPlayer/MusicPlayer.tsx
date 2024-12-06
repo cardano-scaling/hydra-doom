@@ -3,7 +3,7 @@ import { IoMdVolumeHigh, IoMdVolumeOff } from "react-icons/io";
 
 import song1 from "../../assets/music/doom-newm.mp3";
 
-const files = [song1];
+const files = [song1, song1];
 
 const MusicPlayer: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
