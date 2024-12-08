@@ -137,7 +137,7 @@ export class Hydra {
           break;
         case "SnapshotConfirmed":
           {
-            for (const txid of data.snapshot.confirmed) {
+            for (const txid of data.snapshot.confirmedTransactions) {
               if (!this.tx_timings[txid]?.sent) {
                 continue;
               }
