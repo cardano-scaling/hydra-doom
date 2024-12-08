@@ -124,6 +124,8 @@ const args = [
   "-merge",
   "dm_iog.wad",
   "iog_assets.wad",
+  "-warp",
+  "30",
   "-nodraw",
   "-nomouse",
   "-nograbmouse",

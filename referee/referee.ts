@@ -338,6 +338,8 @@ const args = [
   "-merge",
   "dm_iog.wad",
   "iog_assets.wad",
+  "-warp",
+  "30",
   expectedBots > 0 ? "-ai" : "-drone",
   "-nodes",
   (expectedHumans + expectedBots).toString(),
