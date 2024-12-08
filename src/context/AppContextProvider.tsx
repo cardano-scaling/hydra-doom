@@ -5,7 +5,6 @@ import {
   AuthResponse,
   EGameType,
   GameStatistics,
-  Qualifier,
   Region,
 } from "../types";
 import useBestRegion from "../hooks/useBestRegion";
