@@ -16,8 +16,14 @@ interface InitialViewProps {
 }
 
 const InitialView: FC<InitialViewProps> = ({ startGame }) => {
-  const { setGameData, accountData, isLoadingUserData, setAccountData } =
-    useAppContext();
+  const {
+    setGameData,
+    accountData,
+    isQualified,
+    setIsQualified,
+    isLoadingUserData,
+    setAccountData,
+  } = useAppContext();
   const [, setSessionId] = useSessionIdKeyCache();
   const pathSegments = window.location.hash.split("/").filter(Boolean);
   const code = pathSegments[2];
@@ -48,9 +54,9 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
     setGameData((prev) => ({ ...prev, type: EGameType.JOIN }));
   };
 
-  // const handleTournamentLogin = () => {
-  //   setIsLoginModalOpen(true);
-  // };
+  const handleTournamentLogin = () => {
+    setIsLoginModalOpen(true);
+  };
 
   const handleSubmitNameModal = () => {
     setIsNameModalOpen(false);
@@ -63,10 +69,9 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
 
   const onLogout = () => {
     setAccountData(undefined);
+    setIsQualified(false);
     setSessionId("");
   };
-
-  console.log(accountData);
 
   const renderButtons = () => {
     if (isLoadingUserData) {
@@ -77,16 +82,60 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
       return (
         <>
           {accountData ? (
-            <div className="flex items-center gap-6 justify-center mb-8">
-              <div className="text-3xl">
-                Logged In as:{" "}
-                <span className="text-white text-shadow-custom">
-                  {accountData.auth_name}
-                </span>
+            <div className="flex-col">
+              <div className="flex items-center gap-6 justify-center mb-8">
+                <div className="text-3xl">
+                  Logged In as:{" "}
+                  <span className="text-white text-shadow-custom">
+                    {accountData.auth_name}
+                  </span>
+                </div>
+                <Button className="text-xl w-36 h-11" onClick={onLogout} tick>
+                  Logout
+                </Button>
               </div>
-              <Button className="text-xl w-36 h-11" onClick={onLogout} tick>
-                Logout
-              </Button>
+              {!isQualified ? (
+                <>
+                  <div className="flex items-center gap-6 justify-center mb-8">
+                    <span className="text-white text-3xl text-shadow-custom">
+                      Unfortunately, you have not qualified for the next stage
+                      of the tournament.
+                    </span>
+                  </div>
+                  <div className="text-center text-5xl mb-8">Free Play</div>
+                </>
+              ) : (
+                <div className="flex-col items-center gap-6 justify-center text-center mb-8">
+                  <div className="text-white text-3xl text-shadow-custom">
+                    Congratulations, you've qualified! Your next steps:
+                  </div>
+                  <div className="text-white text-3xl text-shadow-custom">
+                    1) Connect your Discord to your tournament account{" "}
+                    <a
+                      target="_blank"
+                      href="https://rewardengine.dripdropz.io/leaderboard/d93212b3-dbdc-40d0-befd-f90508c6232d"
+                      className="text-black hover:text-red-800"
+                    >
+                      here
+                    </a>
+                  </div>
+                  <div className="text-white text-3xl text-shadow-custom">
+                    2) Join our{" "}
+                    <a
+                      target="_blank"
+                      href="https://discord.gg/DBEUycQm7F"
+                      className="text-black hover:text-red-800"
+                    >
+                      Discord server
+                    </a>{" "}
+                    for matchmaking & more information
+                  </div>
+
+                  <div className="mt-8 text-center text-5xl mb-8">
+                    Free Play
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="text-center text-5xl mb-8">Free Play</div>
@@ -103,11 +152,11 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
 
     return (
       <>
-        {/* {Date.now() > 1733238000000 && (
+        {Date.now() > 1733620395000 && ( //1733666400000
           <Button className="w-96 h-16" onClick={handleTournamentLogin}>
             Tournament Login
           </Button>
-        )} */}
+        )}
         <Button className="w-96 h-16" onClick={showActionButtons}>
           Free Play
         </Button>

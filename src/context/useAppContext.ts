@@ -19,11 +19,13 @@ interface AppContextInterface {
   keys: Keys | null;
   players: number;
   region: Region | null;
+  isQualified: boolean;
   setAccountData: Dispatch<React.SetStateAction<Account | undefined>>;
   setBots: Dispatch<React.SetStateAction<number>>;
   setGameData: Dispatch<React.SetStateAction<GameData>>;
   setPlayers: Dispatch<React.SetStateAction<number>>;
   setRegion: Dispatch<React.SetStateAction<Region | null>>;
+  setIsQualified: Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const AppContext = createContext<AppContextInterface>({
@@ -37,11 +39,13 @@ export const AppContext = createContext<AppContextInterface>({
   keys: null,
   players: 1,
   region: null,
+  isQualified: false,
   setAccountData: () => {},
   setBots: () => {},
   setGameData: () => {},
   setPlayers: () => {},
   setRegion: () => {},
+  setIsQualified: () => {},
 });
 
 export const useAppContext = () => {
