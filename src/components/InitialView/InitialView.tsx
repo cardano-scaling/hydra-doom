@@ -123,7 +123,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
                     2) Join our{" "}
                     <a
                       target="_blank"
-                      href="https://discord.gg/DBEUycQm7F"
+                      href="https://discord.gg/mAJkTqAuAM"
                       className="text-black hover:text-red-800"
                     >
                       Discord server
