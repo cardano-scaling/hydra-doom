@@ -82,7 +82,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
 }) => {
   const shouldShowAllTou = Date.now() >= 1733238000000;
   const [, setSessionId] = useSessionIdKeyCache();
-  const { keys, setAccountData } = useAppContext();
+  const { keys, setAccountData, setIsQualified } = useAppContext();
   const { publicKeyHashHex } = keys || {};
   const [isWaitingSigning, setIsWaitingSigning] = useState(false);
   const [tou, setTou] = useState<ITOU>({
@@ -113,14 +113,22 @@ const LoginModal: React.FC<LoginModalProps> = ({
 
   useEffect(() => {
     if (userData?.authenticated) {
-      const { account, session } = userData;
+      const { account, session, qualifier } = userData;
       setIsWaitingSigning(false);
       close();
       showActionButtons();
       if (account) setAccountData(account);
       if (session?.session_id) setSessionId(session.session_id);
+      if (qualifier) setIsQualified(qualifier.is_qualified);
     }
-  }, [close, setAccountData, setSessionId, showActionButtons, userData]);
+  }, [
+    close,
+    setAccountData,
+    setSessionId,
+    showActionButtons,
+    userData,
+    setIsQualified,
+  ]);
 
   const handleClose = () => {
     if (!isWaitingSigning) {

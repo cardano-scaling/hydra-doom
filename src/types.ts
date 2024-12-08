@@ -96,10 +96,33 @@ export interface Session {
   auth_country_code: string;
   authenticated_at: string;
 }
+
+export interface Qualifier {
+  is_qualified: boolean;
+  rqeuirements: [
+    {
+      is_met: boolean;
+      play_to: string;
+      play_from: string;
+    },
+    {
+      is_met: boolean;
+      actual_kill_count: number;
+      required_kill_count: number;
+    },
+    {
+      is_met: true;
+      actual_play_minutes: number;
+      required_play_minutes: number;
+    },
+  ];
+}
+
 export interface AuthResponse {
   authenticated: boolean;
   account: Account | null;
   session: Session | null;
+  qualifier: Qualifier | null;
 }
 
 export interface Keys {

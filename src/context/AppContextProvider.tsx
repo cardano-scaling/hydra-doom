@@ -5,6 +5,7 @@ import {
   AuthResponse,
   EGameType,
   GameStatistics,
+  Qualifier,
   Region,
 } from "../types";
 import useBestRegion from "../hooks/useBestRegion";
@@ -28,6 +29,7 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
     type: EGameType.SOLO,
   });
   const [accountData, setAccountData] = useState<Account>();
+  const [isQualified, setIsQualified] = useState<boolean>(false);
   const [region, setRegion] = useState<Region | null>(null);
   const [players, setPlayers] = useState(1);
   const [bots, setBots] = useState(1);
@@ -58,9 +60,10 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     if (userData) {
-      const { account, session } = userData;
+      const { account, session, qualifier } = userData;
       if (session?.session_id) setSessionId(session.session_id);
       if (account) setAccountData(account);
+      if (qualifier) setIsQualified(qualifier.is_qualified);
     }
   }, [setSessionId, userData]);
 
@@ -90,6 +93,8 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
       setGameData,
       setPlayers,
       setRegion,
+      isQualified,
+      setIsQualified,
     }),
     [
       accountData,
@@ -102,6 +107,7 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
       keys,
       players,
       region,
+      isQualified,
     ],
   );
 
