@@ -12,6 +12,7 @@ import { fromHex, toHex } from "utils/helpers.js";
 
 const NETWORK_ID = Number(process.env.NETWORK_ID);
 const HYDRA_NODE = "http://localhost:4001/";
+const DISCORD_BOT = "http://localhost:8080/"; // TODO
 const RECORD_STATS = true;
 
 const kinesis = new KinesisClient({
@@ -44,6 +45,25 @@ async function sendEvent(gameId, data) {
       return;
     } catch (e) {
       console.warn("Failed to send event, retrying: ", e);
+    }
+  }
+}
+
+async function reportResults(gameId, results) {
+  console.log(`Reporting results for game ${gameId}\n`, JSON.stringify(results, null, 2));
+  for(let i = 0; i < 5; i++) {
+    try {
+      let resp = await fetch(DISCORD_BOT, {
+        method: "POST",
+        body: JSON.stringify(results),
+      })
+      if (resp.status !== 200) {
+        throw new Error(resp.statusText + ": " + await resp.text());
+      } else {
+        break;
+      }
+    } catch(e) {
+      console.warn("Failed to report results, retrying: ", e);
     }
   }
 }
@@ -254,6 +274,13 @@ hydra.onPlayerJoin = async (gameId, ephemeralKeys) => {
     is_elimination: true,
   });
 };
+hydra.onDisagreement = async () => {
+  // TODO: cleanup game state
+  await reportResults(gameId, {
+    gameId: gameId,
+    result: "disagreement",
+  })
+};
 
 // Mark us as waiting for a new game
 try {
@@ -302,12 +329,26 @@ while (!done) {
   if (timer <= 0) {
     console.log("Game ended.");
     done = true;
-    // TODO: report results
+    await reportResults(gameId, {
+      gameId: gameId,
+      result: "finished",
+      playerOne: {
+        pkh: Object.values(players).find(p => p.playerNumber === 0)?.ephemeralKey,
+        kills: hydra.clients[0].kills,
+      },
+      playerTwo: {
+        pkh: Object.values(players).find(p => p.playerNumber === 1)?.ephemeralKey,
+        kills: hydra.clients[1].kills,
+      }
+    });
   }
   if (timeout <= 0) {
     console.log("Game timed out.");
     done = true;
-    // TODO: abort game
+    await reportResults(gameId, {
+      gameId: gameId,
+      result: "timeout",
+    });
   }
 }
 

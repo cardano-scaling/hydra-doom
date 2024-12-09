@@ -13,6 +13,7 @@ export class HydraMultiplayerDedicated extends HydraMultiplayer {
   address: string;
   // A map from player index, to the kills that player has reported
   clients: { [playerIdx: number]: Client };
+  onDisagreement?: () => Promise<void>;
 
   constructor({
     key,
@@ -60,6 +61,7 @@ export class HydraMultiplayerDedicated extends HydraMultiplayer {
         if(clientA && clientB) {
           if(clientA.kills != clientB.kills && Math.abs(clientA.tic - clientB.tic) < 10) {
             console.log(`Players disagree on kills!`);
+            this.onDisagreement?.();
           }
         }
       }
