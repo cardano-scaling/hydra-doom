@@ -12,7 +12,7 @@ import { fromHex, toHex } from "utils/helpers.js";
 
 const NETWORK_ID = Number(process.env.NETWORK_ID);
 const HYDRA_NODE = "http://localhost:4001/";
-const DISCORD_BOT = "http://localhost:8080/"; // TODO
+const DISCORD_BOT = "https://discord.us-east-1.hydra-doom.sundae.fi/match"; // TODO
 const RECORD_STATS = true;
 
 const kinesis = new KinesisClient({
