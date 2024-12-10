@@ -298,13 +298,6 @@ while (!gameId) {
 const args = [
   "-dedicated",
   "-altdeath",
-  "-iwad",
-  "freedoom2.wad",
-  "-merge",
-  "dm_iog.wad",
-  "iog_assets.wad",
-  "-warp",
-  "30",
   "-nodes",
   expectedHumans.toString(),
   "-nodraw",
