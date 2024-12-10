@@ -26,7 +26,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
     setGameData,
     setIsQualified,
   } = useAppContext();
-  const { publicKeyHashHex } = keys || {};
+const publicKeyHashHex = keys?.publicKeyHashHex
   const [, setSessionId] = useSessionIdKeyCache();
   const pathSegments = window.location.hash.split("/").filter(Boolean);
   const code = pathSegments[2];
