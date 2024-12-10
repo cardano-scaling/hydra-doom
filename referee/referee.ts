@@ -234,7 +234,10 @@ let timer = 15 * 60 * 1000; // 15 minute timer
 hydra.onTxSeen = () => {
   timeout = 60_000;
 };
+// Hacky :skull:
+const originalOnPacket = hydra.onPacket;
 hydra.onPacket = (_tx: any, packet: Packet) => {
+  originalOnPacket(_tx, packet);
   if (!players[packet.from]) {
     console.log(
       `Saw a new packet from ${packet.from} with ephemeral key ${toHex(packet.ephemeralKey)}`,

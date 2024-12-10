@@ -49,6 +49,10 @@ export class HydraMultiplayerDedicated extends HydraMultiplayer {
     this.latestUTxO = utxos.find((u) => !u.datumHash && !u.assets.lovelace)!;
   }
   public trackKills(_tx: any, packet: Packet) {
+    // Ignore packets from the server
+    if (packet.from === 1) {
+      return;
+    }
     this.clients[packet.from] = this.clients[packet.from] || { tic: 0, kills: [] };
     this.clients[packet.from].kills = packet.kills;
     this.clients[packet.from].tic += 1;
