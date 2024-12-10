@@ -53,12 +53,19 @@ export class HydraMultiplayerDedicated extends HydraMultiplayer {
     this.clients[packet.from].kills = packet.kills;
     this.clients[packet.from].tic += 1;
 
+    console.log("Kills: ", this.clients);
+
     let keys = Object.keys(this.clients);
     for(let i = 0; i < keys.length; i++) {
       for(let j = i + 1; j < keys.length; j++) {
         const clientA = this.clients[keys[i]];
         const clientB = this.clients[keys[j]];
         if(clientA && clientB) {
+          console.log(`Comparing ${keys[i]} and ${keys[j]}`);
+          console.log(`Client A: ${clientA.kills}`);
+          console.log(`Client B: ${clientB.kills}`);
+          console.log(`Client A tic: ${clientA.tic}`);
+          console.log(`Client B tic: ${clientB.tic}`);
           if(clientA.kills != clientB.kills && Math.abs(clientA.tic - clientB.tic) < 10) {
             console.log(`Players disagree on kills!`);
             this.onDisagreement?.();

@@ -65,6 +65,7 @@ export abstract class HydraMultiplayer {
     kills: number[],
     data: Uint8Array,
   ): Promise<void> {
+    console.log("SendPacket", kills);
     const ephemeralKey = this.key.publicKeyHashBytes;
     this.packetQueue.push({ to, from, ephemeralKey, kills, data });
     await this.sendPacketQueue();
