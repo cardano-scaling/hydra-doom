@@ -130,22 +130,12 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
                     </a>{" "}
                     for matchmaking & more information
                   </div>
-
-                  <div className="mt-8 text-center text-5xl mb-8">
-                    Free Play
-                  </div>
                 </div>
               )}
             </div>
           ) : (
             <div className="text-center text-5xl mb-8">Free Play</div>
           )}
-          <Button className="w-96 h-16" onClick={handleClickStartMultiplayer}>
-            New Game
-          </Button>
-          <Button className="w-96 h-16" onClick={handleClickJoinMultiplayer}>
-            Join Game
-          </Button>
         </>
       );
     }
@@ -157,9 +147,6 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
             Tournament Login
           </Button>
         )}
-        <Button className="w-96 h-16" onClick={showActionButtons}>
-          Free Play
-        </Button>
       </>
     );
   };
