@@ -150,7 +150,7 @@ function encodePackets(packets: Packet[]): string {
         to: BigInt(data.to),
         from: BigInt(data.from),
         ephemeralKey: toHex(data.ephemeralKey),
-        kills: data.kills.map((k) => BigInt(k)),
+        kills: Array.from(data.kills).map((k) => BigInt(k)),
         data: toHex(data.data),
       },
       DatumPacket,
