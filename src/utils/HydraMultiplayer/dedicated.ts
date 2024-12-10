@@ -57,8 +57,6 @@ export class HydraMultiplayerDedicated extends HydraMultiplayer {
     this.clients[packet.from] = this.clients[packet.from] || { kills: [] };
     this.clients[packet.from].kills = packet.kills;
 
-    console.log("Kills: ", this.clients);
-
     let keys = Object.keys(this.clients);
     let allAgree = true;
     for(let i = 0; i < keys.length; i++) {
@@ -66,9 +64,6 @@ export class HydraMultiplayerDedicated extends HydraMultiplayer {
         const clientA = this.clients[keys[i]];
         const clientB = this.clients[keys[j]];
         if(clientA && clientB) {
-          console.log(`Comparing ${keys[i]} and ${keys[j]}`);
-          console.log(`Client A: ${clientA.kills}`);
-          console.log(`Client B: ${clientB.kills}`);
           if(clientA.kills.toString() != clientB.kills.toString()) {
             allAgree = false;
           }

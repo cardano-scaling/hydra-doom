@@ -4,6 +4,7 @@
   "module": "ES2022",
   "target": "ES2022",
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.705.0",
     "@aws-sdk/client-kinesis": "^3.696.0",
     "@blaze-cardano/sdk": "^0.2.11",
     "@noble/ed25519": "^2.1.0",

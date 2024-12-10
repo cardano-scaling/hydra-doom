@@ -7,17 +7,22 @@ import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
 import { KinesisClient, PutRecordsCommand } from "@aws-sdk/client-kinesis";
+import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { Packet } from "utils/HydraMultiplayer/base.js";
 import { fromHex, toHex } from "utils/helpers.js";
 
 const NETWORK_ID = Number(process.env.NETWORK_ID);
 const HYDRA_NODE = "http://localhost:4001/";
-const DISCORD_BOT = "https://discord.us-east-1.hydra-doom.sundae.fi/match"; // TODO
+const DISCORD_BOT = "https://discord.hydra-doom.sundae.fi/match"; // TODO
 const RECORD_STATS = true;
 
 const kinesis = new KinesisClient({
   region: "us-east-1",
 });
+const dynamo = new DynamoDBClient({
+  region: "us-east-1",
+});
+
 const encoder = new TextEncoder();
 
 async function sendEvent(gameId, data) {
@@ -53,6 +58,13 @@ async function reportResults(gameId, results) {
   console.log(`Reporting results for game ${gameId}\n`, JSON.stringify(results, null, 2));
   for(let i = 0; i < 5; i++) {
     try {
+      await dynamo.send(new PutItemCommand({
+        TableName: "doom-game-results",
+        Item: {
+          pk: { S: gameId },
+          results: { S: JSON.stringify(results) },
+        },
+      }));
       let resp = await fetch(DISCORD_BOT, {
         method: "POST",
         body: JSON.stringify(results),
