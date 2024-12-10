@@ -5,7 +5,6 @@ import { EmscriptenModule, Keys, UTxO } from "../../types";
 import { fromHex, toHex } from "../helpers";
 
 interface Client {
-    tic: number;
     kills: number[];
 }
 
@@ -14,6 +13,7 @@ export class HydraMultiplayerDedicated extends HydraMultiplayer {
   // A map from player index, to the kills that player has reported
   clients: { [playerIdx: number]: Client };
   onDisagreement?: () => Promise<void>;
+  disagreeementTimer: number;
 
   constructor({
     key,
@@ -32,6 +32,7 @@ export class HydraMultiplayerDedicated extends HydraMultiplayer {
     this.address = address;
     this.onPacket = this.trackKills.bind(this);
     this.clients = {};
+    this.disagreeementTimer = 0;
   }
 
   public override async selectUTxO(): Promise<void> {
@@ -49,13 +50,12 @@ export class HydraMultiplayerDedicated extends HydraMultiplayer {
     this.latestUTxO = utxos.find((u) => !u.datumHash && !u.assets.lovelace)!;
   }
   public trackKills(_tx: any, packet: Packet) {
-    // Ignore packets from the server
+    // Ignore packets from the serveryarn
     if (packet.from === 1) {
       return;
     }
     this.clients[packet.from] = this.clients[packet.from] || { tic: 0, kills: [] };
     this.clients[packet.from].kills = packet.kills;
-    this.clients[packet.from].tic += 1;
 
     console.log("Kills: ", this.clients);
 
@@ -70,9 +70,14 @@ export class HydraMultiplayerDedicated extends HydraMultiplayer {
           console.log(`Client B: ${clientB.kills}`);
           console.log(`Client A tic: ${clientA.tic}`);
           console.log(`Client B tic: ${clientB.tic}`);
-          if(clientA.kills != clientB.kills && Math.abs(clientA.tic - clientB.tic) < 10) {
-            console.log(`Players disagree on kills!`);
-            this.onDisagreement?.();
+          if(clientA.kills.toString() != clientB.kills.toString()) {
+            this.disagreeementTimer += 1;
+            if (this.disagreeementTimer > 10) {
+              console.log(`Players disagree on kills!`);
+              this.onDisagreement?.();
+            }
+          } else {
+            this.disagreeementTimer = 0;
           }
         }
       }
