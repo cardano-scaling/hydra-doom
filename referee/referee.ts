@@ -297,7 +297,6 @@ while (!gameId) {
 
 const args = [
   "-dedicated",
-  "-altdeath",
   "-nodes",
   expectedHumans.toString(),
   "-nodraw",
