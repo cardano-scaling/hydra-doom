@@ -216,6 +216,9 @@ try {
   if (Object.keys(data).length > 1) {
     console.log("Cleaning up old game state");
     try {
+      await fetch("http://localhost:8000/game/end_game", {
+        method: "POST",
+      });
       await fetch("http://localhost:8000/game/cleanup", {
         method: "POST",
       });
