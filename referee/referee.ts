@@ -215,11 +215,11 @@ global.playerDisconnected = async (addr: number, player: number) => {
     result: "disconnect",
     playerOne: {
       pkh: Object.values(players).find(p => p.playerNumber === 0)?.ephemeralKey,
-      kills: hydra.clients[0].kills,
+      kills: hydra.clients[0]?.kills,
     },
     playerTwo: {
       pkh: Object.values(players).find(p => p.playerNumber === 1)?.ephemeralKey,
-      kills: hydra.clients[1].kills,
+      kills: hydra.clients[1]?.kills,
     }
   })
   if (!RECORD_STATS) return;
@@ -357,11 +357,11 @@ while (!done) {
       result: "finished",
       playerOne: {
         pkh: Object.values(players).find(p => p.playerNumber === 0)?.ephemeralKey,
-        kills: hydra.clients[0].kills,
+        kills: hydra.clients[0]?.kills,
       },
       playerTwo: {
         pkh: Object.values(players).find(p => p.playerNumber === 1)?.ephemeralKey,
-        kills: hydra.clients[1].kills,
+        kills: hydra.clients[1]?.kills,
       }
     });
   }
@@ -373,11 +373,11 @@ while (!done) {
       result: "timeout",
       playerOne: {
         pkh: Object.values(players).find(p => p.playerNumber === 0)?.ephemeralKey,
-        kills: hydra.clients[0].kills,
+        kills: hydra.clients[0]?.kills,
       },
       playerTwo: {
         pkh: Object.values(players).find(p => p.playerNumber === 1)?.ephemeralKey,
-        kills: hydra.clients[1].kills,
+        kills: hydra.clients[1]?.kills,
       }
     });
   }
