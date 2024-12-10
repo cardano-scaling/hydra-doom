@@ -42,18 +42,6 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
     }
   }, [code, setGameData]);
 
-  const handleClickStartMultiplayer = () => {
-    setModalTitle("New Game");
-    setIsNameModalOpen(true);
-    setGameData((prev) => ({ ...prev, type: EGameType.HOST }));
-  };
-
-  const handleClickJoinMultiplayer = () => {
-    setModalTitle("Join Multiplayer");
-    setIsNameModalOpen(true);
-    setGameData((prev) => ({ ...prev, type: EGameType.JOIN }));
-  };
-
   const handleTournamentLogin = () => {
     setIsLoginModalOpen(true);
   };
