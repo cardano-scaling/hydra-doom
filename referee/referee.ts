@@ -279,6 +279,7 @@ hydra.onPlayerJoin = async (gameId, ephemeralKeys) => {
 };
 hydra.onDisagreement = async () => {
   // TODO: cleanup game state
+  done = true;
   await reportResults(gameId, {
     gameId: gameId,
     result: "disagreement",
