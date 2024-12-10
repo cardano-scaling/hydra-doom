@@ -1,7 +1,7 @@
 import { blake2b } from "@noble/hashes/blake2b";
 
 import { HydraMultiplayer, Packet } from "./base";
-import { EmscriptenModule, Keys, TxHash, UTxO } from "../../types";
+import { EmscriptenModule, Keys, UTxO } from "../../types";
 import { fromHex, toHex } from "../helpers";
 
 interface Client {
