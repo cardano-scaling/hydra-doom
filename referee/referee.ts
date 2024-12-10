@@ -107,6 +107,30 @@ const keys = {
 };
 console.log("Address: ", keys.address);
 
+
+// check for extraneous state utxos and cleanup
+while(true) {
+  try {
+    console.log("Checking head's utxo set for stale games...");
+    const response = await fetch(`${HYDRA_NODE}snapshot/utxo`);
+    const data = await response.json();
+    // Currently, we are just wiping the utxos after every game
+    // We may want to make this logic more robust if we are hoping to preserve those utxos
+    if (Object.keys(data).length > 1) {
+      console.log("Cleaning up old game state");
+      await fetch("http://localhost:8000/game/end_game", {
+        method: "POST",
+      });
+      await fetch("http://localhost:8000/game/cleanup", {
+        method: "POST",
+      });
+    }
+    break;
+  } catch (e) {
+    console.warn("Failed to fetch and parse node utxos: ", e);
+  }
+}
+
 const { default: createModule } = await import("../websockets-doom.js");
 const module = await createModule({
   locateFile: (path, scripts) => {
@@ -232,28 +256,6 @@ global.playerDisconnected = async (addr: number, player: number) => {
   }
 };
 
-// check for extraneous state utxos and cleanup
-for(let i = 0; i < 5; i++) {
-  try {
-    console.log("Checking head's utxo set for stale games...");
-    const response = await fetch(`${HYDRA_NODE}snapshot/utxo`);
-    const data = await response.json();
-    // Currently, we are just wiping the utxos after every game
-    // We may want to make this logic more robust if we are hoping to preserve those utxos
-    if (Object.keys(data).length > 1) {
-      console.log("Cleaning up old game state");
-      await fetch("http://localhost:8000/game/end_game", {
-        method: "POST",
-      });
-      await fetch("http://localhost:8000/game/cleanup", {
-        method: "POST",
-      });
-    }
-    break;
-  } catch (e) {
-    console.warn("Failed to fetch and parse node utxos: ", e);
-  }
-}
 
 // Log a new game or player joined transaction if we see it
 let timeout = 60_000;
