@@ -210,16 +210,18 @@ global.playerConnected = async (addr: number, player: number) => {
 global.playerDisconnected = async (addr: number, player: number) => {
   console.log(`Someone disconnected, ending the game`);
   done = true;
+  let [player1Key, player1] = Object.entries(players).find(([_, p]) => p.playerNumber === 0) ?? [];
+  let [player2Key, player2] = Object.entries(players).find(([_, p]) => p.playerNumber === 1) ?? [];
   await reportResults(gameId, {
     gameId: gameId,
     result: "disconnect",
     playerOne: {
-      pkh: Object.values(players).find(p => p.playerNumber === 0)?.ephemeralKey,
-      kills: hydra.clients[0]?.kills,
+      pkh: player1?.ephemeralKey,
+      kills: hydra.clients[player1Key]?.kills,
     },
     playerTwo: {
-      pkh: Object.values(players).find(p => p.playerNumber === 1)?.ephemeralKey,
-      kills: hydra.clients[1]?.kills,
+      pkh: player2?.ephemeralKey,
+      kills: hydra.clients[player2Key]?.kills,
     }
   })
   if (!RECORD_STATS) return;
@@ -350,32 +352,36 @@ while (!done) {
   if (timer <= 0) {
     console.log("Game ended.");
     done = true;
+    let [player1Key, player1] = Object.entries(players).find(([_, p]) => p.playerNumber === 0) ?? [];
+    let [player2Key, player2] = Object.entries(players).find(([_, p]) => p.playerNumber === 1) ?? [];
     await reportResults(gameId, {
       gameId: gameId,
       result: "finished",
       playerOne: {
-        pkh: Object.values(players).find(p => p.playerNumber === 0)?.ephemeralKey,
-        kills: hydra.clients[0]?.kills,
+        pkh: player1?.ephemeralKey,
+        kills: hydra.clients[player1Key]?.kills,
       },
       playerTwo: {
-        pkh: Object.values(players).find(p => p.playerNumber === 1)?.ephemeralKey,
-        kills: hydra.clients[1]?.kills,
+        pkh: player2?.ephemeralKey,
+        kills: hydra.clients[player2Key]?.kills,
       }
     });
   }
   if (timeout <= 0) {
     console.log("Game timed out.");
     done = true;
+    let [player1Key, player1] = Object.entries(players).find(([_, p]) => p.playerNumber === 0) ?? [];
+    let [player2Key, player2] = Object.entries(players).find(([_, p]) => p.playerNumber === 1) ?? [];
     await reportResults(gameId, {
       gameId: gameId,
       result: "timeout",
       playerOne: {
-        pkh: Object.values(players).find(p => p.playerNumber === 0)?.ephemeralKey,
-        kills: hydra.clients[0]?.kills,
+        pkh: player1?.ephemeralKey,
+        kills: hydra.clients[player1Key]?.kills,
       },
       playerTwo: {
-        pkh: Object.values(players).find(p => p.playerNumber === 1)?.ephemeralKey,
-        kills: hydra.clients[1]?.kills,
+        pkh: player2?.ephemeralKey,
+        kills: hydra.clients[player2Key]?.kills,
       }
     });
   }
