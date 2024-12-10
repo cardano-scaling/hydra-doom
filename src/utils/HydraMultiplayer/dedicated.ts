@@ -73,7 +73,7 @@ export class HydraMultiplayerDedicated extends HydraMultiplayer {
     if (!allAgree) {
       this.disagreeementTimer++;
       console.log(`Players disagree on kills! They have ${10 - this.disagreeementTimer} to resolve this`);
-      if (this.disagreeementTimer > 10) {
+      if (this.disagreeementTimer > 35) {
         console.log(`Players disagree on kills for too long; cancelling game!`);
         this.onDisagreement?.();
       }
