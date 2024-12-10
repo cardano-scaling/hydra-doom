@@ -55,9 +55,10 @@ async function sendEvent(gameId, data) {
 }
 
 async function reportResults(gameId, results) {
-  console.log(`Reporting results for game ${gameId}\n`, JSON.stringify(results, null, 2));
-  for(let i = 0; i < 5; i++) {
+  for(let i = 0; i < 10; i++) {
+    console.log(`Reporting results for game ${gameId}\n`, JSON.stringify(results, null, 2));
     try {
+      console.log("Sending to dynamodb");
       await dynamo.send(new PutItemCommand({
         TableName: "doom-game-results",
         Item: {
@@ -65,13 +66,15 @@ async function reportResults(gameId, results) {
           results: { S: JSON.stringify(results) },
         },
       }));
+      console.log("Sending to discord bot");
       let resp = await fetch(DISCORD_BOT, {
         method: "POST",
         body: JSON.stringify(results),
-      })
+      });
       if (resp.status !== 200) {
         throw new Error(resp.statusText + ": " + await resp.text());
       } else {
+        console.log("Success!");
         break;
       }
     } catch(e) {
