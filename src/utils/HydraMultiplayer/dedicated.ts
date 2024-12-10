@@ -60,6 +60,7 @@ export class HydraMultiplayerDedicated extends HydraMultiplayer {
     console.log("Kills: ", this.clients);
 
     let keys = Object.keys(this.clients);
+    let allAgree = true;
     for(let i = 0; i < keys.length; i++) {
       for(let j = i + 1; j < keys.length; j++) {
         const clientA = this.clients[keys[i]];
@@ -69,17 +70,20 @@ export class HydraMultiplayerDedicated extends HydraMultiplayer {
           console.log(`Client A: ${clientA.kills}`);
           console.log(`Client B: ${clientB.kills}`);
           if(clientA.kills.toString() != clientB.kills.toString()) {
-            this.disagreeementTimer += 1;
-            console.log(`Players disagree on kills! They have ${10 - this.disagreeementTimer} to resolve this`);
-            if (this.disagreeementTimer > 10) {
-              console.log(`Players disagree on kills for too long; cancelling game!`);
-              this.onDisagreement?.();
-            }
-          } else {
-            this.disagreeementTimer = 0;
+            allAgree = false;
           }
         }
       }
+    }
+    if (!allAgree) {
+      this.disagreeementTimer++;
+      console.log(`Players disagree on kills! They have ${10 - this.disagreeementTimer} to resolve this`);
+      if (this.disagreeementTimer > 10) {
+        console.log(`Players disagree on kills for too long; cancelling game!`);
+        this.onDisagreement?.();
+      }
+    } else {
+      this.disagreeementTimer = 0;
     }
   } 
 
