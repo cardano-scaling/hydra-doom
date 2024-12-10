@@ -4,6 +4,7 @@ export const PacketSchema = Data.Object({
   to: Data.Integer(),
   from: Data.Integer(),
   ephemeralKey: Data.Bytes(),
+  kills: Data.Array(Data.Integer()),
   data: Data.Bytes(),
 });
 
