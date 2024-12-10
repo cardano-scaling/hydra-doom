@@ -20,6 +20,8 @@ import { HydraMultiplayerClient } from "../../utils/HydraMultiplayer/client.js";
 import cx from "classnames";
 import { NETWORK_ID } from "../../constants.js";
 
+let alreadyFetched: NewGameResponse | undefined = undefined;
+
 const DoomCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const {
@@ -33,7 +35,7 @@ const DoomCanvas: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const mutationKey = useMemo(
     () => ["fetchGameData", address, code, type],
-    [address, code, type],
+    ["fetchGameData", address, code, type],
   );
 
   const {
@@ -48,8 +50,14 @@ const DoomCanvas: React.FC = () => {
       }
       const url =
         type === EGameType.HOST ? newGame(address!) : addPlayer(address!, code);
-      const response = await fetch(url);
-      return response.json();
+      if (!!alreadyFetched) {
+        return alreadyFetched;
+      } else {
+        console.log("fetching", mutationKey);
+        const response = await fetch(url);
+        alreadyFetched = await response.json();
+        return alreadyFetched as any;
+      }
     },
   });
 
