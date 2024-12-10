@@ -1,4 +1,4 @@
-import { IS_LOCAL } from "../constants";
+import { IS_LOCAL, REGIONS } from "../constants";
 import { useAppContext } from "../context/useAppContext";
 
 const healthUrl = (region: string) => {
@@ -25,8 +25,10 @@ const useUrls = () => {
     return {
       newGame: (address: string) =>
         `https://api.${region?.value}.hydra-doom.sundae.fi/new_game?address=${address}&player_count=${players}&bot_count=${bots}`,
-      addPlayer: (address: string, code: string) =>
-        `https://api.${region?.value}.hydra-doom.sundae.fi/add_player?address=${address}&id=${code}`,
+      addPlayer: (address: string, code: string) => {
+        let gameRegion = REGIONS.find(r => r.prefix == code[0]);
+        return `https://api.${gameRegion?.value}.hydra-doom.sundae.fi/add_player?address=${address}&id=${code}`;
+      },
       share: (code?: string) =>
         code ? `${window.location.origin}/#/join/${code}` : "",
     };

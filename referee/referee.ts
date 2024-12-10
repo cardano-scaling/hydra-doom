@@ -1,7 +1,7 @@
 // Run as a node process to run a referee doom server
 
 import { readFile } from "node:fs/promises";
-import { HydraMultiplayerServer } from "utils/HydraMultiplayer/server";
+import { HydraMultiplayerDedicated } from "utils/HydraMultiplayer/dedicated";
 import { Core } from "@blaze-cardano/sdk";
 import * as bech32 from "bech32-buffer";
 import * as ed25519 from "@noble/ed25519";
@@ -12,6 +12,7 @@ import { fromHex, toHex } from "utils/helpers.js";
 
 const NETWORK_ID = Number(process.env.NETWORK_ID);
 const HYDRA_NODE = "http://localhost:4001/";
+const DISCORD_BOT = "http://localhost:8080/"; // TODO
 const RECORD_STATS = true;
 
 const kinesis = new KinesisClient({
@@ -48,11 +49,26 @@ async function sendEvent(gameId, data) {
   }
 }
 
+async function reportResults(gameId, results) {
+  console.log(`Reporting results for game ${gameId}\n`, JSON.stringify(results, null, 2));
+  for(let i = 0; i < 5; i++) {
+    try {
+      let resp = await fetch(DISCORD_BOT, {
+        method: "POST",
+        body: JSON.stringify(results),
+      })
+      if (resp.status !== 200) {
+        throw new Error(resp.statusText + ": " + await resp.text());
+      } else {
+        break;
+      }
+    } catch(e) {
+      console.warn("Failed to report results, retrying: ", e);
+    }
+  }
+}
+
 let done = false;
-// const lucid = await Lucid.new(
-//   undefined,
-//   NETWORK_ID === 1 ? "Mainnet" : "Preprod",
-// );
 const adminKeyFile = process.env.ADMIN_KEY_FILE ?? "admin.sk";
 const adminKey = JSON.parse((await readFile(adminKeyFile)).toString());
 const privateKeyBytes = adminKey.cborHex.slice(4);
@@ -110,7 +126,7 @@ const module = await createModule({
 });
 global.Module = module;
 
-const hydra = new HydraMultiplayerServer({
+const hydra = new HydraMultiplayerDedicated({
   key: keys,
   address: keys.address,
   url: HYDRA_NODE,
@@ -119,13 +135,7 @@ const hydra = new HydraMultiplayerServer({
 });
 global.HydraMultiplayer = hydra;
 
-// NOTE: a lot of this code is brittle, because we're relying on the timing of transactions to match the game
-// There's not another clean way to map the ephemeral key to doom's notion of "player" index without a bunch of refactoring
-// That being said, for the purposes of the tournament, it should be a non-issue
 let expectedHumans = 0;
-let expectedBots = 0;
-let isQualifier = false;
-let timeout = 60_000;
 let gameId = "";
 type Player = {
   ephemeralKey: string;
@@ -133,12 +143,6 @@ type Player = {
   connected: boolean;
 };
 const players: { [addr: number]: Player } = {};
-// Prepopulate with the server, since we don't send out syn packets
-players[1] = {
-  ephemeralKey: keys.publicKeyHashHex,
-  connected: false,
-  playerNumber: -1,
-};
 
 global.gameStarted = async () => {
   const connectedPlayers = Object.values(players)
@@ -201,35 +205,6 @@ global.playerDisconnected = async (addr: number, player: number) => {
     console.warn("Failed to record player left: ", e);
   }
 };
-global.kill = async (killer, victim) => {
-  let killerPlayer: Player, victimPlayer: Player;
-  for (const player of Object.values(players)) {
-    if (player.playerNumber === killer) {
-      killerPlayer = player;
-    }
-    if (player.playerNumber === victim) {
-      victimPlayer = player;
-    }
-  }
-  console.log(
-    `${killerPlayer.ephemeralKey} killed ${victimPlayer.ephemeralKey}`,
-  );
-  if (!RECORD_STATS) return;
-  try {
-    await Promise.all([
-      fetch("http://localhost:8000/player_killed", { method: "POST" }),
-      sendEvent(gameId, {
-        type: "kill",
-        game_id: gameId,
-        killer: killerPlayer.ephemeralKey,
-        victim: victimPlayer.ephemeralKey,
-        is_qualifier: isQualifier,
-      }),
-    ]);
-  } catch (e) {
-    console.warn("Failed to record a kill: ", e);
-  }
-};
 
 // check for extraneous state utxos and cleanup
 try {
@@ -254,6 +229,8 @@ try {
 }
 
 // Log a new game or player joined transaction if we see it
+let timeout = 60_000;
+let timer = 15 * 60 * 1000; // 15 minute timer
 hydra.onTxSeen = () => {
   timeout = 60_000;
 };
@@ -269,38 +246,19 @@ hydra.onPacket = (_tx: any, packet: Packet) => {
     };
   }
 };
-hydra.onNewGame = async (newGameId, humanCount, botCount, ephemeralKey) => {
+hydra.onNewGame = async (newGameId, humanCount, _botCount, ephemeralKey) => {
   console.log(
-    `Observed new game: ${newGameId} with ${humanCount} human players and ${botCount} bots, by ${ephemeralKey}`,
+    `Observed new game: ${newGameId}, by ${ephemeralKey}`,
   );
   gameId = newGameId;
   expectedHumans = humanCount;
-  expectedBots = botCount;
-  const tournamentOpen = 1733238000000; // Dec 3, 2024, 3pm GMT
   await sendEvent(gameId, {
     type: "new_game",
     game_id: gameId,
     humans: humanCount,
-    bots: botCount,
-    is_qualifier: isQualifier,
+    bots: 0,
+    is_elimination: true,
   });
-  if (botCount > 0) {
-    // TODO: should we have the referee call join_game?
-    await sendEvent(gameId, {
-      type: "player_joined",
-      game_id: gameId,
-      key: keys.publicKeyHashHex,
-      is_qualifier: isQualifier,
-    });
-  }
-  if (humanCount > 0) {
-    await sendEvent(gameId, {
-      type: "player_joined",
-      game_id: gameId,
-      key: ephemeralKey,
-      is_qualifier: isQualifier,
-    });
-  }
 };
 hydra.onPlayerJoin = async (gameId, ephemeralKeys) => {
   if (done) {
@@ -313,8 +271,15 @@ hydra.onPlayerJoin = async (gameId, ephemeralKeys) => {
     type: "player_joined",
     game_id: gameId,
     key: newPlayer,
-    is_qualifier: isQualifier,
+    is_elimination: true,
   });
+};
+hydra.onDisagreement = async () => {
+  // TODO: cleanup game state
+  await reportResults(gameId, {
+    gameId: gameId,
+    result: "disagreement",
+  })
 };
 
 // Mark us as waiting for a new game
@@ -331,7 +296,7 @@ while (!gameId) {
 }
 
 const args = [
-  "-server",
+  "-dedicated",
   "-altdeath",
   "-iwad",
   "freedoom2.wad",
@@ -340,9 +305,8 @@ const args = [
   "iog_assets.wad",
   "-warp",
   "30",
-  expectedBots > 0 ? "-ai" : "-drone",
   "-nodes",
-  (expectedHumans + expectedBots).toString(),
+  expectedHumans.toString(),
   "-nodraw",
   "-nomouse",
   "-nograbmouse",
@@ -361,28 +325,40 @@ try {
 while (!done) {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   timeout -= 1000;
+  timer -= 0;
+  if (timer <= 0) {
+    console.log("Game ended.");
+    done = true;
+    await reportResults(gameId, {
+      gameId: gameId,
+      result: "finished",
+      playerOne: {
+        pkh: Object.values(players).find(p => p.playerNumber === 0)?.ephemeralKey,
+        kills: hydra.clients[0].kills,
+      },
+      playerTwo: {
+        pkh: Object.values(players).find(p => p.playerNumber === 1)?.ephemeralKey,
+        kills: hydra.clients[1].kills,
+      }
+    });
+  }
   if (timeout <= 0) {
     console.log("Game timed out.");
     done = true;
+    await reportResults(gameId, {
+      gameId: gameId,
+      result: "timeout",
+    });
   }
 }
 
-console.log("Game finished.");
-try {
-  console.log("Ending game. Marking game as 'Aborted'.");
-  await fetch("http://localhost:8000/game/end_game", {
-    method: "POST",
-  });
-} catch (e) {
-  console.warn("Failed to mark game as ended: ", e);
-}
 try {
   await Promise.all([
     fetch("http://localhost:8000/end_game", { method: "POST" }),
     sendEvent(gameId, {
       type: "game_finished",
       game_id: gameId,
-      is_qualifier: isQualifier,
+      is_elimination: true,
     }),
   ]);
 } catch (e) {

@@ -62,10 +62,11 @@ export abstract class HydraMultiplayer {
   public async SendPacket(
     to: number,
     from: number,
+    kills: number[],
     data: Uint8Array,
   ): Promise<void> {
     const ephemeralKey = this.key.publicKeyHashBytes;
-    this.packetQueue.push({ to, from, ephemeralKey, data });
+    this.packetQueue.push({ to, from, ephemeralKey, kills, data });
     await this.sendPacketQueue();
   }
 
@@ -95,7 +96,7 @@ export abstract class HydraMultiplayer {
       if (!packets) {
         // We failed to decode packets, so this might be a new game or join game tx
         const game = decodeGame(datumRaw);
-        if (game.players.length == 1) {
+        if (game.players.length <= 1) {
           this.gameId = txId;
           this.players = game.players;
           this.onNewGame?.(
@@ -138,6 +139,7 @@ export interface Packet {
   to: number;
   from: number;
   ephemeralKey: Uint8Array;
+  kills: number[];
   data: Uint8Array;
 }
 
@@ -148,6 +150,7 @@ function encodePackets(packets: Packet[]): string {
         to: BigInt(data.to),
         from: BigInt(data.from),
         ephemeralKey: toHex(data.ephemeralKey),
+        kills: data.kills.map((k) => BigInt(k)),
         data: toHex(data.data),
       },
       DatumPacket,
@@ -164,11 +167,12 @@ function decodePackets(raw: Uint8Array): Packet[] | undefined {
       PacketArray,
     );
     return packets instanceof Array
-      ? packets.map(({ to, from, ephemeralKey, data }) => {
+      ? packets.map(({ to, from, ephemeralKey, kills, data }) => {
           return {
             to: Number(to),
             from: Number(from),
             ephemeralKey: fromHex(ephemeralKey as string),
+            kills: kills.map((k) => Number(k)),
             data: fromHex(data as string),
           };
         })
