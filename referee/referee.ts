@@ -217,11 +217,11 @@ global.playerDisconnected = async (addr: number, player: number) => {
     result: "disconnect",
     playerOne: {
       pkh: player1?.ephemeralKey,
-      kills: hydra.clients[player1Key]?.kills,
+      kills: hydra.clients[player1Key]?.kills[0],
     },
     playerTwo: {
       pkh: player2?.ephemeralKey,
-      kills: hydra.clients[player2Key]?.kills,
+      kills: hydra.clients[player2Key]?.kills[1],
     }
   })
   if (!RECORD_STATS) return;
@@ -359,11 +359,11 @@ while (!done) {
       result: "finished",
       playerOne: {
         pkh: player1?.ephemeralKey,
-        kills: hydra.clients[player1Key]?.kills,
+        kills: hydra.clients[player1Key]?.kills[0],
       },
       playerTwo: {
         pkh: player2?.ephemeralKey,
-        kills: hydra.clients[player2Key]?.kills,
+        kills: hydra.clients[player2Key]?.kills[1],
       }
     });
   }
@@ -377,11 +377,11 @@ while (!done) {
       result: "timeout",
       playerOne: {
         pkh: player1?.ephemeralKey,
-        kills: hydra.clients[player1Key]?.kills,
+        kills: hydra.clients[player1Key]?.kills[0],
       },
       playerTwo: {
         pkh: player2?.ephemeralKey,
-        kills: hydra.clients[player2Key]?.kills,
+        kills: hydra.clients[player2Key]?.kills[1],
       }
     });
   }
