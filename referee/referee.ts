@@ -257,7 +257,7 @@ for(let i = 0; i < 5; i++) {
 
 // Log a new game or player joined transaction if we see it
 let timeout = 60_000;
-let timer = 15 * 60 * 1000; // 15 minute timer
+let timer = 3 * 60 * 1000; // 15 minute timer
 hydra.onTxSeen = () => {
   timeout = 60_000;
 };
