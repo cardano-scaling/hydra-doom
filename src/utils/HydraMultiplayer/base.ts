@@ -96,7 +96,7 @@ export abstract class HydraMultiplayer {
       if (!packets) {
         // We failed to decode packets, so this might be a new game or join game tx
         const game = decodeGame(datumRaw);
-        if (game.players.length <= 1) {
+        if (game.players.length == 0) {
           this.gameId = txId;
           this.players = game.players;
           this.onNewGame?.(
