@@ -128,6 +128,7 @@ while(true) {
     break;
   } catch (e) {
     console.warn("Failed to fetch and parse node utxos: ", e);
+    await new Promise((resolve) => setTimeout(resolve, 200));
   }
 }
 
