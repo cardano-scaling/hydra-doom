@@ -506,7 +506,7 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 449394: $0 => {
+ 449302: $0 => {
   var str = UTF8ToString($0) + "\n\n" + "Abort/Retry/Ignore/AlwaysIgnore? [ariA] :";
   var reply = window.prompt(str, "i");
   if (reply === null) {
@@ -514,7 +514,7 @@ var ASM_CONSTS = {
   }
   return allocate(intArrayFromString(reply), "i8", ALLOC_NORMAL);
  },
- 449619: () => {
+ 449527: () => {
   if (typeof (AudioContext) !== "undefined") {
    return true;
   } else if (typeof (webkitAudioContext) !== "undefined") {
@@ -522,7 +522,7 @@ var ASM_CONSTS = {
   }
   return false;
  },
- 449766: () => {
+ 449674: () => {
   if ((typeof (navigator.mediaDevices) !== "undefined") && (typeof (navigator.mediaDevices.getUserMedia) !== "undefined")) {
    return true;
   } else if (typeof (navigator.webkitGetUserMedia) !== "undefined") {
@@ -530,7 +530,7 @@ var ASM_CONSTS = {
   }
   return false;
  },
- 45e4: $0 => {
+ 449908: $0 => {
   if (typeof (Module["SDL2"]) === "undefined") {
    Module["SDL2"] = {};
   }
@@ -552,11 +552,11 @@ var ASM_CONSTS = {
   }
   return SDL2.audioContext === undefined ? -1 : 0;
  },
- 450493: () => {
+ 450401: () => {
   var SDL2 = Module["SDL2"];
   return SDL2.audioContext.sampleRate;
  },
- 450561: ($0, $1, $2, $3) => {
+ 450469: ($0, $1, $2, $3) => {
   var SDL2 = Module["SDL2"];
   var have_microphone = function(stream) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -597,7 +597,7 @@ var ASM_CONSTS = {
    }, have_microphone, no_microphone);
   }
  },
- 452213: ($0, $1, $2, $3) => {
+ 452121: ($0, $1, $2, $3) => {
   var SDL2 = Module["SDL2"];
   SDL2.audio.scriptProcessorNode = SDL2.audioContext["createScriptProcessor"]($1, 0, $0);
   SDL2.audio.scriptProcessorNode["onaudioprocess"] = function(e) {
@@ -609,7 +609,7 @@ var ASM_CONSTS = {
   };
   SDL2.audio.scriptProcessorNode["connect"](SDL2.audioContext["destination"]);
  },
- 452623: ($0, $1) => {
+ 452531: ($0, $1) => {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.capture.currentCaptureBuffer.numberOfChannels;
   for (var c = 0; c < numChannels; ++c) {
@@ -628,7 +628,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 453228: ($0, $1) => {
+ 453136: ($0, $1) => {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.audio.currentOutputBuffer["numberOfChannels"];
   for (var c = 0; c < numChannels; ++c) {
@@ -641,7 +641,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 453708: $0 => {
+ 453616: $0 => {
   var SDL2 = Module["SDL2"];
   if ($0) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -679,7 +679,7 @@ var ASM_CONSTS = {
    SDL2.audioContext = undefined;
   }
  },
- 454880: ($0, $1, $2) => {
+ 454788: ($0, $1, $2) => {
   var w = $0;
   var h = $1;
   var pixels = $2;
@@ -750,7 +750,7 @@ var ASM_CONSTS = {
   }
   SDL2.ctx.putImageData(SDL2.image, 0, 0);
  },
- 456349: ($0, $1, $2, $3, $4) => {
+ 456257: ($0, $1, $2, $3, $4) => {
   var w = $0;
   var h = $1;
   var hot_x = $2;
@@ -787,19 +787,19 @@ var ASM_CONSTS = {
   stringToUTF8(url, urlBuf, url.length + 1);
   return urlBuf;
  },
- 457338: $0 => {
+ 457246: $0 => {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = UTF8ToString($0);
   }
  },
- 457421: () => {
+ 457329: () => {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = "none";
   }
  },
- 457490: () => window.innerWidth,
- 457520: () => window.innerHeight,
- 457551: ($0, $1) => {
+ 457398: () => window.innerWidth,
+ 457428: () => window.innerHeight,
+ 457459: ($0, $1) => {
   alert(UTF8ToString($0) + "\n\n" + UTF8ToString($1));
  }
 };
@@ -815,7 +815,7 @@ function hydra_set_ip(ip) {
 function __asyncjs__hydra_send_packet(to, from, kills, kills_len, packet, len) {
  return Asyncify.handleAsync(async () => {
   let data = HEAPU8.subarray(packet, packet + len);
-  let killsBuffer = HEAP32.subarray(kills, kills + kills_len);
+  let killsBuffer = HEAP32.subarray(kills / 4, kills / 4 + kills_len);
   let g = typeof window !== "undefined" ? window : global;
   let hydra = !!g ? g.HydraMultiplayer : null;
   if (!!hydra) {
@@ -8659,9 +8659,9 @@ var _asyncify_start_rewind = a0 => (_asyncify_start_rewind = wasmExports["asynci
 
 var _asyncify_stop_rewind = () => (_asyncify_stop_rewind = wasmExports["asyncify_stop_rewind"])();
 
-var ___start_em_js = Module["___start_em_js"] = 447984;
+var ___start_em_js = Module["___start_em_js"] = 447888;
 
-var ___stop_em_js = Module["___stop_em_js"] = 449394;
+var ___stop_em_js = Module["___stop_em_js"] = 449302;
 
 function intArrayFromBase64(s) {
  if (typeof ENVIRONMENT_IS_NODE != "undefined" && ENVIRONMENT_IS_NODE) {
