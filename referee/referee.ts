@@ -135,6 +135,7 @@ while(true) {
   }
 }
 
+let exiting = false;
 const { default: createModule } = await import("../websockets-doom.js");
 const module = await createModule({
   locateFile: (path, scripts) => {
@@ -161,7 +162,7 @@ const module = await createModule({
   },
   onExit: () => {
     console.log("Game exited");
-    done = true;
+    exiting = true;
   },
 });
 global.Module = module;
@@ -389,6 +390,10 @@ while (!done) {
         kills: hydra.clients[player2Key]?.kills[1],
       }
     });
+    done = true;
+  }
+  if (exiting) {
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     done = true;
   }
 }
