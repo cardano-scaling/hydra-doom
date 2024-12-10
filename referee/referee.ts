@@ -237,7 +237,6 @@ global.playerConnected = async (addr: number, player: number) => {
 };
 global.playerDisconnected = async (addr: number, player: number) => {
   console.log(`Someone disconnected, ending the game`);
-  done = true;
   let [player1Key, player1] = Object.entries(players).find(([_, p]) => p.playerNumber === 0) ?? [];
   let [player2Key, player2] = Object.entries(players).find(([_, p]) => p.playerNumber === 1) ?? [];
   await reportResults(gameId, {
@@ -252,6 +251,7 @@ global.playerDisconnected = async (addr: number, player: number) => {
       kills: hydra.clients[player2Key]?.kills[1],
     }
   })
+  done = true;
   if (!RECORD_STATS) return;
   try {
     await fetch("http://localhost:8000/player_left", { method: "POST" });
@@ -312,11 +312,11 @@ hydra.onPlayerJoin = async (gameId, ephemeralKeys) => {
 };
 hydra.onDisagreement = async () => {
   // TODO: cleanup game state
-  done = true;
   await reportResults(gameId, {
     gameId: gameId,
     result: "disagreement",
-  })
+  });
+  done = true;
 };
 
 // Mark us as waiting for a new game
@@ -357,7 +357,6 @@ while (!done) {
   timer -= 1000;
   if (timer <= 0) {
     console.log("Game ended.");
-    done = true;
     let [player1Key, player1] = Object.entries(players).find(([_, p]) => p.playerNumber === 0) ?? [];
     let [player2Key, player2] = Object.entries(players).find(([_, p]) => p.playerNumber === 1) ?? [];
     await reportResults(gameId, {
@@ -372,10 +371,10 @@ while (!done) {
         kills: hydra.clients[player2Key]?.kills[1],
       }
     });
+    done = true;
   }
   if (timeout <= 0) {
     console.log("Game timed out.");
-    done = true;
     let [player1Key, player1] = Object.entries(players).find(([_, p]) => p.playerNumber === 0) ?? [];
     let [player2Key, player2] = Object.entries(players).find(([_, p]) => p.playerNumber === 1) ?? [];
     await reportResults(gameId, {
@@ -390,6 +389,7 @@ while (!done) {
         kills: hydra.clients[player2Key]?.kills[1],
       }
     });
+    done = true;
   }
 }
 
