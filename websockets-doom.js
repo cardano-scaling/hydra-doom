@@ -506,7 +506,7 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 449291: $0 => {
+ 449298: $0 => {
   var str = UTF8ToString($0) + "\n\n" + "Abort/Retry/Ignore/AlwaysIgnore? [ariA] :";
   var reply = window.prompt(str, "i");
   if (reply === null) {
@@ -514,7 +514,7 @@ var ASM_CONSTS = {
   }
   return allocate(intArrayFromString(reply), "i8", ALLOC_NORMAL);
  },
- 449516: () => {
+ 449523: () => {
   if (typeof (AudioContext) !== "undefined") {
    return true;
   } else if (typeof (webkitAudioContext) !== "undefined") {
@@ -522,7 +522,7 @@ var ASM_CONSTS = {
   }
   return false;
  },
- 449663: () => {
+ 449670: () => {
   if ((typeof (navigator.mediaDevices) !== "undefined") && (typeof (navigator.mediaDevices.getUserMedia) !== "undefined")) {
    return true;
   } else if (typeof (navigator.webkitGetUserMedia) !== "undefined") {
@@ -530,7 +530,7 @@ var ASM_CONSTS = {
   }
   return false;
  },
- 449897: $0 => {
+ 449904: $0 => {
   if (typeof (Module["SDL2"]) === "undefined") {
    Module["SDL2"] = {};
   }
@@ -552,11 +552,11 @@ var ASM_CONSTS = {
   }
   return SDL2.audioContext === undefined ? -1 : 0;
  },
- 450390: () => {
+ 450397: () => {
   var SDL2 = Module["SDL2"];
   return SDL2.audioContext.sampleRate;
  },
- 450458: ($0, $1, $2, $3) => {
+ 450465: ($0, $1, $2, $3) => {
   var SDL2 = Module["SDL2"];
   var have_microphone = function(stream) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -597,7 +597,7 @@ var ASM_CONSTS = {
    }, have_microphone, no_microphone);
   }
  },
- 452110: ($0, $1, $2, $3) => {
+ 452117: ($0, $1, $2, $3) => {
   var SDL2 = Module["SDL2"];
   SDL2.audio.scriptProcessorNode = SDL2.audioContext["createScriptProcessor"]($1, 0, $0);
   SDL2.audio.scriptProcessorNode["onaudioprocess"] = function(e) {
@@ -609,7 +609,7 @@ var ASM_CONSTS = {
   };
   SDL2.audio.scriptProcessorNode["connect"](SDL2.audioContext["destination"]);
  },
- 452520: ($0, $1) => {
+ 452527: ($0, $1) => {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.capture.currentCaptureBuffer.numberOfChannels;
   for (var c = 0; c < numChannels; ++c) {
@@ -628,7 +628,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 453125: ($0, $1) => {
+ 453132: ($0, $1) => {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.audio.currentOutputBuffer["numberOfChannels"];
   for (var c = 0; c < numChannels; ++c) {
@@ -641,7 +641,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 453605: $0 => {
+ 453612: $0 => {
   var SDL2 = Module["SDL2"];
   if ($0) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -679,7 +679,7 @@ var ASM_CONSTS = {
    SDL2.audioContext = undefined;
   }
  },
- 454777: ($0, $1, $2) => {
+ 454784: ($0, $1, $2) => {
   var w = $0;
   var h = $1;
   var pixels = $2;
@@ -750,7 +750,7 @@ var ASM_CONSTS = {
   }
   SDL2.ctx.putImageData(SDL2.image, 0, 0);
  },
- 456246: ($0, $1, $2, $3, $4) => {
+ 456253: ($0, $1, $2, $3, $4) => {
   var w = $0;
   var h = $1;
   var hot_x = $2;
@@ -787,19 +787,19 @@ var ASM_CONSTS = {
   stringToUTF8(url, urlBuf, url.length + 1);
   return urlBuf;
  },
- 457235: $0 => {
+ 457242: $0 => {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = UTF8ToString($0);
   }
  },
- 457318: () => {
+ 457325: () => {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = "none";
   }
  },
- 457387: () => window.innerWidth,
- 457417: () => window.innerHeight,
- 457448: ($0, $1) => {
+ 457394: () => window.innerWidth,
+ 457424: () => window.innerHeight,
+ 457455: ($0, $1) => {
   alert(UTF8ToString($0) + "\n\n" + UTF8ToString($1));
  }
 };
@@ -815,11 +815,11 @@ function hydra_set_ip(ip) {
 function __asyncjs__hydra_send_packet(to, from, kills, kills_len, packet, len) {
  return Asyncify.handleAsync(async () => {
   let data = HEAPU8.subarray(packet, packet + len);
-  let kills = HEAPU8.subarray(kills, kills + kills_len);
+  let killsBuffer = HEAP32.subarray(kills, kills + kills_len);
   let g = typeof window !== "undefined" ? window : global;
   let hydra = !!g ? g.HydraMultiplayer : null;
   if (!!hydra) {
-   await hydra.SendPacket(to, from, kills, data);
+   await hydra.SendPacket(to, from, killsBuffer, data);
   }
  });
 }
@@ -8661,7 +8661,7 @@ var _asyncify_stop_rewind = () => (_asyncify_stop_rewind = wasmExports["asyncify
 
 var ___start_em_js = Module["___start_em_js"] = 447888;
 
-var ___stop_em_js = Module["___stop_em_js"] = 449291;
+var ___stop_em_js = Module["___stop_em_js"] = 449298;
 
 function intArrayFromBase64(s) {
  if (typeof ENVIRONMENT_IS_NODE != "undefined" && ENVIRONMENT_IS_NODE) {
