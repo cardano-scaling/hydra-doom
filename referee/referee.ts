@@ -198,6 +198,18 @@ global.playerConnected = async (addr: number, player: number) => {
 global.playerDisconnected = async (addr: number, player: number) => {
   console.log(`Someone disconnected, ending the game`);
   done = true;
+  await reportResults(gameId, {
+    gameId: gameId,
+    result: "disconnect",
+    playerOne: {
+      pkh: Object.values(players).find(p => p.playerNumber === 0)?.ephemeralKey,
+      kills: hydra.clients[0].kills,
+    },
+    playerTwo: {
+      pkh: Object.values(players).find(p => p.playerNumber === 1)?.ephemeralKey,
+      kills: hydra.clients[1].kills,
+    }
+  })
   if (!RECORD_STATS) return;
   try {
     await fetch("http://localhost:8000/player_left", { method: "POST" });
@@ -324,7 +336,7 @@ try {
 while (!done) {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   timeout -= 1000;
-  timer -= 0;
+  timer -= 1000;
   if (timer <= 0) {
     console.log("Game ended.");
     done = true;
@@ -347,6 +359,14 @@ while (!done) {
     await reportResults(gameId, {
       gameId: gameId,
       result: "timeout",
+      playerOne: {
+        pkh: Object.values(players).find(p => p.playerNumber === 0)?.ephemeralKey,
+        kills: hydra.clients[0].kills,
+      },
+      playerTwo: {
+        pkh: Object.values(players).find(p => p.playerNumber === 1)?.ephemeralKey,
+        kills: hydra.clients[1].kills,
+      }
     });
   }
 }
