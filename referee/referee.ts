@@ -117,26 +117,57 @@ console.log("Address: ", keys.address);
 
 // check for extraneous state utxos and cleanup
 while (true) {
+  console.log("Checking head's utxo set for stale games...");
   try {
-    console.log("Checking head's utxo set for stale games...");
     const response = await fetch(`${HYDRA_NODE}snapshot/utxo`);
     const data = await response.json();
-    // Currently, we are just wiping the utxos after every game
-    // We may want to make this logic more robust if we are hoping to preserve those utxos
+    console.log("Current UTxO set size: ", Object.keys(data).length);
     if (Object.keys(data).length > 1) {
-      console.log("Cleaning up old game state");
-      await fetch("http://localhost:8000/game/end_game", {
-        method: "POST",
-      });
-      await fetch("http://localhost:8000/game/cleanup", {
-        method: "POST",
-      });
+      console.log("Ending existing game...");
+      await endGame();
+      console.log("Cleaningup existing game...");
+      await cleanupGame();
+      console.log("Cleaned up! Node is back to healthy state");
     }
     break;
   } catch (e) {
     console.warn("Failed to fetch and parse node utxos: ", e);
     await new Promise((resolve) => setTimeout(resolve, 200));
   }
+}
+
+async function endGame() {
+  let status = 0;
+  while (![200, 201].includes(status)) {
+    try {
+      let response = await fetch("http://localhost:8000/game/end_game", {
+        method: "POST",
+      });
+      status = response.status;
+    } catch (e) {
+      console.log("Failed to end game: ", e);
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+  }
+
+  console.log("Succesfully ended game");
+}
+
+async function cleanupGame() {
+  let status = 0;
+  while (![200, 201].includes(status)) {
+    try {
+      let response = await fetch("http://localhost:8000/game/cleanup", {
+        method: "POST",
+      });
+      status = response.status;
+    } catch (e) {
+      console.log("Failed to cleanup game: ", e);
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+  }
+
+  console.log("Succesfully cleanedup game");
 }
 
 let exiting = false;
