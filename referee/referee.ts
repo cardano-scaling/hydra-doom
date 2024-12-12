@@ -55,29 +55,34 @@ async function sendEvent(gameId, data) {
 }
 
 async function reportResults(gameId, results) {
-  for(let i = 0; i < 10; i++) {
-    console.log(`Reporting results for game ${gameId}\n`, JSON.stringify(results, null, 2));
+  for (let i = 0; i < 10; i++) {
+    console.log(
+      `Reporting results for game ${gameId}\n`,
+      JSON.stringify(results, null, 2),
+    );
     try {
       console.log("Sending to dynamodb");
-      await dynamo.send(new PutItemCommand({
-        TableName: "doom-game-results",
-        Item: {
-          pk: { S: gameId },
-          results: { S: JSON.stringify(results) },
-        },
-      }));
+      await dynamo.send(
+        new PutItemCommand({
+          TableName: "doom-game-results",
+          Item: {
+            pk: { S: `${gameId}-${Date.now()}` },
+            results: { S: JSON.stringify(results) },
+          },
+        }),
+      );
       console.log("Sending to discord bot");
       let resp = await fetch(DISCORD_BOT, {
         method: "POST",
         body: JSON.stringify(results),
       });
       if (resp.status !== 200) {
-        throw new Error(resp.statusText + ": " + await resp.text());
+        throw new Error(resp.statusText + ": " + (await resp.text()));
       } else {
         console.log("Success!");
         break;
       }
-    } catch(e) {
+    } catch (e) {
       console.warn("Failed to report results, retrying: ", e);
     }
   }
@@ -110,9 +115,8 @@ const keys = {
 };
 console.log("Address: ", keys.address);
 
-
 // check for extraneous state utxos and cleanup
-while(true) {
+while (true) {
   try {
     console.log("Checking head's utxo set for stale games...");
     const response = await fetch(`${HYDRA_NODE}snapshot/utxo`);
@@ -238,8 +242,10 @@ global.playerConnected = async (addr: number, player: number) => {
 };
 global.playerDisconnected = async (addr: number, player: number) => {
   console.log(`Someone disconnected, ending the game`);
-  let [player1Key, player1] = Object.entries(players).find(([_, p]) => p.playerNumber === 0) ?? [];
-  let [player2Key, player2] = Object.entries(players).find(([_, p]) => p.playerNumber === 1) ?? [];
+  let [player1Key, player1] =
+    Object.entries(players).find(([_, p]) => p.playerNumber === 0) ?? [];
+  let [player2Key, player2] =
+    Object.entries(players).find(([_, p]) => p.playerNumber === 1) ?? [];
   await reportResults(gameId, {
     gameId: gameId,
     result: "disconnect",
@@ -250,8 +256,8 @@ global.playerDisconnected = async (addr: number, player: number) => {
     playerTwo: {
       pkh: player2?.ephemeralKey,
       kills: hydra.clients[player2Key]?.kills[1],
-    }
-  })
+    },
+  });
   done = true;
   if (!RECORD_STATS) return;
   try {
@@ -260,7 +266,6 @@ global.playerDisconnected = async (addr: number, player: number) => {
     console.warn("Failed to record player left: ", e);
   }
 };
-
 
 // Log a new game or player joined transaction if we see it
 let timeout = 60_000;
@@ -284,9 +289,7 @@ hydra.onPacket = (_tx: any, packet: Packet) => {
   }
 };
 hydra.onNewGame = async (newGameId, humanCount, _botCount, ephemeralKey) => {
-  console.log(
-    `Observed new game: ${newGameId}, by ${ephemeralKey}`,
-  );
+  console.log(`Observed new game: ${newGameId}, by ${ephemeralKey}`);
   gameId = newGameId;
   expectedHumans = humanCount;
   await sendEvent(gameId, {
@@ -358,8 +361,10 @@ while (!done) {
   timer -= 1000;
   if (timer <= 0) {
     console.log("Game ended.");
-    let [player1Key, player1] = Object.entries(players).find(([_, p]) => p.playerNumber === 0) ?? [];
-    let [player2Key, player2] = Object.entries(players).find(([_, p]) => p.playerNumber === 1) ?? [];
+    let [player1Key, player1] =
+      Object.entries(players).find(([_, p]) => p.playerNumber === 0) ?? [];
+    let [player2Key, player2] =
+      Object.entries(players).find(([_, p]) => p.playerNumber === 1) ?? [];
     await reportResults(gameId, {
       gameId: gameId,
       result: "finished",
@@ -370,14 +375,16 @@ while (!done) {
       playerTwo: {
         pkh: player2?.ephemeralKey,
         kills: hydra.clients[player2Key]?.kills[1],
-      }
+      },
     });
     done = true;
   }
   if (timeout <= 0) {
     console.log("Game timed out.");
-    let [player1Key, player1] = Object.entries(players).find(([_, p]) => p.playerNumber === 0) ?? [];
-    let [player2Key, player2] = Object.entries(players).find(([_, p]) => p.playerNumber === 1) ?? [];
+    let [player1Key, player1] =
+      Object.entries(players).find(([_, p]) => p.playerNumber === 0) ?? [];
+    let [player2Key, player2] =
+      Object.entries(players).find(([_, p]) => p.playerNumber === 1) ?? [];
     await reportResults(gameId, {
       gameId: gameId,
       result: "timeout",
@@ -388,7 +395,7 @@ while (!done) {
       playerTwo: {
         pkh: player2?.ephemeralKey,
         kills: hydra.clients[player2Key]?.kills[1],
-      }
+      },
     });
     done = true;
   }
