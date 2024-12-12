@@ -14,18 +14,19 @@ interface AppContextInterface {
   bots: number;
   gameData: GameData;
   globalStats?: GameStatistics;
+  isUserDataFetched: boolean;
   isLoadingGlobalStats: boolean;
   isLoadingUserData: boolean;
+  isQualified: boolean;
   keys: Keys | null;
   players: number;
   region: Region | null;
-  isQualified: boolean;
   setAccountData: Dispatch<React.SetStateAction<Account | undefined>>;
   setBots: Dispatch<React.SetStateAction<number>>;
   setGameData: Dispatch<React.SetStateAction<GameData>>;
+  setIsQualified: Dispatch<React.SetStateAction<boolean>>;
   setPlayers: Dispatch<React.SetStateAction<number>>;
   setRegion: Dispatch<React.SetStateAction<Region | null>>;
-  setIsQualified: Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const AppContext = createContext<AppContextInterface>({
@@ -34,18 +35,19 @@ export const AppContext = createContext<AppContextInterface>({
   bots: 1,
   gameData: { petName: "", code: "", type: EGameType.SOLO },
   globalStats: undefined,
+  isUserDataFetched: false,
   isLoadingGlobalStats: false,
   isLoadingUserData: false,
+  isQualified: false,
   keys: null,
   players: 1,
   region: null,
-  isQualified: false,
   setAccountData: () => {},
   setBots: () => {},
   setGameData: () => {},
+  setIsQualified: () => {},
   setPlayers: () => {},
   setRegion: () => {},
-  setIsQualified: () => {},
 });
 
 export const useAppContext = () => {
