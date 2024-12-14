@@ -133,9 +133,10 @@ while (true) {
     break;
   } catch (e) {
     console.warn("Failed to fetch and parse node utxos: ", e);
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
   }
 }
+
 
 async function endGame() {
   let status = 0;
@@ -170,6 +171,8 @@ async function cleanupGame() {
 
   console.log("Succesfully cleanedup game");
 }
+
+console.log("Hydra online and cleaned up; attempting to connect...")
 
 let exiting = false;
 const { default: createModule } = await import("../websockets-doom.js");
@@ -211,8 +214,8 @@ const hydra = new HydraMultiplayerDedicated({
   module,
   networkId: NETWORK_ID,
   onConnect: () => {
-    console.log("Connected to Hydra");
     connected = true;
+    console.log("Connected to Hydra: ", connected);
   },
   onDisconnect: async () => {
     console.log("Abruptly disconnected from Hydra, restarting");
@@ -233,8 +236,10 @@ const hydra = new HydraMultiplayerDedicated({
 global.HydraMultiplayer = hydra;
 
 while(!connected) {
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  console.log("Sleeping, connected: ", connected);
+  await new Promise((resolve) => setTimeout(resolve, 3000));
 }
+console.log("Continuing with server start...");
 
 let expectedHumans = 0;
 let gameId = "";
