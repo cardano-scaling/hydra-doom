@@ -57,6 +57,8 @@ export class Hydra {
   constructor(
     url: string | URL,
     filterAddress?: string,
+    public onConnect?: () => void,
+    public onDisconnect?: () => void,
     public queue_length: number = 10,
   ) {
     this.tx_count = 0;
@@ -69,6 +71,8 @@ export class Hydra {
     this.url.protocol = this.url.protocol.replace("ws", "http");
     const websocketUrl = new URL(url);
     websocketUrl.protocol = websocketUrl.protocol.replace("http", "ws");
+
+    let self = this;
     this.connection = new WebSocket(
       websocketUrl +
         (websocketUrl.toString().endsWith("/") ? "" : "/") +
@@ -76,12 +80,14 @@ export class Hydra {
     );
     this.connection.onopen = () => {
       console.log("Connected to Hydra");
+      self.onConnect?.();
     };
     this.connection.onerror = (error) => {
       console.error("Error on Hydra websocket: ", error);
     };
     this.connection.onclose = () => {
       console.error("Hydra websocket closed");
+      self.onDisconnect?.();
     };
     this.connection.onmessage = this.receiveMessage.bind(this);
   }
