@@ -37,18 +37,22 @@ export abstract class HydraMultiplayer {
     filterAddress,
     module,
     networkId = 0,
+    onConnect,
+    onDisconnect,
   }: {
     key: Keys;
     url: string;
     module: EmscriptenModule;
     filterAddress?: string;
     networkId?: number;
+    onConnect?: () => void;
+    onDisconnect?: () => void;
   }) {
     this.key = key;
     this.module = module;
     this.networkId = networkId;
 
-    this.hydra = new Hydra(url, filterAddress, 100);
+    this.hydra = new Hydra(url, filterAddress, onConnect, onDisconnect, 100);
     this.hydra.onTxSeen = this.observeTx.bind(this);
 
     this.SendPacket = this.SendPacket.bind(this);

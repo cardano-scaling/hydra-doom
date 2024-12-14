@@ -21,14 +21,18 @@ export class HydraMultiplayerDedicated extends HydraMultiplayer {
     url,
     module,
     networkId,
+    onConnect,
+    onDisconnect,
   }: {
     key: Keys;
     address: string;
     url: string;
     module: EmscriptenModule;
     networkId?: number;
+    onConnect?: () => void;
+    onDisconnect?: () => void;
   }) {
-    super({ key, url, module, networkId });
+    super({ key, url, module, networkId, onConnect, onDisconnect });
     this.address = address;
     this.onPacket = this.trackKills.bind(this);
     this.clients = {};

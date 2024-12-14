@@ -55,18 +55,19 @@ async function sendEvent(gameId, data) {
 }
 
 async function reportResults(gameId, results) {
+  console.log(
+    `Reporting results for game ${gameId}\n`,
+    JSON.stringify(results, null, 2),
+  );
+  let now = Date.now();
   for (let i = 0; i < 10; i++) {
-    console.log(
-      `Reporting results for game ${gameId}\n`,
-      JSON.stringify(results, null, 2),
-    );
     try {
       console.log("Sending to dynamodb");
       await dynamo.send(
         new PutItemCommand({
           TableName: "doom-game-results",
           Item: {
-            pk: { S: `${gameId}-${Date.now()}` },
+            pk: { S: `${gameId}-${now}` },
             results: { S: JSON.stringify(results) },
           },
         }),
@@ -202,14 +203,38 @@ const module = await createModule({
 });
 global.Module = module;
 
+let connected = false;
 const hydra = new HydraMultiplayerDedicated({
   key: keys,
   address: keys.address,
   url: HYDRA_NODE,
   module,
   networkId: NETWORK_ID,
+  onConnect: () => {
+    console.log("Connected to Hydra");
+    connected = true;
+  },
+  onDisconnect: async () => {
+    console.log("Abruptly disconnected from Hydra, restarting");
+    if (hydra.gameId) {
+      try {
+        await reportResults(hydra.gameId, {
+          gameId: hydra.gameId,
+          result: "error",
+        })
+      } catch(e) {
+
+      }
+    }
+    connected = false;
+    process.exit(1);
+  }
 });
 global.HydraMultiplayer = hydra;
+
+while(!connected) {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+}
 
 let expectedHumans = 0;
 let gameId = "";
