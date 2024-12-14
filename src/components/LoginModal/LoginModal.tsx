@@ -26,7 +26,9 @@ import { checkSignin, fetchAuthProviders } from "../../utils/requests";
 
 interface LoginModalProps {
   close: () => void;
+  isJoin: boolean;
   isOpen: boolean;
+  openNameModal: () => void;
   showActionButtons: () => void;
 }
 
@@ -77,7 +79,9 @@ const CheckBoxInput: FC<{
 
 const LoginModal: React.FC<LoginModalProps> = ({
   close,
+  isJoin,
   isOpen,
+  openNameModal,
   showActionButtons,
 }) => {
   const shouldShowAllTou = Date.now() >= 1733238000000;
@@ -120,14 +124,17 @@ const LoginModal: React.FC<LoginModalProps> = ({
       if (account) setAccountData(account);
       if (session?.session_id) setSessionId(session.session_id);
       if (qualifier) setIsQualified(qualifier.is_qualified);
+      if (isJoin) openNameModal();
     }
   }, [
     close,
+    isJoin,
+    openNameModal,
     setAccountData,
+    setIsQualified,
     setSessionId,
     showActionButtons,
     userData,
-    setIsQualified,
   ]);
 
   const handleClose = () => {
@@ -154,7 +161,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
   const renderConsentContent = () => {
     return (
       <div className="text-left flex flex-col gap-4">
-        <h1 className="text-5xl uppercase">Tournament Consent</h1>
+        <h1 className="text-5xl uppercase mb-6">Tournament Consent</h1>
         {shouldShowAllTou ? (
           <>
             {/**

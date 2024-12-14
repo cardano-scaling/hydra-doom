@@ -17,20 +17,22 @@ interface InitialViewProps {
 
 const InitialView: FC<InitialViewProps> = ({ startGame }) => {
   const {
-    setGameData,
     accountData,
-    isQualified,
-    setIsQualified,
     isLoadingUserData,
+    isQualified,
+    isUserDataFetched,
+    keys,
     setAccountData,
+    setGameData,
+    setIsQualified,
   } = useAppContext();
+const publicKeyHashHex = keys?.publicKeyHashHex
   const [, setSessionId] = useSessionIdKeyCache();
   const pathSegments = window.location.hash.split("/").filter(Boolean);
   const code = pathSegments[2];
   const [modalTitle, _] = useState("Join Multiplayer");
-  const [isNameModalOpen, setIsNameModalOpen] = useState(
-    pathSegments[1] === EGameType.JOIN,
-  );
+  const [isNameModalOpen, setIsNameModalOpen] = useState(false);
+  const isJoin = pathSegments[1] === EGameType.JOIN;
 
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -41,6 +43,16 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
       setGameData((prev) => ({ ...prev, code, type: EGameType.JOIN }));
     }
   }, [code, setGameData]);
+
+  useEffect(() => {
+    if (isJoin && publicKeyHashHex && !isLoadingUserData) {
+      if (isUserDataFetched) {
+        setIsNameModalOpen(true);
+      } else {
+        setIsLoginModalOpen(true);
+      }
+    }
+  }, [isLoadingUserData, isUserDataFetched, isJoin, publicKeyHashHex]);
 
   const handleTournamentLogin = () => {
     setIsLoginModalOpen(true);
@@ -188,7 +200,9 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
       />
       <LoginModal
         close={() => setIsLoginModalOpen(false)}
+        isJoin={isJoin}
         isOpen={isLoginModalOpen}
+        openNameModal={() => setIsNameModalOpen(true)}
         showActionButtons={showActionButtons}
       />
     </Layout>
