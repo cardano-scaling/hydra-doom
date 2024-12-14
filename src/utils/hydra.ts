@@ -57,8 +57,8 @@ export class Hydra {
   constructor(
     url: string | URL,
     filterAddress?: string,
-    public onConnect?: () => void,
-    public onDisconnect?: () => void,
+    onConnect?: () => void,
+    onDisconnect?: () => void,
     public queue_length: number = 10,
   ) {
     this.tx_count = 0;
