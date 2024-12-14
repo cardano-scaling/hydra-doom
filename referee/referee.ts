@@ -235,7 +235,7 @@ const hydra = new HydraMultiplayerDedicated({
 });
 global.HydraMultiplayer = hydra;
 
-while(!connected) {
+while(!hydra.hydra.isConnected()) {
   console.log("Sleeping, connected: ", connected);
   await new Promise((resolve) => setTimeout(resolve, 3000));
 }
