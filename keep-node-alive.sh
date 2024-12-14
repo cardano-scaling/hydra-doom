@@ -2,7 +2,7 @@
 PROCESS=$1
 while true; do
     echo "Starting $PROCESS..."
-    curl "http://localhost:8000/server_unavailable"
+    curl -XPOST "http://localhost:8000/server_unavailable"
 
     npx -y tsx $PROCESS
 
