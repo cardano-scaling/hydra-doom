@@ -1,6 +1,7 @@
 FROM node:20-alpine AS base
 
 RUN apk add
+RUN apk add curl
 
 WORKDIR /usr/src/app
 RUN --mount=type=bind,source=referee/package.json,target=package.json \
