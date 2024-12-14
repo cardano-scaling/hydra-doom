@@ -71,21 +71,21 @@ export class Hydra {
     this.url.protocol = this.url.protocol.replace("ws", "http");
     const websocketUrl = new URL(url);
     websocketUrl.protocol = websocketUrl.protocol.replace("http", "ws");
-
+    console.log(`onConnect: ${!!onConnect}, onDisconnect: ${!!onDisconnect}`);
     this.connection = new WebSocket(
       websocketUrl +
         (websocketUrl.toString().endsWith("/") ? "" : "/") +
         `?${filterAddress ? `address=${filterAddress}&` : ""}history=no`,
     );
     this.connection.onopen = () => {
-      console.log("Connected to Hydra");
+      console.log("Connected to Hydra, callback: ", !!onConnect);
       onConnect?.();
     };
     this.connection.onerror = (error) => {
       console.error("Error on Hydra websocket: ", error);
     };
     this.connection.onclose = () => {
-      console.error("Hydra websocket closed");
+      console.error("Hydra websocket closed, callback: ", !!onDisconnect);
       onDisconnect?.();
     };
     this.connection.onmessage = this.receiveMessage.bind(this);

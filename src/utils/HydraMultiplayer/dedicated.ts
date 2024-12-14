@@ -29,8 +29,8 @@ export class HydraMultiplayerDedicated extends HydraMultiplayer {
     url: string;
     module: EmscriptenModule;
     networkId?: number;
-    onConnect?: () => void;
-    onDisconnect?: () => void;
+    onConnect: () => void;
+    onDisconnect: () => void;
   }) {
     super({ key, url, module, networkId, onConnect, onDisconnect });
     this.address = address;
