@@ -1,7 +1,7 @@
 import { REGIONS } from "../constants";
 import { EGameType, GameData } from "../types";
 
-export const getArgs = ({ type, petName }: GameData) => {
+export const getArgs = ({ type, petName }: GameData, host: boolean) => {
   const args = ["-window", "-nogui", "-nomusic", "-config", "default.cfg"];
 
   args.push(
@@ -21,7 +21,12 @@ export const getArgs = ({ type, petName }: GameData) => {
     // Do nothing
     console.log("SOLO");
   } else {
-    args.push("-altdeath", "-connect", "1");
+    args.push("-altdeath");
+    if (host) {
+      args.push("-server");
+    } else {
+      args.push("-connect", "-1");
+    }
   }
 
   if (petName) args.push("-pet", petName);
