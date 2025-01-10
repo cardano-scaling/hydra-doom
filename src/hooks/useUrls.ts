@@ -15,9 +15,9 @@ const useUrls = () => {
   if (IS_LOCAL) {
     return {
       newGame: (address: string) =>
-        `http://localhost:3000/new_game?address=${address}&player_count=${players}&bot_count=${bots}`,
+        `http://localhost:8000/game/new_game?address=${address}&player_count=${players}&bot_count=${bots}`,
       addPlayer: (address: string, code: string) =>
-        `http://localhost:3000/add_player?address=${address}&id=${code}`,
+        `http://localhost:8000/game/add_player?address=${address}&id=${code}`,
       share: (code?: string) =>
         code ? `http://localhost:3000/join/${code}` : "",
     };
@@ -26,7 +26,7 @@ const useUrls = () => {
       newGame: (address: string) =>
         `https://api.${region?.value}.hydra-doom.sundae.fi/new_game?address=${address}&player_count=${players}&bot_count=${bots}`,
       addPlayer: (address: string, code: string) => {
-        let gameRegion = REGIONS.find(r => r.prefix == code[0]);
+        let gameRegion = REGIONS.find((r) => r.prefix == code[0]);
         return `https://api.${gameRegion?.value}.hydra-doom.sundae.fi/add_player?address=${address}&id=${code}`;
       },
       share: (code?: string) =>

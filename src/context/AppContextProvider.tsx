@@ -49,7 +49,7 @@ const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
     useQuery<GameStatistics>({
       queryKey: ["globalStats", bestRegion],
       queryFn: () => fetchGlobalStats(bestRegion?.value ?? ""),
-      enabled: !!bestRegion,
+      enabled: false,
       refetchInterval: 6000, // 6 seconds
     });
 
