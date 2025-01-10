@@ -73,8 +73,11 @@ const DoomCanvas: React.FC = () => {
   }, [address, fetchGameData, region]);
 
   useEffect(() => {
+    console.log("JSHY", "Hello, World!");
+    console.log(address);
     if (!address) return;
-    if (type !== EGameType.SOLO && !data?.ip) return;
+
+    console.log("JSHY", "Hello, World 2");
 
     const canvas = canvasRef.current;
 
@@ -103,9 +106,11 @@ const DoomCanvas: React.FC = () => {
         files.forEach((file) => {
           Module.FS!.createPreloadedFile("/", file, file, true, true);
         });
+        console.log("JSHY", "Pre run!");
       },
       printErr: console.error,
       postRun: () => {
+        console.log("JSHY", "Post Run");
         setIsLoading(false);
       },
       locateFile: (path) => {
@@ -124,7 +129,8 @@ const DoomCanvas: React.FC = () => {
     // Attach Module to the window object to make it globally accessible
     window.Module = Module;
     // Initialize HydraMultiplayer
-    if (data?.ip && !!keys) {
+    if (data && !!keys) {
+      console.log("JSHY", "Setting up keys");
       const adminAddress = Core.Address.fromBytes(
         Core.HexBlob.fromBytes(
           new Uint8Array([
@@ -137,7 +143,7 @@ const DoomCanvas: React.FC = () => {
       window.HydraMultiplayer = new HydraMultiplayerClient({
         key: keys,
         adminPkh: data.admin_pkh,
-        url: data.ip,
+        url: "ws://localhost:4001",
         module: Module,
         filterAddress: adminAddress.toBech32(),
         networkId: NETWORK_ID,
@@ -145,11 +151,12 @@ const DoomCanvas: React.FC = () => {
     }
     // Dynamically load websockets-doom.js
     const loadDoom = async () => {
-      const args = getArgs({ code, petName, type });
+      const args = getArgs({ code, petName, type }, type === EGameType.HOST);
       const module = await createModule(Module);
       module.callMain(args);
     };
     loadDoom();
+    console.log("JSHY", "Loaded DOOM");
 
     return () => {
       canvas.removeEventListener("webglcontextlost", handleContextLost);

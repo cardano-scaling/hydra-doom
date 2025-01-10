@@ -26,11 +26,11 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
     setGameData,
     setIsQualified,
   } = useAppContext();
-const publicKeyHashHex = keys?.publicKeyHashHex
+  const publicKeyHashHex = keys?.publicKeyHashHex;
   const [, setSessionId] = useSessionIdKeyCache();
   const pathSegments = window.location.hash.split("/").filter(Boolean);
   const code = pathSegments[2];
-  const [modalTitle, _] = useState("Join Multiplayer");
+  const [modalTitle, setModalTitle] = useState("Join Multiplayer");
   const [isNameModalOpen, setIsNameModalOpen] = useState(false);
   const isJoin = pathSegments[1] === EGameType.JOIN;
 
@@ -53,6 +53,18 @@ const publicKeyHashHex = keys?.publicKeyHashHex
       }
     }
   }, [isLoadingUserData, isUserDataFetched, isJoin, publicKeyHashHex]);
+
+  const handleClickStartMultiplayer = () => {
+    setModalTitle("New Game");
+    setIsNameModalOpen(true);
+    setGameData((prev) => ({ ...prev, type: EGameType.HOST }));
+  };
+
+  const handleClickJoinMultiplayer = () => {
+    setModalTitle("Join Multiplayer");
+    setIsNameModalOpen(true);
+    setGameData((prev) => ({ ...prev, type: EGameType.JOIN }));
+  };
 
   const handleTournamentLogin = () => {
     setIsLoginModalOpen(true);
@@ -102,7 +114,6 @@ const publicKeyHashHex = keys?.publicKeyHashHex
                       of the tournament.
                     </span>
                   </div>
-                  <div className="text-center text-5xl mb-8">Free Play</div>
                 </>
               ) : (
                 <div className="flex-col items-center gap-6 justify-center text-center mb-8">
@@ -134,7 +145,21 @@ const publicKeyHashHex = keys?.publicKeyHashHex
               )}
             </div>
           ) : (
-            <div className="text-center text-5xl mb-8">Free Play</div>
+            <>
+              <div className="text-center text-5xl mb-8">Free Play</div>
+              <Button
+                className="w-96 h-16"
+                onClick={handleClickStartMultiplayer}
+              >
+                New Game
+              </Button>
+              <Button
+                className="w-96 h-16"
+                onClick={handleClickJoinMultiplayer}
+              >
+                Join Game
+              </Button>
+            </>
           )}
         </>
       );
@@ -142,11 +167,9 @@ const publicKeyHashHex = keys?.publicKeyHashHex
 
     return (
       <>
-        {Date.now() > 1733670000000 && (
-          <Button className="w-96 h-16" onClick={handleTournamentLogin}>
-            Tournament Login
-          </Button>
-        )}
+        <Button className="w-96 h-16" onClick={showActionButtons}>
+          Free Play
+        </Button>
       </>
     );
   };
