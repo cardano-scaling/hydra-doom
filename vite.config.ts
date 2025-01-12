@@ -41,11 +41,13 @@ export default defineConfig({
     target: "ES2022",
   },
   define: {
+    "import.meta.env.IS_LOCAL": JSON.stringify(process.env.VITE_IS_LOCAL),
+    "import.meta.env.LOCAL_HOST": JSON.stringify(process.env.VITE_LOCAL_HOST),
     "import.meta.env.SERVER_URL": JSON.stringify(process.env.SERVER_URL),
     "import.meta.env.REGION": JSON.stringify(process.env.REGION),
     "import.meta.env.CABINET_KEY": JSON.stringify(process.env.CABINET_KEY),
     "import.meta.env.PERSISTENT_SESSION": JSON.stringify(
-      process.env.PERSISTENT_SESSION
+      process.env.PERSISTENT_SESSION,
     ),
   },
 });
