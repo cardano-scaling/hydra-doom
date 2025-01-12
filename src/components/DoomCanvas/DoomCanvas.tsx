@@ -18,7 +18,7 @@ import { useUrls } from "../../hooks/useUrls";
 import { Core } from "@blaze-cardano/sdk";
 import { HydraMultiplayerClient } from "../../utils/HydraMultiplayer/client.js";
 import cx from "classnames";
-import { NETWORK_ID } from "../../constants.js";
+import { NETWORK_ID, LOCAL_HOST, LOCAL_HYDRA_PORT } from "../../constants.js";
 
 const DoomCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -143,7 +143,7 @@ const DoomCanvas: React.FC = () => {
       window.HydraMultiplayer = new HydraMultiplayerClient({
         key: keys,
         adminPkh: data.admin_pkh,
-        url: "ws://localhost:4001",
+        url: `ws://${LOCAL_HOST}:${LOCAL_HYDRA_PORT}`,
         module: Module,
         filterAddress: adminAddress.toBech32(),
         networkId: NETWORK_ID,
