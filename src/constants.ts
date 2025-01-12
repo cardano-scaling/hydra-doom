@@ -3,6 +3,7 @@ export const IS_LOCAL = !!import.meta.env.VITE_IS_LOCAL;
 export const LOCAL_HOST = import.meta.env.VITE_LOCAL_HOST || "localhost";
 export const LOCAL_GAME_PORT = import.meta.env.VITE_LOCAL_GAME_PORT || 8000;
 export const LOCAL_HEALTH_PORT = import.meta.env.VITE_LOCAL_HEALTH_PORT || 3000;
+export const LOCAL_HYDRA_PORT = import.meta.env.VITE_LOCAL_HYDRA_PORT || 4001;
 
 export const CABINET_KEY = import.meta.env.VITE_CABINET_KEY;
 export const NETWORK_ID = Number(import.meta.env.VITE_NETWORK_ID || 1);
