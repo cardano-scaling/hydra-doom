@@ -33,7 +33,7 @@ const DoomCanvas: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const mutationKey = useMemo(
     () => ["fetchGameData", address, code, type],
-    ["fetchGameData", address, code, type],
+    [address, code, type],
   );
 
   const {
@@ -75,7 +75,7 @@ const DoomCanvas: React.FC = () => {
   useEffect(() => {
     console.log("JSHY", "Hello, World!");
     console.log(address);
-    if (!address) return;
+    if (!address || !data?.admin_pkh) return;
 
     console.log("JSHY", "Hello, World 2");
 
@@ -129,7 +129,7 @@ const DoomCanvas: React.FC = () => {
     // Attach Module to the window object to make it globally accessible
     window.Module = Module;
     // Initialize HydraMultiplayer
-    if (data && !!keys) {
+    if (keys) {
       console.log("JSHY", "Setting up keys");
       const adminAddress = Core.Address.fromBytes(
         Core.HexBlob.fromBytes(
@@ -161,7 +161,7 @@ const DoomCanvas: React.FC = () => {
     return () => {
       canvas.removeEventListener("webglcontextlost", handleContextLost);
     };
-  }, [address, code, data?.admin_pkh, data?.ip, keys, petName, type]);
+  }, [address, code, data?.admin_pkh, keys, petName, type]);
 
   return (
     <>
