@@ -1,0 +1,10 @@
+{
+  "name": "admin",
+  "type": "module",
+  "module": "ES2022",
+  "target": "ES2022",
+  "dependencies": {
+    "@blaze-cardano/sdk": "^0.2.13",
+    "dotenv": "^16.4.7"
+  }
+}
