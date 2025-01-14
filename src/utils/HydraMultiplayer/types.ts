@@ -3,6 +3,13 @@ import { Data, Static } from "@blaze-cardano/sdk";
 export const PacketSchema = Data.Object({
   to: Data.Integer(),
   from: Data.Integer(),
+  state: Data.Enum([
+    Data.Literal("Lobby"),
+    Data.Literal("Running"),
+    Data.Literal("Cheated"),
+    Data.Literal("Finished"),
+    Data.Literal("Aborted"),
+  ]),
   ephemeralKey: Data.Bytes(),
   kills: Data.Array(Data.Integer()),
   state: Data.Enum([
