@@ -28,7 +28,6 @@ export class HydraProvider extends Provider {
     filterAddress?: string,
     onConnect?: () => void,
     onDisconnect?: () => void,
-    public queue_length: number = 10,
   ) {
     super(networkId);
 
