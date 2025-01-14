@@ -77,11 +77,7 @@ const DoomCanvas: React.FC = () => {
   }, [address, fetchGameData, region]);
 
   useEffect(() => {
-    console.log("JSHY", "Hello, World!");
-    console.log(address);
     if (!address || !data?.admin_pkh) return;
-
-    console.log("JSHY", "Hello, World 2");
 
     const canvas = canvasRef.current;
 
@@ -110,11 +106,9 @@ const DoomCanvas: React.FC = () => {
         files.forEach((file) => {
           Module.FS!.createPreloadedFile("/", file, file, true, true);
         });
-        console.log("JSHY", "Pre run!");
       },
       printErr: console.error,
       postRun: () => {
-        console.log("JSHY", "Post Run");
         setIsLoading(false);
       },
       locateFile: (path) => {
@@ -134,7 +128,6 @@ const DoomCanvas: React.FC = () => {
     window.Module = Module;
     // Initialize HydraMultiplayer
     if (keys) {
-      console.log("JSHY", "Setting up keys");
       const adminAddress = Core.Address.fromBytes(
         Core.HexBlob.fromBytes(
           new Uint8Array([
