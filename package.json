@@ -12,9 +12,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@blaze-cardano/sdk": "^0.2.11",
+    "@blaze-cardano/sdk": "^0.2.14",
     "@noble/ed25519": "^2.1.0",
     "@noble/hashes": "^1.5.0",
+    "@sundaeswap/wallet-lite": "^0.0.67",
     "@tanstack/react-query": "^5.55.4",
     "bech32-buffer": "^0.2.1",
     "cbor-x": "^1.6.0",
