@@ -13,8 +13,8 @@ import {
   NetworkId,
   Datum,
   hardCodedProtocolParams,
-  toHex,
   Value,
+  PlutusLanguageVersion,
 } from "@blaze-cardano/core";
 import { Provider } from "@blaze-cardano/sdk";
 
@@ -59,6 +59,20 @@ export class HydraProvider extends Provider {
   async getParameters(): Promise<ProtocolParameters> {
     const resp = await fetch(`${this.url}protocol-parameters`);
     const rawParams = await resp.json();
+    const costModels = new Map(
+      Object.entries(rawParams.costModels).map(([key, value]) => {
+        let version: PlutusLanguageVersion;
+        if (key === "PlutusV1") {
+          version = PlutusLanguageVersion.V1;
+        } else if (key === "PlutusV2") {
+          version = PlutusLanguageVersion.V2;
+        } else {
+          version = PlutusLanguageVersion.V3;
+        }
+
+        return [version, value as number[]];
+      }),
+    );
     return {
       minFeeConstant: rawParams.txFeeFixed,
       minFeeCoefficient: rawParams.txFeePerByte,
@@ -77,7 +91,7 @@ export class HydraProvider extends Provider {
       coinsPerUtxoByte: rawParams.utxoCostPerByte,
       collateralPercentage: rawParams.collateralPercentage,
       maxCollateralInputs: rawParams.maxCollateralInputs,
-      costModels: rawParams.costModels,
+      costModels,
       minFeeReferenceScripts: rawParams.minfeeRefscriptCostPerByte
         ? {
             ...hardCodedProtocolParams.minFeeReferenceScripts!,
@@ -184,7 +198,7 @@ export class HydraProvider extends Provider {
     txId: TransactionId,
     timeout?: number,
   ): Promise<boolean> {
-    const averageBlockTime = 20_000;
+    const averageBlockTime = 500;
 
     if (timeout && timeout < averageBlockTime) {
       console.log("Warning: timeout given is less than average block time.");
@@ -234,11 +248,17 @@ export class HydraProvider extends Provider {
 
     return txId;
   }
-  evaluateTransaction(
+  async evaluateTransaction(
     tx: Transaction,
     additionalUtxos: TransactionUnspentOutput[],
   ): Promise<Redeemers> {
-    throw new Error("Unsupported by the Hydra API");
+    const pp = await this.getParameters();
+    const redeemers = tx.witnessSet().redeemers().toCore();
+    for (const redeemer of redeemers) {
+      redeemer.executionUnits = pp.maxExecutionUnitsPerTransaction;
+    }
+
+    return Redeemers.fromCore(redeemers);
   }
 
   async fetchUTxOs(): Promise<{ [txRef: string]: TransactionUnspentOutput }> {
@@ -264,14 +284,19 @@ export class HydraProvider extends Provider {
     output: any,
   ): TransactionUnspentOutput {
     const address = Address.fromBech32(output.address);
-    const value = output.amount
-      ? new Value(BigInt(output.amount.coin ?? 0), output.amount.multiasset)
-      : new Value(BigInt(output.value.lovelace ?? 0));
+
+    const tokenMap = new Map();
+    for (const policy in output.value) {
+      if (typeof output.value[policy] === "object") {
+        for (const assetId in output.value[policy]) {
+          tokenMap.set(policy + assetId, BigInt(output.value[policy][assetId]));
+        }
+      }
+    }
+    const value = new Value(BigInt(output.value.lovelace ?? 0), tokenMap);
     const txOut = new TransactionOutput(address, value);
 
-    const datumBytes = output.datum?.Data?.original_bytes
-      ? toHex(output.datum.Data.original_bytes)
-      : output.inlineDatum?.Data?.original;
+    const datumBytes = output.inlineDatumRaw;
 
     if (datumBytes) {
       const datum = new Datum(
@@ -296,17 +321,17 @@ export class HydraProvider extends Provider {
           break;
         case "TxValid":
           {
-            console.log("TxValid", data);
+            // console.log("TxValid", data);
           }
           break;
         case "TxInvalid":
           {
-            console.error("TxInvalid", data);
+            console.error(data.validationError.reason);
           }
           break;
         case "SnapshotConfirmed":
           {
-            console.log("SnapshotConfirmed", data);
+            // console.log("SnapshotConfirmed", data);
           }
           break;
         default:
@@ -317,3 +342,17 @@ export class HydraProvider extends Provider {
     }
   }
 }
+
+type HydraLanguageVersions = "PlutusV1" | "PlutusV2" | "PlutusV3";
+export const fromHydraLanguageVersions = (
+  x: HydraLanguageVersions,
+): PlutusLanguageVersion => {
+  if (x == "PlutusV1") {
+    return PlutusLanguageVersion.V1;
+  } else if (x == "PlutusV2") {
+    return PlutusLanguageVersion.V2;
+  } else if (x == "PlutusV3") {
+    return PlutusLanguageVersion.V3;
+  }
+  throw new Error("fromHydraLanguageVersions: Unreachable!");
+};
