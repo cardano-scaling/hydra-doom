@@ -5,12 +5,15 @@ import {
   Wallet,
   Provider,
   Static,
+  Value,
 } from "@blaze-cardano/sdk";
 import * as contracts from "./finale-manager.js";
 
-const PacketSchema = Data.Object({
+export const PacketSchema = Data.Object({
   to: Data.Integer(),
   from: Data.Integer(),
+  ephemeralKey: Data.Bytes(),
+  kills: Data.Array(Data.Integer()),
   state: Data.Enum([
     Data.Literal("Lobby"),
     Data.Literal("Running"),
@@ -18,13 +21,11 @@ const PacketSchema = Data.Object({
     Data.Literal("Finished"),
     Data.Literal("Aborted"),
   ]),
-  ephemeralKey: Data.Bytes(),
-  kills: Data.Array(Data.Integer()),
   data: Data.Bytes(),
 });
 
-type TPacket = Static<typeof PacketSchema>;
-const Packet = PacketSchema as unknown as TPacket;
+export type TPacket = Static<typeof PacketSchema>;
+export const Packet = PacketSchema as unknown as TPacket;
 
 export class TransactionBuilder {
   contract: Core.Script;
@@ -55,8 +56,9 @@ export class TransactionBuilder {
   ): Promise<Core.Transaction> {
     const multiasset = utxo.output().amount().multiasset();
     const nftNames: string[] = [];
-    for (const assetId in multiasset) {
-      nftNames.push(assetId.substring(64));
+    for (const [assetId, _] of multiasset) {
+      console.log(assetId, assetId.length);
+      nftNames.push(assetId.substring(56));
     }
 
     const datum = Data.to(
@@ -71,19 +73,18 @@ export class TransactionBuilder {
 
     const tx = this.blaze
       .newTransaction()
-      .setFeePadding(0n)
-      .setMinimumFee(0n)
       .addInput(utxo)
-
-      .lockAssets(this.address, utxo.output().amount(), datum);
+      .lockAssets(this.address, new Core.Value(0n, multiasset), datum);
 
     (tx as any)["fee"] = 0;
+
     return await tx.complete();
   }
 
   async storeGame(
     utxo: Core.TransactionUnspentOutput,
     gameUtxos: Core.TransactionUnspentOutput[],
+    signer: Core.Address,
   ): Promise<Core.Transaction> {
     const datum = Core.PlutusData.fromCore(
       utxo.output().datum().asInlineData().toCore(),
@@ -95,20 +96,33 @@ export class TransactionBuilder {
       const gameDatum = Core.PlutusData.fromCore(
         gameUtxo.output().datum().asInlineData().toCore(),
       );
+      console.log(gameDatum.toCbor());
       const packet = Data.from(gameDatum, PacketSchema);
       const address = Core.fromHex(gameUtxo.output().address().toBytes());
       const pkh = address.subarray(1);
       const index = pkhs.indexOf(Core.toHex(pkh));
-      kills[index] = kills[index] + packet.kills[packet.from];
+      kills[index] = kills[index] + packet.kills[index];
     }
 
+    seriesState.finishedGames += 1n;
+    console.log("new series state", seriesState);
+    const newDatum = Data.to(seriesState, contracts.FinaleManagerSpend.datum);
+    console.log(newDatum.toCbor());
+    const redeemer = Data.to(
+      "StoreGame",
+      contracts.FinaleManagerSpend.redeemer,
+    );
     const tx = this.blaze
       .newTransaction()
-      .addInput(utxo)
-      .lockAssets(this.address, utxo.output().amount(), datum)
-      .provideScript(this.contract);
-    gameUtxos.forEach(tx.addReferenceInput);
-
+      .addInput(utxo, redeemer)
+      .lockAssets(this.address, utxo.output().amount(), newDatum)
+      .provideScript(this.contract)
+      .addRequiredSigner(
+        Core.Ed25519KeyHashHex(
+          signer.asEnterprise().getPaymentCredential().hash,
+        ),
+      );
+    gameUtxos.forEach((utxo) => tx.addReferenceInput(utxo));
     (tx as any)["fee"] = 0;
 
     return await tx.complete();
@@ -116,7 +130,7 @@ export class TransactionBuilder {
 
   async distribute(
     utxo: Core.TransactionUnspentOutput,
-    changeAddress: Core.Address,
+    requiredSigner: string,
   ) {
     // Order a [players, kills] set by kills
     // Create outputs for each player such that they get the asset that represents their position in that set
@@ -135,22 +149,24 @@ export class TransactionBuilder {
       else return 0;
     });
 
+    const redeemer = Data.to(
+      "Distribute",
+      contracts.FinaleManagerSpend.redeemer,
+    );
     const tx = this.blaze
       .newTransaction()
-      .addInput(utxo)
-      .provideScript(this.contract);
+      .addInput(utxo, redeemer)
+      .provideScript(this.contract)
+      .addRequiredSigner(Core.Ed25519KeyHashHex(requiredSigner));
 
     playerKills.forEach(([pkhHex, _], i) => {
-      const pkh = Core.fromHex(pkhHex);
-      const addressBytes = Core.HexBlob.fromBytes(
-        Uint8Array.from([0b0110 | this.networkId, ...pkh]),
-      );
-      const address = Core.Address.fromBytes(addressBytes);
+      const address = Core.Address.fromBytes(Core.HexBlob("60" + pkhHex));
       const policyId = Core.PolicyId(this.policyId);
+      console.log("assetName = ", seriesState.nftNames[i]);
       const assetName = Core.AssetName(seriesState.nftNames[i]);
 
       const assetId = Core.AssetId.fromParts(policyId, assetName);
-      const value = new Core.Value(1_500_000n, new Map([[assetId, 1n]]));
+      const value = new Core.Value(0n, new Map([[assetId, 1n]]));
       tx.payAssets(address, value);
     });
 
