@@ -66,10 +66,10 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
     setGameData((prev) => ({ ...prev, type: EGameType.JOIN }));
   };
 
-  const handleTournamentLogin = () => {
-    setIsLoginModalOpen(true);
-  };
-
+  /* const handleTournamentLogin = () => {
+   *   setIsLoginModalOpen(true);
+   * };
+   */
   const handleSubmitNameModal = () => {
     setIsNameModalOpen(false);
     startGame();
