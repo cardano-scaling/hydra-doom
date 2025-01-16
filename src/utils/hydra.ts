@@ -49,10 +49,11 @@ export class Hydra {
   onTxConfirmed?: (txid: TxHash) => void;
   onTxInvalid?: (txid: TxHash) => void;
 
-  tx_count: number;
-  tx_timings: {
-    [tx: string]: TransactionTiming;
-  };
+  // NOTE: Disabled timings for production
+  // tx_count: number;
+  // tx_timings: {
+  //   [tx: string]: TransactionTiming;
+  // };
 
   constructor(
     url: string | URL,
@@ -61,8 +62,9 @@ export class Hydra {
     onDisconnect?: () => void,
     public queue_length: number = 10,
   ) {
-    this.tx_count = 0;
-    this.tx_timings = {};
+    // NOTE: Disabled timings for production
+    // this.tx_count = 0;
+    // this.tx_timings = {};
     this.outbound_transactions = [];
     this.utxos = {};
     this.tombstones = {};
@@ -110,7 +112,8 @@ export class Hydra {
 
   async receiveMessage(message: MessageEvent) {
     try {
-      const now = performance.now();
+      // NOTE: Disabled timings for production
+      // const now = performance.now();
       const data = JSON.parse(message.data);
       switch (data.tag) {
         case "Greetings":
@@ -118,12 +121,13 @@ export class Hydra {
         case "TxValid":
           {
             const txid = data.transaction.txId;
+            // NOTE: Disabled timings for production
             // Record seen time
-            if (this.tx_timings[txid]?.sent) {
-              const seenTime = now - this.tx_timings[txid].sent;
-              this.tx_timings[txid].seen = seenTime;
-              // console.log(`seen ${txid} after ${seenTime}ms`);
-            }
+            // if (this.tx_timings[txid]?.sent) {
+            //   const seenTime = now - this.tx_timings[txid].sent;
+            //   this.tx_timings[txid].seen = seenTime;
+            //   // console.log(`seen ${txid} after ${seenTime}ms`);
+            // }
             const cbor = fromHex(data.transaction.cborHex);
             const tx = decode(cbor);
             this.onTxSeen?.(txid, tx);
@@ -133,21 +137,23 @@ export class Hydra {
           {
             // console.error("TxInvalid", data);
             const txid = data.transaction.txId;
-            if (this.tx_timings[txid]?.sent) {
-              const invTime = now - this.tx_timings[txid].sent;
-              this.tx_timings[txid].invalid = invTime;
-            }
+            // NOTE: Disabled timings for production
+            // if (this.tx_timings[txid]?.sent) {
+            //   const invTime = now - this.tx_timings[txid].sent;
+            //   this.tx_timings[txid].invalid = invTime;
+            // }
             this.onTxInvalid?.(txid);
           }
           break;
         case "SnapshotConfirmed":
           {
             for (const txid of data.snapshot.confirmedTransactions) {
-              if (!this.tx_timings[txid]?.sent) {
-                continue;
-              }
-              const confirmationTime = now - this.tx_timings[txid].sent;
-              this.tx_timings[txid].confirmed = confirmationTime;
+              // NOTE: Disabled timings for production
+              // if (!this.tx_timings[txid]?.sent) {
+              //   continue;
+              // }
+              // const confirmationTime = now - this.tx_timings[txid].sent;
+              // this.tx_timings[txid].confirmed = confirmationTime;
               this.onTxConfirmed?.(txid);
               // console.log(`confirmed ${txid} after ${confirmationTime}ms`);
             }
@@ -157,18 +163,19 @@ export class Hydra {
           console.warn("Unexpected message: " + data);
       }
 
-      if (this.tx_count > 10000) {
-        // Purge anything older than 5s
-        for (const tx in this.tx_timings) {
-          if (this.tx_timings[tx]?.sent ?? 0 > now - 5000) {
-            this.tx_count--;
-            delete this.tx_timings[tx];
-          }
-          if (this.tx_count < 5000) {
-            break;
-          }
-        }
-      }
+      // NOTE: Disabled timings for production
+      // if (this.tx_count > 10000) {
+      //   // Purge anything older than 5s
+      //   for (const tx in this.tx_timings) {
+      //     if (this.tx_timings[tx]?.sent ?? 0 > now - 5000) {
+      //       this.tx_count--;
+      //       delete this.tx_timings[tx];
+      //     }
+      //     if (this.tx_count < 5000) {
+      //       break;
+      //     }
+      //   }
+      // }
     } catch (err) {
       console.warn(err);
     }
@@ -196,11 +203,12 @@ export class Hydra {
     };
   }
 
-  public async submitTx(tx: Transaction): Promise<string> {
-    const txParsed = Core.Transaction.fromCbor(Core.TxCBOR(tx));
-    const txId = txParsed.body().hash();
-    this.tx_timings[txId] = { sent: performance.now() };
-    this.tx_count++;
+  public submitTx(tx: Transaction): void {
+    // NOTE: Disabled for production
+    // const txParsed = Core.Transaction.fromCbor(Core.TxCBOR(tx));
+    // const txId = txParsed.body().hash();
+    // this.tx_timings[txId] = { sent: performance.now() };
+    // this.tx_count++;
     this.connection.send(
       JSON.stringify({
         tag: "NewTx",
@@ -210,19 +218,19 @@ export class Hydra {
         },
       }),
     );
-    return txId;
   }
-  public async awaitTx(txId: TxHash, checkInterval?: number): Promise<boolean> {
-    await new Promise((res) => {
-      const interval = setInterval(() => {
-        if (this.tx_timings[txId]?.confirmed) {
-          clearInterval(interval);
-          res(void 0);
-        }
-      }, checkInterval);
-    });
-    return true;
-  }
+  // NOTE: Not usable without tx_timings
+  // public async awaitTx(txId: TxHash, checkInterval?: number): Promise<boolean> {
+  //   await new Promise((res) => {
+  //     const interval = setInterval(() => {
+  //       if (this.tx_timings[txId]?.confirmed) {
+  //         clearInterval(interval);
+  //         res(void 0);
+  //       }
+  //     }, checkInterval);
+  //   });
+  //   return true;
+  // }
   public async awaitUtxo(txRef: string, timeout: number = 1000): Promise<UTxO> {
     while (true) {
       if (this.utxos[txRef]) {
