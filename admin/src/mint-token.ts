@@ -5,7 +5,7 @@ import { Blaze, Core, Data, HotSingleWallet } from "@blaze-cardano/sdk";
 import minimist from "minimist";
 
 dotenv.config();
-console.log(process.env);
+
 const args =
   process.argv[0] === "npx"
     ? minimist(process.argv.slice(3))
@@ -13,7 +13,7 @@ const args =
 
 const usdmAssetId = process.env.USDM_ASSET_ID;
 const networkId = parseInt(process.env.NETWORK_ID);
-const network = networkId === 1 ? "cardano-mainnet" : "cardano-preprod";
+const network = networkId === 1 ? "cardano-mainnet" : "cardano-preview";
 
 const provider = new Blockfrost({
   projectId: process.env.PROJECT_ID,
@@ -27,7 +27,7 @@ const wallet = new HotSingleWallet(
 );
 
 const adminAddress = (await wallet.getUsedAddresses())[0];
-console.log(adminAddress.toBech32());
+console.log("Your address:", adminAddress.toBech32());
 const adminKeyHash = adminAddress.asEnterprise().getPaymentCredential().hash;
 
 const blaze = await Blaze.from(provider, wallet);
