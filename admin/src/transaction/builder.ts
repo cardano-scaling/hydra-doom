@@ -32,7 +32,6 @@ export class TransactionBuilder {
   address: Core.Address;
   constructor(
     public blaze: Blaze<Provider, Wallet>,
-    public policyId: string,
     public adminKeyHash: string,
     public networkId: number,
   ) {
@@ -51,30 +50,34 @@ export class TransactionBuilder {
   }
 
   async newSeries(
-    utxo: Core.TransactionUnspentOutput,
+    utxos: Core.TransactionUnspentOutput[],
     pkhs: string[],
+    policies: string[],
   ): Promise<Core.Transaction> {
-    const multiasset = utxo.output().amount().multiasset();
-    const nftNames: string[] = [];
-    for (const [assetId, _] of multiasset) {
-      console.log(assetId, assetId.length);
-      nftNames.push(assetId.substring(56));
-    }
+    const multiasset = new Map();
+
+    utxos.forEach((utxo) =>
+      utxo
+        .output()
+        .amount()
+        .multiasset()
+        .forEach((value, key) => multiasset.set(key, value)),
+    );
 
     const datum = Data.to(
       {
         finishedGames: 0n,
         kills: [0n, 0n, 0n, 0n],
         pkhs,
-        nftNames,
+        policies,
       },
       contracts.FinaleManagerSpend.datum,
     );
 
     const tx = this.blaze
       .newTransaction()
-      .addInput(utxo)
-      .lockAssets(this.address, new Core.Value(0n, multiasset), datum);
+      .lockAssets(this.address, new Core.Value(20_000_000n, multiasset), datum);
+    utxos.forEach((utxo) => tx.addInput(utxo));
 
     (tx as any)["fee"] = 0;
 
@@ -159,13 +162,16 @@ export class TransactionBuilder {
       .provideScript(this.contract)
       .addRequiredSigner(Core.Ed25519KeyHashHex(requiredSigner));
 
+    const assets = utxo.output().amount().multiasset()!;
     playerKills.forEach(([pkhHex, _], i) => {
       const address = Core.Address.fromBytes(Core.HexBlob("60" + pkhHex));
-      const policyId = Core.PolicyId(this.policyId);
-      console.log("assetName = ", seriesState.nftNames[i]);
-      const assetName = Core.AssetName(seriesState.nftNames[i]);
+      const policyId = seriesState.policies[i];
+      console.log("policy = ", policyId);
 
-      const assetId = Core.AssetId.fromParts(policyId, assetName);
+      const asset = Object.keys(assets).find((assetId) =>
+        assetId.startsWith(policyId),
+      );
+      const assetId = Core.AssetId(asset);
       const value = new Core.Value(0n, new Map([[assetId, 1n]]));
       tx.payAssets(address, value);
     });
