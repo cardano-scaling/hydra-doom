@@ -1,9 +1,16 @@
-import { IS_LOCAL, LOCAL_HOST, LOCAL_GAME_PORT, REGIONS } from "../constants";
+import {
+  IS_LOCAL,
+  LOCAL_HOST,
+  LOCAL_GAME_PORT,
+  REGIONS,
+  LOCAL_HEALTH_HOST,
+  LOCAL_HEALTH_PORT,
+} from "../constants";
 import { useAppContext } from "../context/useAppContext";
 
 const healthUrl = (region: string) => {
   if (IS_LOCAL) {
-    return `http://${LOCAL_HOST}:${LOCAL_GAME_PORT}/health`;
+    return `http://${LOCAL_HEALTH_HOST}:${LOCAL_HEALTH_PORT}/health`;
   } else {
     return `https://api.${region}.hydra-doom.sundae.fi/health`;
   }

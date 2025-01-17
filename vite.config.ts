@@ -46,8 +46,14 @@ export default defineConfig({
     "import.meta.env.LOCAL_GAME_PORT": JSON.stringify(
       process.env.VITE_LOCAL_GAME_PORT,
     ),
+    "import.meta.env.LOCAL_HEALTH_HOST": JSON.stringify(
+      process.env.VITE_LOCAL_HEALTH_HOST,
+    ),
     "import.meta.env.LOCAL_HEALTH_PORT": JSON.stringify(
       process.env.VITE_LOCAL_HEALTH_PORT,
+    ),
+    "import.meta.env.LOCAL_HYDRA_HOST": JSON.stringify(
+      process.env.VITE_LOCAL_HYDRA_HOST,
     ),
     "import.meta.env.LOCAL_HYDRA_PORT": JSON.stringify(
       process.env.VITE_LOCAL_HYDRA_PORT,
