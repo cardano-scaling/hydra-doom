@@ -36,7 +36,7 @@ export class TransactionBuilder {
     public adminKeyHash: string,
     public networkId: number,
   ) {
-    this.contract = new contracts.FinaleManagerSpend(this.policyId, {
+    this.contract = new contracts.FinaleManagerSpend({
       VerificationKey: [this.adminKeyHash],
     });
 
