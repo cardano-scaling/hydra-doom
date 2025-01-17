@@ -166,13 +166,11 @@ export class TransactionBuilder {
     playerKills.forEach(([pkhHex, _], i) => {
       const address = Core.Address.fromBytes(Core.HexBlob("60" + pkhHex));
       const policyId = seriesState.policies[i];
-      console.log("policy = ", policyId);
-
-      const asset = Object.keys(assets).find((assetId) =>
+      const asset = Array.from(assets.keys()).find((assetId) =>
         assetId.startsWith(policyId),
       );
       const assetId = Core.AssetId(asset);
-      const value = new Core.Value(0n, new Map([[assetId, 1n]]));
+      const value = new Core.Value(5_000_000n, new Map([[assetId, 1n]]));
       tx.payAssets(address, value);
     });
 
