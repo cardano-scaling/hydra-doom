@@ -9,9 +9,6 @@ export const withClaimWrapper = (Component: FC) => () => {
     <WalletObserverProvider
       options={{
         refreshInterval: 1000,
-        observerOptions: {
-          persistence: true,
-        },
       }}
     >
       <main className="relative min-h-screen pb-8">
