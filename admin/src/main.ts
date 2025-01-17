@@ -35,12 +35,6 @@ const mintContract = new contracts.PrizePrizeMint(
     outputIndex: utxos[0].input().index(),
   },
 );
-console.log(
-  mintContract.asPlutusV1() !== undefined,
-  mintContract.asPlutusV2() !== undefined,
-  mintContract.asPlutusV3() !== undefined,
-  mintContract.asNative() !== undefined,
-);
 
 const policyId = mintContract.hash();
 console.log(policyId);
