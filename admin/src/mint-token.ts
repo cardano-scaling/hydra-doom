@@ -95,7 +95,7 @@ const tx = await blaze
     Data.void(),
   )
   .payAssets(
-    adminAddress,
+    Core.Address.fromBech32(args.outputAddress as string) ?? adminAddress,
     new Core.Value(
       0n,
       new Map(
