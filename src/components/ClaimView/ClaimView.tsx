@@ -6,21 +6,47 @@ import {
   useWalletLoadingState,
 } from "@sundaeswap/wallet-lite";
 import { AssetAmount } from "@sundaeswap/asset";
-import { Blaze, Blockfrost } from "@blaze-cardano/sdk";
+import {
+  Blaze,
+  Blockfrost,
+  CIP30Interface,
+  Core,
+  Data,
+  WebWallet,
+} from "@blaze-cardano/sdk";
 
+import * as contracts from "../../../admin/src/transaction/finale-manager";
 import Button from "../Button";
+import {
+  BLOCKFROST_API_KEY,
+  CLAIM_ADMIN_ADDRESS,
+  NETWORK_ID,
+} from "../../constants";
+
+const USDM_ASSET_ID =
+  "d8906ca5c7ba124a0407a32dab37b2c82b13b3dcd9111e42940dcea4.0014df105553444d";
 
 export const ClaimView: FC = withClaimWrapper(() => {
-  const { disconnect, connectWallet, balance } = useWalletObserver();
+  const { disconnect, connectWallet, balance, mainAddress, observer } =
+    useWalletObserver();
   const { ready } = useWalletLoadingState();
   const extensions = useAvailableExtensions();
   const extension = extensions.find((e) => e.name === "Lace");
   const prizeData = useMemo(() => {
-    const nft1 = balance.get("nft1");
+    const nft1 = balance.get(
+      `503aa923622f9de3fc524ac253fbbe93578d48a48acfdb49548c8620.12`,
+    );
     if (nft1) {
       return {
         userNft: nft1,
-        prize: new AssetAmount(10_000_000n, { decimals: 6, assetId: "" }),
+        prize: new AssetAmount(1_000_000n, {
+          decimals: 6,
+          assetId: USDM_ASSET_ID,
+        }),
+        mintUtxo:
+          "510256a0aa0669137301bea89daed8b619e07aad3388708024805234156ca329#2",
+        usdmUtxo:
+          "2e976d6810b84fca603864bccd98c0de5a25072ef79e51fd432260221bca8323#0",
       };
     }
 
@@ -29,14 +55,18 @@ export const ClaimView: FC = withClaimWrapper(() => {
       return {
         userNft: nft2,
         prize: new AssetAmount(15_000_000n, { decimals: 6, assetId: "" }),
+        mintUtxo: "",
+        usdmUtxo: "",
       };
     }
 
     const nft3 = balance.get("nft3");
-    if (true) {
+    if (nft3) {
       return {
         userNft: nft3,
         prize: new AssetAmount(30_000_000n, { decimals: 6, assetId: "" }),
+        mintUtxo: "",
+        usdmUtxo: "",
       };
     }
 
@@ -45,6 +75,8 @@ export const ClaimView: FC = withClaimWrapper(() => {
       return {
         userNft: nft4,
         prize: new AssetAmount(50_000_000n, { decimals: 6, assetId: "" }),
+        mintUtxo: "",
+        usdmUtxo: "",
       };
     }
 
@@ -54,6 +86,67 @@ export const ClaimView: FC = withClaimWrapper(() => {
   const handleConnect = useCallback(async () => {
     await connectWallet("lace");
   }, [connectWallet]);
+
+  const handleClaim = useCallback(async () => {
+    if (!prizeData || !observer.api) {
+      return;
+    }
+
+    const builder = await Blaze.from(
+      new Blockfrost({
+        network: NETWORK_ID === 1 ? "cardano-mainnet" : "cardano-preview",
+        projectId: BLOCKFROST_API_KEY,
+      }),
+      new WebWallet(observer.api as CIP30Interface)
+    );
+
+    const [usdmUtxo] = await builder.provider.resolveUnspentOutputs([
+      Core.TransactionInput.fromCore({
+        index: Number(prizeData.usdmUtxo.split("#")[1]),
+        txId: Core.TransactionId(prizeData.usdmUtxo.split("#")[0]),
+      }),
+    ]);
+
+    const adminAddress = Core.Address.fromBech32(CLAIM_ADMIN_ADDRESS);
+    const adminKeyHash = adminAddress
+      .asEnterprise()
+      ?.getPaymentCredential().hash;
+
+    if (!adminKeyHash) {
+      throw new Error(
+        "Could not generate a key hash from the CLAIM_ADMIN_ADDRESS env."
+      );
+    }
+
+    const [oneShotId, oneShotIx] = prizeData.mintUtxo.split("#");
+    const mintContract = new contracts.PrizePrizeMint(
+      {
+        VerificationKey: [adminKeyHash],
+      },
+      {
+        transactionId: oneShotId,
+        outputIndex: BigInt(oneShotIx),
+      }
+    );
+
+    const totalAssets = Core.Value.fromCore(
+      usdmUtxo.output().amount().toCore()
+    );
+    totalAssets
+      .multiasset()
+      ?.set(Core.AssetId(prizeData.userNft.metadata.assetId), 1n);
+
+    const tx = await builder
+      .newTransaction()
+      .addInput(usdmUtxo, Data.void())
+      .provideScript(mintContract)
+      .payAssets(Core.Address.fromBech32(mainAddress), totalAssets)
+      .complete();
+
+    const signedTx = await builder.signTransaction(tx);
+    const txHash = await builder.submitTransaction(signedTx);
+    console.log(txHash);
+  }, [prizeData, observer.api, mainAddress]);
 
   return (
     <div className="w-full max-w-5xl">
@@ -80,7 +173,7 @@ export const ClaimView: FC = withClaimWrapper(() => {
               <p>You do not have a reward NFT in your wallet, sorry!</p>
             ) : (
               <Button
-                onClick={disconnect}
+                onClick={handleClaim}
                 className="w-96 h-16 inline-flex gap-4"
               >
                 Claim {prizeData.prize.value.toNumber()} USDM!
