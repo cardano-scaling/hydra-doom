@@ -12,7 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@blaze-cardano/sdk": "^0.2.16",
+    "@blaze-cardano/sdk": "^0.2.17",
     "@noble/ed25519": "^2.1.0",
     "@noble/hashes": "^1.5.0",
     "@sundaeswap/asset": "^1.0.6",

@@ -11,6 +11,10 @@ export const LOCAL_HYDRA_PORT = import.meta.env.VITE_LOCAL_HYDRA_PORT || 4001;
 
 export const CABINET_KEY = import.meta.env.VITE_CABINET_KEY;
 export const NETWORK_ID = Number(import.meta.env.VITE_NETWORK_ID || 1);
+export const CLAIM_ADMIN_ADDRESS = import.meta.env
+  .VITE_CLAIM_ADMIN_ADDRESS as string;
+export const BLOCKFROST_API_KEY = import.meta.env
+  .VITE_BLOCKFROST_PROJECT_ID as string;
 export const HANDLE_CACHE_KEY = "player-handle-cache";
 export const MAX_SPEED = 40;
 export const REGIONS = [
