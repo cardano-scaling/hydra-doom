@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import { withClaimWrapper } from "./withClaimWrapper";
 import {
   useWalletObserver,
@@ -23,23 +23,27 @@ import {
   NETWORK_ID,
 } from "../../constants";
 
+const CLAIM_LOCAL_STORAGE_KEY = "HYRDA_DOOM_CLAIMED";
 const USDM_ASSET_ID =
   "d8906ca5c7ba124a0407a32dab37b2c82b13b3dcd9111e42940dcea4.0014df105553444d";
 
 export const ClaimView: FC = withClaimWrapper(() => {
   const { disconnect, connectWallet, balance, mainAddress, observer } =
     useWalletObserver();
-  const { ready } = useWalletLoadingState();
+  const { ready, connectingWallet } = useWalletLoadingState();
   const extensions = useAvailableExtensions();
   const extension = extensions.find((e) => e.name === "Lace");
+  const [claimTx, setClaimTx] = useState<string | null>(
+    window.localStorage.getItem(CLAIM_LOCAL_STORAGE_KEY)
+  );
   const prizeData = useMemo(() => {
     const nft1 = balance.get(
-      `503aa923622f9de3fc524ac253fbbe93578d48a48acfdb49548c8620.12`,
+      `503aa923622f9de3fc524ac253fbbe93578d48a48acfdb49548c8620.12`
     );
     if (nft1) {
       return {
         userNft: nft1,
-        prize: new AssetAmount(1_000_000n, {
+        prize: new AssetAmount(20_000_000_000n, {
           decimals: 6,
           assetId: USDM_ASSET_ID,
         }),
@@ -145,49 +149,85 @@ export const ClaimView: FC = withClaimWrapper(() => {
 
     const signedTx = await builder.signTransaction(tx);
     const txHash = await builder.submitTransaction(signedTx);
-    console.log(txHash);
+    if (txHash) {
+      setClaimTx(txHash);
+      localStorage.setItem(CLAIM_LOCAL_STORAGE_KEY, txHash);
+    }
   }, [prizeData, observer.api, mainAddress]);
 
   return (
     <div className="w-full max-w-5xl">
-      <h1 className="text-black text-center font-['Pixelify_Sans'] text-7xl font-bold mb-8">
-        Claim Your Prize!
+      <h1 className="text-black text-center font-['Pixelify_Sans'] text-7xl font-bold mb-2">
+        Claim Your Prize
       </h1>
-      <div className="flex flex-col items-center justify-center gap-2">
-        {!ready && extension && (
-          <Button
-            onClick={handleConnect}
-            className="w-96 h-16 inline-flex gap-4"
-          >
-            <img
-              className="w-6 h-6"
-              src={extension.reference.icon}
-              alt={extension.name}
-            />{" "}
-            Connect with {extension.name}
-          </Button>
-        )}
-        {ready && (
-          <>
-            {!prizeData ? (
-              <p>You do not have a reward NFT in your wallet, sorry!</p>
-            ) : (
-              <Button
-                onClick={handleClaim}
-                className="w-96 h-16 inline-flex gap-4"
-              >
-                Claim {prizeData.prize.value.toNumber()} USDM!
-              </Button>
+      {connectingWallet ? (
+        <p className="text-3xl mb-8 text-center max-w-[600px] mx-auto">
+          Connecting...
+        </p>
+      ) : (
+        <>
+          <div className="flex flex-col items-center justify-center gap-2">
+            {!ready && extension && (
+              <>
+                <p className="text-3xl mb-8 text-center max-w-[600px] mx-auto">
+                  Connect your wallet to claim your prize for the Hydra Doom
+                  Tournament!
+                </p>
+                <Button
+                  onClick={handleConnect}
+                  className="w-96 h-16 inline-flex gap-4"
+                >
+                  <img
+                    className="w-6 h-6"
+                    src={extension.reference.icon}
+                    alt={extension.name}
+                  />{" "}
+                  Connect with {extension.name}
+                </Button>
+              </>
             )}
-            <Button
-              onClick={disconnect}
-              className="w-96 h-16 inline-flex gap-4"
-            >
-              Disconnect Wallet
-            </Button>
-          </>
-        )}
-      </div>
+            {ready && (
+              <>
+                {!prizeData ? (
+                  <p className="text-3xl mb-8">
+                    You do not have a reward NFT in your wallet, sorry!
+                  </p>
+                ) : (
+                  <>
+                    <p className="text-3xl mb-8 text-center max-w-[600px] mx-auto">
+                      Congratulations, you're a winner!
+                    </p>
+                    {claimTx ? (
+                      <p className="text-3xl mb-8 text-center max-w-[600px] mx-auto">
+                        You've already claimed this reward. Here's the
+                        transaction ID:{" "}
+                        <span className="text-lg">{claimTx}</span>
+                      </p>
+                    ) : (
+                      <Button
+                        onClick={handleClaim}
+                        className="w-96 h-16 inline-flex gap-4"
+                      >
+                        Claim{" "}
+                        {new Intl.NumberFormat("en-us").format(
+                          prizeData.prize.value.toNumber()
+                        )}{" "}
+                        USDM!
+                      </Button>
+                    )}
+                  </>
+                )}
+                <Button
+                  onClick={disconnect}
+                  className="w-96 h-16 inline-flex gap-4"
+                >
+                  Disconnect Wallet
+                </Button>
+              </>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 });
