@@ -506,7 +506,7 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 449590: $0 => {
+ 449461: $0 => {
   var str = UTF8ToString($0) + "\n\n" + "Abort/Retry/Ignore/AlwaysIgnore? [ariA] :";
   var reply = window.prompt(str, "i");
   if (reply === null) {
@@ -514,7 +514,7 @@ var ASM_CONSTS = {
   }
   return allocate(intArrayFromString(reply), "i8", ALLOC_NORMAL);
  },
- 449815: () => {
+ 449686: () => {
   if (typeof (AudioContext) !== "undefined") {
    return true;
   } else if (typeof (webkitAudioContext) !== "undefined") {
@@ -522,7 +522,7 @@ var ASM_CONSTS = {
   }
   return false;
  },
- 449962: () => {
+ 449833: () => {
   if ((typeof (navigator.mediaDevices) !== "undefined") && (typeof (navigator.mediaDevices.getUserMedia) !== "undefined")) {
    return true;
   } else if (typeof (navigator.webkitGetUserMedia) !== "undefined") {
@@ -530,7 +530,7 @@ var ASM_CONSTS = {
   }
   return false;
  },
- 450196: $0 => {
+ 450067: $0 => {
   if (typeof (Module["SDL2"]) === "undefined") {
    Module["SDL2"] = {};
   }
@@ -552,11 +552,11 @@ var ASM_CONSTS = {
   }
   return SDL2.audioContext === undefined ? -1 : 0;
  },
- 450689: () => {
+ 450560: () => {
   var SDL2 = Module["SDL2"];
   return SDL2.audioContext.sampleRate;
  },
- 450757: ($0, $1, $2, $3) => {
+ 450628: ($0, $1, $2, $3) => {
   var SDL2 = Module["SDL2"];
   var have_microphone = function(stream) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -597,7 +597,7 @@ var ASM_CONSTS = {
    }, have_microphone, no_microphone);
   }
  },
- 452409: ($0, $1, $2, $3) => {
+ 452280: ($0, $1, $2, $3) => {
   var SDL2 = Module["SDL2"];
   SDL2.audio.scriptProcessorNode = SDL2.audioContext["createScriptProcessor"]($1, 0, $0);
   SDL2.audio.scriptProcessorNode["onaudioprocess"] = function(e) {
@@ -609,7 +609,7 @@ var ASM_CONSTS = {
   };
   SDL2.audio.scriptProcessorNode["connect"](SDL2.audioContext["destination"]);
  },
- 452819: ($0, $1) => {
+ 452690: ($0, $1) => {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.capture.currentCaptureBuffer.numberOfChannels;
   for (var c = 0; c < numChannels; ++c) {
@@ -628,7 +628,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 453424: ($0, $1) => {
+ 453295: ($0, $1) => {
   var SDL2 = Module["SDL2"];
   var numChannels = SDL2.audio.currentOutputBuffer["numberOfChannels"];
   for (var c = 0; c < numChannels; ++c) {
@@ -641,7 +641,7 @@ var ASM_CONSTS = {
    }
   }
  },
- 453904: $0 => {
+ 453775: $0 => {
   var SDL2 = Module["SDL2"];
   if ($0) {
    if (SDL2.capture.silenceTimer !== undefined) {
@@ -679,7 +679,7 @@ var ASM_CONSTS = {
    SDL2.audioContext = undefined;
   }
  },
- 455076: ($0, $1, $2) => {
+ 454947: ($0, $1, $2) => {
   var w = $0;
   var h = $1;
   var pixels = $2;
@@ -750,7 +750,7 @@ var ASM_CONSTS = {
   }
   SDL2.ctx.putImageData(SDL2.image, 0, 0);
  },
- 456545: ($0, $1, $2, $3, $4) => {
+ 456416: ($0, $1, $2, $3, $4) => {
   var w = $0;
   var h = $1;
   var hot_x = $2;
@@ -787,19 +787,19 @@ var ASM_CONSTS = {
   stringToUTF8(url, urlBuf, url.length + 1);
   return urlBuf;
  },
- 457534: $0 => {
+ 457405: $0 => {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = UTF8ToString($0);
   }
  },
- 457617: () => {
+ 457488: () => {
   if (Module["canvas"]) {
    Module["canvas"].style["cursor"] = "none";
   }
  },
- 457686: () => window.innerWidth,
- 457716: () => window.innerHeight,
- 457747: ($0, $1) => {
+ 457557: () => window.innerWidth,
+ 457587: () => window.innerHeight,
+ 457618: ($0, $1) => {
   alert(UTF8ToString($0) + "\n\n" + UTF8ToString($1));
  }
 };
@@ -849,6 +849,14 @@ function hydra_player_disconnected(ip, player) {
  const g = typeof window !== "undefined" ? window : global;
  if (!!g && !!g.playerDisconnected) {
   g.playerDisconnected(ip, player);
+ }
+}
+
+function hydra_client_update_state(state) {
+ let g = typeof window !== "undefined" ? window : global;
+ let hydra = !!g ? g.HydraMultiplayer : null;
+ if (!!hydra) {
+  hydra.setState(state);
  }
 }
 
@@ -1514,10 +1522,7 @@ var zeroMemory = (address, size) => {
 var alignMemory = (size, alignment) => Math.ceil(size / alignment) * alignment;
 
 var mmapAlloc = size => {
- size = alignMemory(size, 65536);
- var ptr = _emscripten_builtin_memalign(65536, size);
- if (!ptr) return 0;
- return zeroMemory(ptr, size);
+ abort();
 };
 
 var MEMFS = {
@@ -3769,39 +3774,6 @@ function ___syscall_unlinkat(dirfd, path, flags) {
 var nowIsMonotonic = true;
 
 var __emscripten_get_now_is_monotonic = () => nowIsMonotonic;
-
-var convertI32PairToI53Checked = (lo, hi) => ((hi + 2097152) >>> 0 < 4194305 - !!lo) ? (lo >>> 0) + hi * 4294967296 : NaN;
-
-function __mmap_js(len, prot, flags, fd, offset_low, offset_high, allocated, addr) {
- var offset = convertI32PairToI53Checked(offset_low, offset_high);
- try {
-  if (isNaN(offset)) return 61;
-  var stream = SYSCALLS.getStreamFromFD(fd);
-  var res = FS.mmap(stream, len, offset, prot, flags);
-  var ptr = res.ptr;
-  SAFE_HEAP_STORE(((allocated) >> 2) * 4, res.allocated, 4);
-  SAFE_HEAP_STORE(((addr) >> 2) * 4, ptr, 4);
-  return 0;
- } catch (e) {
-  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
-  return -e.errno;
- }
-}
-
-function __munmap_js(addr, len, prot, flags, fd, offset_low, offset_high) {
- var offset = convertI32PairToI53Checked(offset_low, offset_high);
- try {
-  if (isNaN(offset)) return 61;
-  var stream = SYSCALLS.getStreamFromFD(fd);
-  if (prot & 2) {
-   SYSCALLS.doMsync(addr, stream, len, flags, offset);
-  }
-  FS.munmap(stream);
- }  catch (e) {
-  if (typeof FS == "undefined" || !(e.name === "ErrnoError")) throw e;
-  return -e.errno;
- }
-}
 
 var runtimeKeepaliveCounter = 0;
 
@@ -7854,6 +7826,8 @@ function _fd_read(fd, iov, iovcnt, pnum) {
  }
 }
 
+var convertI32PairToI53Checked = (lo, hi) => ((hi + 2097152) >>> 0 < 4194305 - !!lo) ? (lo >>> 0) + hi * 4294967296 : NaN;
+
 function _fd_seek(fd, offset_low, offset_high, whence, newOffset) {
  var offset = convertI32PairToI53Checked(offset_low, offset_high);
  try {
@@ -8327,8 +8301,6 @@ var wasmImports = {
  /** @export */ __syscall_stat64: ___syscall_stat64,
  /** @export */ __syscall_unlinkat: ___syscall_unlinkat,
  /** @export */ _emscripten_get_now_is_monotonic: __emscripten_get_now_is_monotonic,
- /** @export */ _mmap_js: __mmap_js,
- /** @export */ _munmap_js: __munmap_js,
  /** @export */ alignfault: alignfault,
  /** @export */ eglBindAPI: _eglBindAPI,
  /** @export */ eglChooseConfig: _eglChooseConfig,
@@ -8564,6 +8536,7 @@ var wasmImports = {
  /** @export */ fd_read: _fd_read,
  /** @export */ fd_seek: _fd_seek,
  /** @export */ fd_write: _fd_write,
+ /** @export */ hydra_client_update_state: hydra_client_update_state,
  /** @export */ hydra_game_ended: hydra_game_ended,
  /** @export */ hydra_game_started: hydra_game_started,
  /** @export */ hydra_player_connected: hydra_player_connected,
@@ -8592,8 +8565,6 @@ var ___errno_location = () => (___errno_location = wasmExports["__errno_location
 var _ReceivePacket = Module["_ReceivePacket"] = (a0, a1, a2) => (_ReceivePacket = Module["_ReceivePacket"] = wasmExports["ReceivePacket"])(a0, a1, a2);
 
 var ___funcs_on_exit = () => (___funcs_on_exit = wasmExports["__funcs_on_exit"])();
-
-var _emscripten_builtin_memalign = (a0, a1) => (_emscripten_builtin_memalign = wasmExports["emscripten_builtin_memalign"])(a0, a1);
 
 var _emscripten_get_sbrk_ptr = () => (_emscripten_get_sbrk_ptr = wasmExports["emscripten_get_sbrk_ptr"])();
 
@@ -8697,9 +8668,9 @@ var _asyncify_start_rewind = a0 => (_asyncify_start_rewind = wasmExports["asynci
 
 var _asyncify_stop_rewind = () => (_asyncify_stop_rewind = wasmExports["asyncify_stop_rewind"])();
 
-var ___start_em_js = Module["___start_em_js"] = 448176;
+var ___start_em_js = Module["___start_em_js"] = 447888;
 
-var ___stop_em_js = Module["___stop_em_js"] = 449590;
+var ___stop_em_js = Module["___stop_em_js"] = 449461;
 
 function intArrayFromBase64(s) {
  if (typeof ENVIRONMENT_IS_NODE != "undefined" && ENVIRONMENT_IS_NODE) {

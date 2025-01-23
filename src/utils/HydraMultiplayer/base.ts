@@ -17,6 +17,7 @@ export abstract class HydraMultiplayer {
   packetQueue: Packet[] = [];
   module: EmscriptenModule;
   networkId: number;
+  state: "Finished" | "Running";
 
   gameId?: string;
   players?: string[];
@@ -51,12 +52,20 @@ export abstract class HydraMultiplayer {
     this.key = key;
     this.module = module;
     this.networkId = networkId;
+    this.state = "Running";
 
     this.hydra = new Hydra(url, filterAddress, onConnect, onDisconnect, 100);
     this.hydra.onTxSeen = this.observeTx.bind(this);
 
     this.SendPacket = this.SendPacket.bind(this);
     this.setIP = this.setIP.bind(this);
+    this.setState = this.setState.bind(this);
+  }
+
+  public setState(state: number) {
+    if (state === 0) {
+      this.state = "Running";
+    } else if (state === 1) this.state = "Finished";
   }
 
   public setIP(ip: number) {
@@ -79,7 +88,7 @@ export abstract class HydraMultiplayer {
       return;
     }
     await this.selectUTxO();
-    const datum = encodePackets(this.packetQueue);
+    const datum = encodePackets(this.packetQueue, this.state);
 
     const [newUTxO, tx] = this.buildTx(datum);
     await this.hydra.submitTx(tx);
@@ -147,7 +156,10 @@ export interface Packet {
   data: Uint8Array;
 }
 
-function encodePackets(packets: Packet[]): string {
+function encodePackets(
+  packets: Packet[],
+  state: "Finished" | "Running",
+): string {
   const packetData = packets.map((data) =>
     Data.to(
       {
@@ -155,6 +167,7 @@ function encodePackets(packets: Packet[]): string {
         from: BigInt(data.from),
         ephemeralKey: toHex(data.ephemeralKey),
         kills: Array.from(data.kills).map((k) => BigInt(k)),
+        state,
         data: toHex(data.data),
       },
       DatumPacket,
@@ -219,7 +232,7 @@ function decodeGame(raw: Uint8Array): TGame {
     referee_key_hash: referee_key_hash,
     playerCount,
     botCount,
-    players: player_payments.map(p => p.payment_key_hash),
+    players: player_payments.map((p) => p.payment_key_hash),
     state: stateTag,
     winner: winnerRaw,
     cheater: cheaterRaw,
