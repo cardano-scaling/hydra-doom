@@ -15,13 +15,13 @@ const GameView = () => {
       <RestartButton />
       <div className="grid grid-cols-[20.5rem_1fr_20.5rem] container gap-16 items-center">
         <div className="flex flex-col gap-8">
-          <GlobalTotals size="sm" titleAlign="left" />
-          <SessionStats size="sm" titleAlign="left" />
+          {/* <GlobalTotals size="sm" titleAlign="left" />
+          <SessionStats size="sm" titleAlign="left" /> */}
         </div>
         <div className="flex flex-col gap-6">
           <DoomCanvas />
         </div>
-        <GlobalTPS size="sm" titleAlign="left" />
+        {/* <GlobalTPS size="sm" titleAlign="left" /> */}
       </div>
     </Layout>
   );
