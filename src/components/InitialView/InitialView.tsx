@@ -54,14 +54,8 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
     }
   }, [isLoadingUserData, isUserDataFetched, isJoin, publicKeyHashHex]);
 
-  const handleClickStartMultiplayer = () => {
-    setModalTitle("New Game");
-    setIsNameModalOpen(true);
-    setGameData((prev) => ({ ...prev, type: EGameType.HOST }));
-  };
-
   const handleClickJoinMultiplayer = () => {
-    setModalTitle("Join Multiplayer");
+    setModalTitle("Join Finale Game");
     setIsNameModalOpen(true);
     setGameData((prev) => ({ ...prev, type: EGameType.JOIN }));
   };
@@ -90,85 +84,88 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
       return <div className="h-72 flex items-center text-3xl">Loading...</div>;
     }
 
-    if (displayActionButtons || accountData) {
-      return (
-        <>
-          {accountData ? (
-            <div className="flex-col">
-              <div className="flex items-center gap-6 justify-center mb-8">
-                <div className="text-3xl">
-                  Logged In as:{" "}
-                  <span className="text-white text-shadow-custom">
-                    {accountData.auth_name}
-                  </span>
-                </div>
-                <Button className="text-xl w-36 h-11" onClick={onLogout} tick>
-                  Logout
-                </Button>
-              </div>
-              {!isQualified ? (
-                <>
-                  <div className="flex items-center gap-6 justify-center mb-8">
-                    <span className="text-white text-3xl text-shadow-custom">
-                      Unfortunately, you have not qualified for the next stage
-                      of the tournament.
-                    </span>
-                  </div>
-                </>
-              ) : (
-                <div className="flex-col items-center gap-6 justify-center text-center mb-8">
-                  <div className="text-white text-3xl text-shadow-custom">
-                    Congratulations, you've qualified! Your next steps:
-                  </div>
-                  <div className="text-white text-3xl text-shadow-custom">
-                    1) Connect your Discord to your tournament account{" "}
-                    <a
-                      target="_blank"
-                      href="https://rewardengine.dripdropz.io/leaderboard/d93212b3-dbdc-40d0-befd-f90508c6232d"
-                      className="text-black hover:text-red-800"
-                    >
-                      here
-                    </a>
-                  </div>
-                  <div className="text-white text-3xl text-shadow-custom">
-                    2) Join our{" "}
-                    <a
-                      target="_blank"
-                      href="https://discord.gg/mAJkTqAuAM"
-                      className="text-black hover:text-red-800"
-                    >
-                      Discord server
-                    </a>{" "}
-                    for matchmaking & more information
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <>
-              <div className="text-center text-5xl mb-8">Free Play</div>
-              <Button
-                className="w-96 h-16"
-                onClick={handleClickStartMultiplayer}
-              >
-                New Game
-              </Button>
-              <Button
-                className="w-96 h-16"
-                onClick={handleClickJoinMultiplayer}
-              >
-                Join Game
-              </Button>
-            </>
-          )}
-        </>
-      );
-    }
+    // if (displayActionButtons || accountData) {
+    //   return (
+    //     <>
+    //       {accountData ? (
+    //         <div className="flex-col">
+    //           <div className="flex items-center gap-6 justify-center mb-8">
+    //             <div className="text-3xl">
+    //               Logged In as:{" "}
+    //               <span className="text-white text-shadow-custom">
+    //                 {accountData.auth_name}
+    //               </span>
+    //             </div>
+    //             <Button className="text-xl w-36 h-11" onClick={onLogout} tick>
+    //               Logout
+    //             </Button>
+    //           </div>
+    //           {!isQualified ? (
+    //             <>
+    //               <div className="flex items-center gap-6 justify-center mb-8">
+    //                 <span className="text-white text-3xl text-shadow-custom">
+    //                   Unfortunately, you have not qualified for the next stage
+    //                   of the tournament.
+    //                 </span>
+    //               </div>
+    //             </>
+    //           ) : (
+    //             <div className="flex-col items-center gap-6 justify-center text-center mb-8">
+    //               <div className="text-white text-3xl text-shadow-custom">
+    //                 Congratulations, you've qualified! Your next steps:
+    //               </div>
+    //               <div className="text-white text-3xl text-shadow-custom">
+    //                 1) Connect your Discord to your tournament account{" "}
+    //                 <a
+    //                   target="_blank"
+    //                   href="https://rewardengine.dripdropz.io/leaderboard/d93212b3-dbdc-40d0-befd-f90508c6232d"
+    //                   className="text-black hover:text-red-800"
+    //                 >
+    //                   here
+    //                 </a>
+    //               </div>
+    //               <div className="text-white text-3xl text-shadow-custom">
+    //                 2) Join our{" "}
+    //                 <a
+    //                   target="_blank"
+    //                   href="https://discord.gg/mAJkTqAuAM"
+    //                   className="text-black hover:text-red-800"
+    //                 >
+    //                   Discord server
+    //                 </a>{" "}
+    //                 for matchmaking & more information
+    //               </div>
+    //             </div>
+    //           )}
+    //         </div>
+    //       ) : (
+    //         <>
+    //           <div className="text-center text-5xl mb-8">Free Play</div>
+    //           <Button
+    //             className="w-96 h-16"
+    //             onClick={handleClickStartMultiplayer}
+    //           >
+    //             New Game
+    //           </Button>
+    //           <Button
+    //             className="w-96 h-16"
+    //             onClick={handleClickJoinMultiplayer}
+    //           >
+    //             Join Game
+    //           </Button>
+    //         </>
+    //       )}
+    //     </>
+    //   );
+    // }
 
     return (
       <>
-        <Button className="w-96 h-16" onClick={showActionButtons}>
-          Free Play
+        <Button
+          className="mt-24 w-96 h-16"
+          onClick={handleClickJoinMultiplayer}
+        >
+          Join Game
         </Button>
       </>
     );
@@ -184,10 +181,10 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
       <div className="flex flex-col gap-6 items-center mb-10">
         {renderButtons()}
       </div>
-      <div className="grid grid-cols-2 gap-52 w-full max-w-5xl">
+      {/* <div className="grid grid-cols-2 gap-52 w-full max-w-5xl">
         <GlobalTotals />
         <GlobalTPS />
-      </div>
+      </div> */}
       {isWelcomeModalOpen && (
         <Modal
           isOpen={isWelcomeModalOpen}
