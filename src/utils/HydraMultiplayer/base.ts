@@ -174,7 +174,9 @@ function encodePackets(
     ),
   );
 
-  return Data.to(packetData, PacketArray).toCbor();
+  const x = Data.to(packetData, PacketArray).toCbor();
+  console.log(x);
+  return x;
 }
 
 function decodePackets(raw: Uint8Array): Packet[] | undefined {
