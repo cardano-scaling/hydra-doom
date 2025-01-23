@@ -5,6 +5,13 @@ export const PacketSchema = Data.Object({
   from: Data.Integer(),
   ephemeralKey: Data.Bytes(),
   kills: Data.Array(Data.Integer()),
+  state: Data.Enum([
+    Data.Literal("Lobby"),
+    Data.Literal("Running"),
+    Data.Literal("Cheated"),
+    Data.Literal("Finished"),
+    Data.Literal("Aborted"),
+  ]),
   data: Data.Bytes(),
 });
 
@@ -18,7 +25,7 @@ export const PacketArray = PacketArraySchema as unknown as TPacketArray;
 
 export const GameSchema = Data.Object({
   referee_payment: Data.Object({
-    payment_key_hash: Data.Bytes()
+    payment_key_hash: Data.Bytes(),
   }),
   playerCountRaw: Data.Integer(),
   botCountRaw: Data.Integer(),
