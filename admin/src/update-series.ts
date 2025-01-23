@@ -49,3 +49,16 @@ const signedTx = await blaze.signTransaction(tx);
 console.log("Your new series tx:", signedTx.toCbor());
 const txId = await blaze.submitTransaction(signedTx, true);
 console.log("Transaction ID:", txId);
+console.log("Hitting control plane to update state...");
+try {
+  await fetch(`http://localhost:8000/game/new_series?utxo=${txId}%230`, {
+    method: "PATCH",
+  });
+  console.log("Series has been updated!");
+} catch (e) {
+  console.error(
+    "Failed to update state, (PATCH) URL:",
+    `http://localhost:8000/game/new_series?utxo=${txId}%230`,
+    e,
+  );
+}
