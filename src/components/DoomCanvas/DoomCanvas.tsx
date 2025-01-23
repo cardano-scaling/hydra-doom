@@ -133,7 +133,6 @@ const DoomCanvas: React.FC = () => {
       module.callMain(args);
     };
     loadDoom();
-    console.log("JSHY", "Loaded DOOM");
 
     return () => {
       canvas.removeEventListener("webglcontextlost", handleContextLost);
