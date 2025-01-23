@@ -1,18 +1,9 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { EGameType, EmscriptenModule, NewGameResponse } from "../../types";
 import { useAppContext } from "../../context/useAppContext";
 import { getArgs } from "../../utils/game";
 import { useMutation } from "@tanstack/react-query";
 import Card from "../Card";
-import { FaRegCircleCheck } from "react-icons/fa6";
-import { MdContentCopy } from "react-icons/md";
-import { ClipboardAPI, useClipboard } from "use-clipboard-copy";
 import createModule from "../../../websockets-doom.js";
 import { useUrls } from "../../hooks/useUrls";
 import { Core } from "@blaze-cardano/sdk";
@@ -32,8 +23,7 @@ const DoomCanvas: React.FC = () => {
     region,
   } = useAppContext();
   const { address } = keys || {};
-  const urlClipboard = useClipboard({ copiedTimeout: 1500 });
-  const { newGame, addPlayer, share } = useUrls();
+  const { newGame } = useUrls();
   const [isLoading, setIsLoading] = useState(true);
   const mutationKey = useMemo(
     () => ["fetchGameData", address, code, type],
@@ -50,24 +40,14 @@ const DoomCanvas: React.FC = () => {
       if (type === EGameType.SOLO) {
         return { game_id: "solo" };
       }
-      const url =
-        type === EGameType.HOST ? newGame(address!) : addPlayer(address!, code);
+
       console.log("fetching", mutationKey);
-      const response = await fetch(url);
+      const response = await fetch(newGame(address!));
       const json = await response.json();
       // hasFetched.current = true;
       return json;
     },
   });
-
-  const gameUrl = share(data?.game_id);
-
-  const urlClipboardCopy = useCallback(
-    (clipboard: ClipboardAPI, value: string) => {
-      clipboard.copy(value);
-    },
-    [],
-  );
 
   const hasFetched = useRef(false);
   useEffect(() => {
@@ -179,26 +159,6 @@ const DoomCanvas: React.FC = () => {
           </div>
         )}
       </Card>
-      {type === EGameType.HOST && data?.game_id && (
-        <Card className="px-4 py-2 text-center text-xl text-white flex items-center gap-2 justify-center">
-          Share this URL with friends{" "}
-          <a
-            className="text-yellow-400 underline"
-            href={gameUrl}
-            target="_blank"
-          >
-            {gameUrl}
-          </a>
-          {urlClipboard.copied ? (
-            <FaRegCircleCheck className="text-green-600" />
-          ) : (
-            <MdContentCopy
-              role="button"
-              onClick={() => urlClipboardCopy(urlClipboard, gameUrl)}
-            />
-          )}
-        </Card>
-      )}
     </>
   );
 };

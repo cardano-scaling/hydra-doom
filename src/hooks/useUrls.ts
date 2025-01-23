@@ -2,7 +2,6 @@ import {
   IS_LOCAL,
   LOCAL_HOST,
   LOCAL_GAME_PORT,
-  REGIONS,
   LOCAL_HEALTH_HOST,
   LOCAL_HEALTH_PORT,
 } from "../constants";
@@ -17,27 +16,17 @@ const healthUrl = (region: string) => {
 };
 
 const useUrls = () => {
-  const { region, players, bots } = useAppContext();
+  const { region } = useAppContext();
 
   if (IS_LOCAL) {
     return {
       newGame: (address: string) =>
-        `http://${LOCAL_HOST}:${LOCAL_GAME_PORT}/game/new_game?address=${address}&player_count=${players}&bot_count=${bots}`,
-      addPlayer: (address: string, code: string) =>
-        `http://${LOCAL_HOST}:${LOCAL_GAME_PORT}/game/add_player?address=${address}&id=${code}`,
-      share: (code?: string) =>
-        code ? `http://${LOCAL_HOST}:${LOCAL_GAME_PORT}/join/${code}` : "",
+        `http://${LOCAL_HOST}:${LOCAL_GAME_PORT}/game/new_game?address=${address}`,
     };
   } else {
     return {
       newGame: (address: string) =>
-        `https://api.${region?.value}.hydra-doom.sundae.fi/new_game?address=${address}&player_count=${players}&bot_count=${bots}`,
-      addPlayer: (address: string, code: string) => {
-        let gameRegion = REGIONS.find((r) => r.prefix == code[0]);
-        return `https://api.${gameRegion?.value}.hydra-doom.sundae.fi/add_player?address=${address}&id=${code}`;
-      },
-      share: (code?: string) =>
-        code ? `${window.location.origin}/#/join/${code}` : "",
+        `https://api.${region?.value}.hydra-doom.sundae.fi/new_game?address=${address}`,
     };
   }
 };

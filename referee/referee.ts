@@ -124,8 +124,6 @@ while (true) {
     const data = await response.json();
     console.log("Current UTxO set size: ", Object.keys(data).length);
     if (Object.keys(data).length > 1) {
-      console.log("Ending existing game...");
-      await endGame();
       console.log("Cleaningup existing game...");
       await cleanupGame();
       console.log("Cleaned up! Node is back to healthy state");
@@ -135,24 +133,6 @@ while (true) {
     console.warn("Failed to fetch and parse node utxos: ", e);
     await new Promise((resolve) => setTimeout(resolve, 2000));
   }
-}
-
-
-async function endGame() {
-  let status = 0;
-  while (![200, 201].includes(status)) {
-    try {
-      let response = await fetch("http://localhost:8000/game/end_game", {
-        method: "POST",
-      });
-      status = response.status;
-    } catch (e) {
-      console.log("Failed to end game: ", e);
-      await new Promise((resolve) => setTimeout(resolve, 200));
-    }
-  }
-
-  console.log("Succesfully ended game");
 }
 
 async function cleanupGame() {
@@ -172,7 +152,7 @@ async function cleanupGame() {
   console.log("Succesfully cleanedup game");
 }
 
-console.log("Hydra online and cleaned up; attempting to connect...")
+console.log("Hydra online and cleaned up; attempting to connect...");
 
 let exiting = false;
 const { default: createModule } = await import("../websockets-doom.js");
@@ -224,18 +204,16 @@ const hydra = new HydraMultiplayerDedicated({
         await reportResults(hydra.gameId, {
           gameId: hydra.gameId,
           result: "error",
-        })
-      } catch(e) {
-
-      }
+        });
+      } catch (e) {}
     }
     connected = false;
     process.exit(1);
-  }
+  },
 });
 global.HydraMultiplayer = hydra;
 
-while(!hydra.hydra.isConnected()) {
+while (!hydra.hydra.isConnected()) {
   console.log("Sleeping, connected: ", connected);
   await new Promise((resolve) => setTimeout(resolve, 3000));
 }
