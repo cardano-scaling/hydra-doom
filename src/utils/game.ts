@@ -16,6 +16,8 @@ export const getArgs = ({ type, petName }: GameData, host: boolean) => {
     "-extratics",
     "1",
     "-devparm",
+    "-timer",
+    "1",
   );
   if (type === EGameType.SOLO) {
     // Do nothing
