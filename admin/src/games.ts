@@ -25,10 +25,7 @@ const adminKeyHash = adminAddress.asEnterprise().getPaymentCredential().hash;
 
 const blaze = await Blaze.from(provider, wallet);
 
-const utxo = (await blaze.provider.getUnspentOutputs(adminAddress)).find(
-  (utxo) => utxo.output().amount().coin() === 0n,
-);
-
+const utxo = (await blaze.provider.getUnspentOutputs(adminAddress))[0];
 const gameTx = blaze.newTransaction().addInput(utxo);
 
 const playerOne = Core.Address.fromBech32(args.playerOne);
