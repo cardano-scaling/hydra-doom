@@ -87,29 +87,12 @@ const hydra = new HydraMultiplayerClient({
   networkId: NETWORK_ID,
 });
 global.HydraMultiplayer = hydra;
+await Promise.resolve((resolve) => setTimeout(resolve, 1500));
 
-let gameId;
-let shouldPlay = false;
-
-hydra.onNewGame = async (newGameId, humanCount, botCount, _ephemeralKey) => {
-  console.log(
-    `Saw new game ${newGameId}, with ${humanCount} humans and ${botCount} bots, deciding whether to join...`,
-  );
-  if (botCount > bot_index) {
-    await new Promise((resolve) => setTimeout(resolve, 1000 * bot_index));
-    console.log(`Bot ${bot_index} joining game ${newGameId}`);
-    gameId = newGameId;
-    shouldPlay = true;
-  }
-};
 let timeout = 10_000;
 hydra.onTxSeen = async (tx) => {
   timeout = 10_000;
 };
-
-while (!shouldPlay) {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-}
 
 // await fetch(`http://localhost:8000/game/add_player?address=${keys.address}`);
 
@@ -118,8 +101,9 @@ const args = [
   "-server",
   "-nodes",
   "2",
-  "-altdeath",
   "-ai",
+
+  "-altdeath",
   "-iwad",
   "freedoom2.wad",
   "-merge",
@@ -135,20 +119,8 @@ const args = [
   "default.cfg",
 ];
 try {
-  console.log("Attempting to join the game");
+  console.log("Attempting to start game");
   module.callMain(args);
 } catch (e) {
   console.error(e);
 }
-
-while (!done) {
-  console.log(`Game ${gameId} is still running...`);
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  timeout -= 1000;
-  if (timeout <= 0) {
-    console.log(`Game ${gameId} timed out, restarting`);
-    done = true;
-  }
-}
-
-process.exit(0);
