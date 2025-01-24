@@ -94,6 +94,7 @@ export class TransactionBuilder {
     const datum = Core.PlutusData.fromCore(
       utxo.output().datum().asInlineData().toCore(),
     );
+
     const seriesState = Data.from(datum, contracts.FinaleManagerSpend.datum);
     const kills: bigint[] = seriesState.kills;
     const pkhs: string[] = seriesState.pkhs;
