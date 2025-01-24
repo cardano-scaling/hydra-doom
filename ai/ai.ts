@@ -4,9 +4,12 @@ import { HydraMultiplayerClient } from "utils/HydraMultiplayer/client";
 import * as bech32 from "bech32-buffer";
 import { Core } from "@blaze-cardano/sdk";
 import * as ed25519 from "@noble/ed25519";
+import { sha512 } from "@noble/hashes/sha512";
 import { blake2b } from "@noble/hashes/blake2b";
 import { readFile } from "node:fs/promises";
 import { fromHex, toHex } from "utils/helpers.js";
+
+ed25519.etc.sha512Async = async (...m) => sha512(ed25519.etc.concatBytes(...m));
 
 const NETWORK_ID = Number(process.env.NETWORK_ID);
 const HYDRA_NODE = "http://localhost:4001/";

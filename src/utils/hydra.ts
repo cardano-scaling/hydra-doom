@@ -1,7 +1,7 @@
 /// A broker for communicating with Hydra over websockets
 import { Core } from "@blaze-cardano/sdk";
 import { decode } from "cbor-x";
-
+import WebSocket from "ws";
 import { fromHex, toHex } from "./helpers";
 import {
   Address,
