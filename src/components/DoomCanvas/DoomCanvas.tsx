@@ -51,6 +51,7 @@ const DoomCanvas: React.FC = () => {
       console.log("fetching", mutationKey);
       const response = await fetch(url);
       const json = await response.json();
+      // hasFetched.current = true;
       return json;
     },
   });
@@ -67,9 +68,8 @@ const DoomCanvas: React.FC = () => {
   const hasFetched = useRef(false);
   useEffect(() => {
     if (!address || !region || hasFetched.current) return;
-
-    fetchGameData();
     hasFetched.current = true;
+    fetchGameData();
   }, [address, fetchGameData, region]);
 
   useEffect(() => {
