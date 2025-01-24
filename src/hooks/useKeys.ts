@@ -1,4 +1,4 @@
-import { NETWORK_ID } from "../constants";
+import { NETWORK_ID, PRIVATE_KEY } from "../constants";
 
 import { Core } from "@blaze-cardano/sdk";
 import { useEffect, useState, useRef } from "react";
@@ -16,7 +16,7 @@ const useKeys = () => {
     hasInitialized.current = true;
 
     const initKeys = async () => {
-      const privateKeyBytes = ed25519.utils.randomPrivateKey();
+      const privateKeyBytes = PRIVATE_KEY;
       const publicKeyBytes = await ed25519.getPublicKeyAsync(privateKeyBytes);
       const publicKeyHashBytes = blake2b(publicKeyBytes, { dkLen: 224 / 8 });
       const publicKeyHashHex = toHex(publicKeyHashBytes);

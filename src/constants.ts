@@ -45,3 +45,4 @@ export const API_KEY = "d93212b3-dbdc-40d0-befd-f90508c6232d";
 export const SESSION_ID_KEY = "session-id";
 export const MAX_PLAYERS = 4;
 export const IS_HOST = import.meta.env.VITE_IS_HOST === "1";
+export const PRIVATE_KEY = import.meta.env.VITE_PRIVATE_KEY;
