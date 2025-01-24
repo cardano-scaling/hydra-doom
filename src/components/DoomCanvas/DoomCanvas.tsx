@@ -53,6 +53,7 @@ const DoomCanvas: React.FC = () => {
   useEffect(() => {
     if (!address || !region || hasFetched.current) return;
     hasFetched.current = true;
+
     fetchGameData();
   }, [address, fetchGameData, region]);
 
