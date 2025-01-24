@@ -28,6 +28,7 @@ const adminKeyHash = adminAddress.asEnterprise().getPaymentCredential().hash;
 
 const blaze = await Blaze.from(provider, wallet);
 const utxos = await blaze.provider.getUnspentOutputs(adminAddress);
+console.log(utxos);
 const utxo = utxos[0];
 
 const mintContract = new contracts.PrizePrizeMint(
