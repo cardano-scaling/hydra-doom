@@ -39,10 +39,10 @@ const secondPlace: string = args.secondPlace;
 const thirdPlace: string = args.thirdPlace;
 const fourthPlace: string = args.fourthPlace;
 
-const firstPlaceDistribute: string = args.firstPlaceDisbtribute;
-const secondPlaceDistribute: string = args.secondPlaceDisbtribute;
-const thirdPlaceDistribute: string = args.thirdPlaceDisbtribute;
-const fourthPlaceDistribute: string = args.fourthPlaceDisbtribute;
+const firstPlaceDistribute: string = args.firstPlaceDistribute;
+const secondPlaceDistribute: string = args.secondPlaceDistribute;
+const thirdPlaceDistribute: string = args.thirdPlaceDistribute;
+const fourthPlaceDistribute: string = args.fourthPlaceDistribute;
 
 const txBuilder = new TransactionBuilder(blaze, adminKeyHash, networkId);
 
