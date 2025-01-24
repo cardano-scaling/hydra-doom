@@ -8,8 +8,8 @@ import LoginModal from "../LoginModal/LoginModal";
 import { useAppContext } from "../../context/useAppContext";
 import { EGameType } from "../../types";
 import { useSessionIdKeyCache } from "../../utils/localStorage";
-import GlobalTPS from "../GlobalTPS";
-import GlobalTotals from "../GlobalTotals";
+
+import { IS_HOST } from "../../constants.js";
 
 interface InitialViewProps {
   startGame: () => void;
@@ -17,9 +17,7 @@ interface InitialViewProps {
 
 const InitialView: FC<InitialViewProps> = ({ startGame }) => {
   const {
-    accountData,
     isLoadingUserData,
-    isQualified,
     isUserDataFetched,
     keys,
     setAccountData,
@@ -57,7 +55,10 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
   const handleClickJoinMultiplayer = () => {
     setModalTitle("Join Finale Game");
     setIsNameModalOpen(true);
-    setGameData((prev) => ({ ...prev, type: EGameType.JOIN }));
+    setGameData((prev) => ({
+      ...prev,
+      type: IS_HOST ? EGameType.HOST : EGameType.JOIN,
+    }));
   };
 
   /* const handleTournamentLogin = () => {

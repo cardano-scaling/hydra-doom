@@ -4,10 +4,6 @@ import * as dotenv from "dotenv";
 import { HydraProvider } from "./hydra/provider.js";
 import minimist from "minimist";
 dotenv.config();
-//addr_test1vp5cxztpc6hep9ds7fjgmle3l225tk8ske3rmwr9adu0m6sdkn7p3
-//addr_test1vp5cxztpc6hep9ds7fjgmle3l225tk8ske3rmwr9adu0m6cnzhjlv
-// addr_test1vp5cxztpc6hep9ds7fjgmle3l225tk8ske3rmwr9adu0mmqh25uly
-// addr_test1vp5cxztpc6hep9ds7fjgmle3l225tk8ske3rmwr9adu0mmgf7sspe
 const args =
   process.argv[0] === "npx"
     ? minimist(process.argv.slice(3))
@@ -29,7 +25,22 @@ const adminKeyHash = adminAddress.asEnterprise().getPaymentCredential().hash;
 
 const blaze = await Blaze.from(provider, wallet);
 
-const utxo = (await blaze.provider.getUnspentOutputs(adminAddress))[0];
+let utxo = (await blaze.provider.getUnspentOutputs(adminAddress))[0];
+
+const zeroTx = await blaze
+  .newTransaction()
+  .addInput(utxo)
+  .addOutput(new Core.TransactionOutput(adminAddress, new Core.Value(0n)))
+  .complete();
+const signedZeroTx = await blaze.signTransaction(zeroTx);
+const _ = await blaze.submitTransaction(signedZeroTx);
+await Promise.resolve((resolve) => setTimeout(resolve, 2000));
+console.log("Waited");
+
+utxo = (await blaze.provider.getUnspentOutputs(adminAddress)).find(
+  (utxo) => utxo.output().amount().coin() === 0n,
+);
+
 const gameTx = blaze.newTransaction().addInput(utxo);
 
 const playerOne = Core.Address.fromBech32(args.playerOne);
@@ -71,12 +82,7 @@ outputFour.setDatum(
   getDatum(playerFour.asEnterprise().getPaymentCredential().hash),
 );
 
-const tx = await gameTx
-  .addOutput(outputOne)
-  .addOutput(outputTwo)
-  .addOutput(outputThree)
-  .addOutput(outputFour)
-  .complete();
+const tx = await gameTx.addOutput(outputOne).complete();
 
 const signedTx = await blaze.signTransaction(tx);
 const txId = await blaze.submitTransaction(signedTx, true);
