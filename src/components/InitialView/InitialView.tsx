@@ -66,8 +66,6 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
     setSessionId("");
   };
 
-  console.log(accountData);
-
   const renderButtons = () => {
     if (isLoadingUserData) {
       return <div className="h-72 flex items-center text-3xl">Loading...</div>;

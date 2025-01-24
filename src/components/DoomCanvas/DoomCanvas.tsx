@@ -53,7 +53,7 @@ const DoomCanvas: React.FC = () => {
     },
   });
 
-  const gameUrl = share(data?.game_id);
+  const gameUrl = share("0");
 
   const urlClipboardCopy = useCallback(
     (clipboard: ClipboardAPI, value: string) => {
@@ -62,15 +62,15 @@ const DoomCanvas: React.FC = () => {
     [],
   );
 
-  useEffect(() => {
-    if (!address || !region) return;
+  // useEffect(() => {
+  //   if (!address || !region) return;
 
-    fetchGameData();
-  }, [address, fetchGameData, region]);
+  //   // fetchGameData();
+  // }, [address, fetchGameData, region]);
 
   useEffect(() => {
-    if (!address) return;
-    if (type !== EGameType.SOLO && !data?.ip) return;
+    // if (!address) return;
+    // if (type !== EGameType.SOLO && !data?.ip) return;
 
     const canvas = canvasRef.current;
 
@@ -133,7 +133,7 @@ const DoomCanvas: React.FC = () => {
       window.HydraMultiplayer = new HydraMultiplayerClient({
         key: keys,
         adminPkh: data.admin_pkh,
-        url: data.ip,
+        url: "ws://localhost:4001",
         module: Module,
         filterAddress: adminAddress.toBech32(),
         networkId: NETWORK_ID,
@@ -150,7 +150,15 @@ const DoomCanvas: React.FC = () => {
     return () => {
       canvas.removeEventListener("webglcontextlost", handleContextLost);
     };
-  }, [address, code, data?.admin_pkh, data?.ip, keys, petName, type]);
+  }, [
+    address,
+    code,
+    data?.admin_pkh,
+    "ws://localhost:4001",
+    keys,
+    petName,
+    type,
+  ]);
 
   return (
     <>
@@ -171,7 +179,7 @@ const DoomCanvas: React.FC = () => {
           </div>
         )}
       </Card>
-      {type === EGameType.HOST && data?.game_id && (
+      {type === EGameType.HOST && (
         <Card className="px-4 py-2 text-center text-xl text-white flex items-center gap-2 justify-center">
           Share this URL with friends{" "}
           <a

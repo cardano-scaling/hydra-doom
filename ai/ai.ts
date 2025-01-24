@@ -14,7 +14,7 @@ const bot_index = Number(process.env.BOT_INDEX ?? 1);
 
 let done = false;
 
-const adminKeyFile = process.env.ADMIN_KEY_FILE ?? "admin.sk";
+const adminKeyFile = "bob";
 const adminKey = JSON.parse((await readFile(adminKeyFile)).toString());
 const adminPrivateKeyBytes = adminKey.cborHex.slice(4);
 
@@ -111,7 +111,7 @@ while (!shouldPlay) {
   await new Promise((resolve) => setTimeout(resolve, 1000));
 }
 
-await fetch(`http://localhost:8000/game/add_player?address=${keys.address}`);
+// await fetch(`http://localhost:8000/game/add_player?address=${keys.address}`);
 
 // TODO: generate a fun pet name
 const args = [

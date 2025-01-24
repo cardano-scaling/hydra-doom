@@ -5,6 +5,7 @@ export const getArgs = ({ type, petName }: GameData) => {
   const args = ["-window", "-nogui", "-nomusic", "-config", "default.cfg"];
 
   args.push(
+    "-server",
     "-iwad",
     "freedoom2.wad",
     "-merge",

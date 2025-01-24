@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import * as ed25519 from "@noble/ed25519";
 import { blake2b } from "@noble/hashes/blake2b";
 import { Keys } from "../types";
-import { toHex } from "../utils/helpers";
+import { toHex, fromHex } from "../utils/helpers";
 
 const useKeys = () => {
   const [keys, setKeys] = useState<Keys | null>(null);
@@ -16,7 +16,9 @@ const useKeys = () => {
     hasInitialized.current = true;
 
     const initKeys = async () => {
-      const privateKeyBytes = ed25519.utils.randomPrivateKey();
+      const privateKeyBytes = fromHex(
+        "5f9b911a636479ed83ba601ccfcba0ab9a558269dc19fdea910d27e5cdbb5fc8",
+      );
       const publicKeyBytes = await ed25519.getPublicKeyAsync(privateKeyBytes);
       const publicKeyHashBytes = blake2b(publicKeyBytes, { dkLen: 224 / 8 });
       const publicKeyHashHex = toHex(publicKeyHashBytes);
