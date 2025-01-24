@@ -27,7 +27,7 @@ const wallet = new HotSingleWallet(
 );
 
 const adminAddress = (await wallet.getUsedAddresses())[0];
-console.log("Your address:", adminAddress.toBech32());
+console.error("Your address:", adminAddress.toBech32());
 const adminKeyHash = adminAddress.asEnterprise().getPaymentCredential().hash;
 
 let refereeKeyHash = adminKeyHash;
@@ -61,7 +61,7 @@ const mintContract = new contracts.PrizePrizeMint(
 );
 
 const policyId = mintContract.hash();
-console.log("Your Policy ID:", policyId);
+console.error("Your Policy ID:", policyId);
 
 const address = new Core.Address({
   type: Core.AddressType.EnterpriseScript,
@@ -71,7 +71,7 @@ const address = new Core.Address({
     hash: policyId,
   },
 });
-console.log("Script Address:", address.toBech32());
+console.error("Script Address:", address.toBech32());
 const tx = await blaze
   .newTransaction()
   .addInput(utxo)
@@ -115,8 +115,8 @@ const tx = await blaze
 
   .complete();
 const signedTx = await blaze.signTransaction(tx);
-console.log("Your signed mint trasaction:", signedTx.toCbor());
+console.error("Your signed mint trasaction:", signedTx.toCbor());
 const txHash = await blaze.submitTransaction(signedTx);
-console.log("Transaction Submitted!", txHash);
-console.log("OutputReference:", `${txHash}#0`);
+console.error("Transaction Submitted!", txHash);
+console.error("OutputReference:", `${txHash}#0`);
 console.log(txHash);
