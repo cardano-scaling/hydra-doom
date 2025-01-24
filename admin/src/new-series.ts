@@ -41,6 +41,11 @@ const secondPlace: string = args.secondPlace;
 const thirdPlace: string = args.thirdPlace;
 const fourthPlace: string = args.fourthPlace;
 
+const firstPlaceDistribute: string = args.firstPlacePkh;
+const secondPlaceDistribute: string = args.secondPlacePkh;
+const thirdPlaceDistribute: string = args.thirdPlacePkh;
+const fourthPlaceDistribute: string = args.fourthPlacePkh;
+
 const txBuilder = new TransactionBuilder(blaze, adminKeyHash, networkId);
 
 const utxos = await blaze.provider.getUnspentOutputs(adminAddress);
@@ -58,6 +63,12 @@ const tx = await txBuilder.newSeries(
     secondPlace.substring(0, 56),
     thirdPlace.substring(0, 56),
     fourthPlace.substring(0, 56),
+  ],
+  [
+    firstPlaceDistribute,
+    secondPlaceDistribute,
+    thirdPlaceDistribute,
+    fourthPlaceDistribute,
   ],
 );
 
