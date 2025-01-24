@@ -238,13 +238,14 @@ button:focus-visible {
 }
 
 .layer--foreground {
-  position: relative;
+  position: absolute;
   z-index: 2;
   overflow: hidden;
   margin-top: -120px;
   max-height: 50vh;
   min-height: 560px;
   height: 900px;
+  bottom: 0;
 }
 
 @media (max-width: 1200px) {
@@ -313,14 +314,10 @@ main {
 .logos {
   align-items: center;
   display: flex;
-  flex-wrap: wrap;
+  flex-flow: column nowrap;
   font-size: 0;
   gap: 24px;
   justify-content: center;
-  left: 60px;
-  position: absolute;
-  top: 65px;
-  width: 230px;
   z-index: 4;
 }
 
@@ -720,10 +717,8 @@ td.animate::after {
   display: none;
   font-size: 25px;
   justify-content: center;
-  position: absolute;
-  right: 205px;
-  top: 3px;
   transition: all 0.3s;
+  margin-right: 8px;
 }
 
 .mute-button:hover {
@@ -849,6 +844,21 @@ td.animate::after {
 
 .modal--game {
   padding: 1.25rem;
+  flex-flow: row nowrap;
+  align-items: start;
+}
+
+.modal--game > .logos {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.modal--game > .game-header {
+  position: relative;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
 }
 
 @media (max-width: 1900px) {
@@ -914,7 +924,6 @@ td.animate::after {
 .game-view-wrapper {
   width: 100%;
   max-width: 1800px;
-  margin: 2.4rem auto 0;
 }
 
 /* Header */
@@ -965,12 +974,10 @@ td.animate::after {
   display: flex;
   justify-content: center;
   align-items: center;
-  position: absolute;
-  top: -0.7rem;
-  right: 10px;
   width: 177px;
-  height: 61px;
+  height: 53px;
   padding: 0;
+  padding-top: 8px;
   background: url("../assets/images/connect-wallet-button.png");
 }
 
@@ -1034,10 +1041,13 @@ td.animate::after {
 /* Game Slot */
 
 .game-slot {
+  max-width: 1280px;
+  max-height: 90vh;
+  margin: 32px auto;
   aspect-ratio: 1028/805;
   background: linear-gradient(11.57deg, #000000 5.67%, #ff2f2f 68.21%);
   padding: 5px;
-  box-shadow: 0px 4px 10px 6px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 10px 6px rgba(0, 0, 0, 0.25);
 }
 
 .game-slot__container {
@@ -1053,7 +1063,7 @@ td.animate::after {
   position: absolute;
 }
 
-/* Speedometer */
+/*!* Speedometer *!
 
 .speedometer {
   width: 30px;
@@ -1103,7 +1113,7 @@ td.animate::after {
   width: 113px;
   height: 19px;
   transform-origin: right center;
-  transform: rotate(0deg); /* updated via js */
+  transform: rotate(0deg); !* updated via js *!
 }
 
 .global.speedometer__tick {
@@ -1150,7 +1160,7 @@ td.animate::after {
   height: 10px;
   margin-right: 0.5rem;
   background-color: #ccac25;
-}
+}*/
 
 .tabs {
   display: flex;

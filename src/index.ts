@@ -1,7 +1,7 @@
 import { fetchNewGame, hydraRecv, hydraSend } from "./game";
 import { generatePooQrUri, keys } from "./keys";
 import "./osano.js";
-import { startQueryingAPI, truncateString } from "./stats";
+// import { startQueryingAPI, truncateString } from "./stats";
 import "./styles.css";
 
 declare function callMain(args: string[]): void;
@@ -26,9 +26,9 @@ const continentForm: HTMLFormElement | null =
 const startGameButton: HTMLButtonElement | null =
   document.querySelector("#start-game-button");
 const tabButtons = document.querySelectorAll(".js-tab-button");
-const sessionPkhDisplay: HTMLElement | null = document.querySelector(
-  "#session-pkh-display"
-);
+// const sessionPkhDisplay: HTMLElement | null = document.querySelector(
+//   "#session-pkh-display"
+// );
 
 // Stuff for POO
 const { sessionPkh } = keys;
@@ -36,9 +36,9 @@ let pollingInterval: any = undefined;
 let qrCode = await generatePooQrUri();
 let qrShown = false;
 
-if (sessionPkhDisplay) {
-  sessionPkhDisplay.textContent = `(${truncateString(sessionPkh, 7, 7)})`;
-}
+// if (sessionPkhDisplay) {
+//   sessionPkhDisplay.textContent = `(${truncateString(sessionPkh, 7, 7)})`;
+// }
 
 async function pollForPoo(ephemeralKeyHash: string) {
   const request = await fetch(`https://auth.hydradoom.fun/v1/${ephemeralKeyHash}`);
@@ -56,13 +56,6 @@ async function pollForPoo(ephemeralKeyHash: string) {
 // Glue together callbacks available from doom-wasm
 (window as any).hydraSend = hydraSend;
 (window as any).hydraRecv = hydraRecv;
-
-if (process.env.CABINET_KEY) {
-  document.querySelectorAll(".js-cabinet-logos").forEach((element) => {
-    const e = element as HTMLElement | null;
-    if (e) e.style.display = "block";
-  });
-}
 
 if (process.env.REGION) {
   if (selectContinent) selectContinent.style.display = "none";
@@ -255,4 +248,4 @@ if (params.get("watch") != null) {
     callMain(commonArgs.concat("-hydra-recv"));
   }, 1000);
 }
-startQueryingAPI();
+// startQueryingAPI();

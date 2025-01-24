@@ -23,7 +23,7 @@ import {
 } from "./contract/datum";
 import { Hydra } from "./hydra";
 import { keys } from "./keys";
-import { setLocalSpeedometerValue } from "./speedometer";
+// import { setLocalSpeedometerValue } from "./speedometer";
 import { appendTx, session, updateUI } from "./stats";
 
 import * as ed25519 from "@noble/ed25519";
@@ -125,11 +125,11 @@ export async function fetchNewGame(region: string) {
           tps++;
         }
       }
-      setLocalSpeedometerValue(tps);
+      // setLocalSpeedometerValue(tps);
     };
     hydra.onTxInvalid = (txId) => {
       console.error("invalid", txId);
-      setLocalSpeedometerValue(0);
+      // setLocalSpeedometerValue(0);
       stop = true;
     };
     latestUTxO = await hydra.awaitUtxo(newGameResponse.player_utxo, 5000);

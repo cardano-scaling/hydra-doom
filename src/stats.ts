@@ -1,5 +1,5 @@
 import { keys } from "./keys";
-import { setGlobalSpeedometerValue } from "./speedometer";
+// import { setGlobalSpeedometerValue } from "./speedometer";
 import { GameStatistics, LeaderboardEntry, PlayerStats } from "./types";
 let global: {
   games: NodeListOf<HTMLDataListElement>;
@@ -123,12 +123,12 @@ export function updateGlobalsUI(data: GameStatistics) {
       timestamp: performance.now(),
       transactions: data.transactions,
     });
-    if (recent_queries.length > 5) {
-      let last = recent_queries.shift();
-      let difference = data.transactions - last.transactions;
-      let time_diff = (performance.now() - last.timestamp) / 1000;
-      setGlobalSpeedometerValue(Math.round(difference / time_diff));
-    }
+    // if (recent_queries.length > 5) {
+    //   // let last = recent_queries.shift();
+    //   // let difference = data.transactions - last.transactions;
+    //   // let time_diff = (performance.now() - last.timestamp) / 1000;
+    //   // setGlobalSpeedometerValue(Math.round(difference / time_diff));
+    // }
     global.txs.forEach((element) => {
       element.innerText = new Intl.NumberFormat("en").format(data.transactions);
     });
