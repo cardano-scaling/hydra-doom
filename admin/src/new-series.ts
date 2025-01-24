@@ -72,11 +72,9 @@ const tx = await txBuilder.newSeries(
   ],
 );
 
-const txId = tx.toCore().id;
-
-// const signedTx = await blaze.signTransaction(tx);
+const signedTx = await blaze.signTransaction(tx);
 console.log("Your new series tx:", tx.toCbor());
-// const txId = await blaze.submitTransaction(signedTx, true);
+const txId = await blaze.submitTransaction(signedTx, true);
 console.log("Transaction ID:", txId);
 console.log("Hitting control plane to update state...");
 try {
