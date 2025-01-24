@@ -25,19 +25,7 @@ const adminKeyHash = adminAddress.asEnterprise().getPaymentCredential().hash;
 
 const blaze = await Blaze.from(provider, wallet);
 
-let utxo = (await blaze.provider.getUnspentOutputs(adminAddress))[0];
-
-const zeroTx = await blaze
-  .newTransaction()
-  .addInput(utxo)
-  .addOutput(new Core.TransactionOutput(adminAddress, new Core.Value(0n)))
-  .complete();
-const signedZeroTx = await blaze.signTransaction(zeroTx);
-const _ = await blaze.submitTransaction(signedZeroTx);
-await Promise.resolve((resolve) => setTimeout(resolve, 2000));
-console.log("Waited");
-
-utxo = (await blaze.provider.getUnspentOutputs(adminAddress)).find(
+const utxo = (await blaze.provider.getUnspentOutputs(adminAddress)).find(
   (utxo) => utxo.output().amount().coin() === 0n,
 );
 
@@ -82,7 +70,12 @@ outputFour.setDatum(
   getDatum(playerFour.asEnterprise().getPaymentCredential().hash),
 );
 
-const tx = await gameTx.addOutput(outputOne).complete();
+const tx = await gameTx
+  .addOutput(outputOne)
+  .addOutput(outputTwo)
+  .addOutput(outputThree)
+  .addOutput(outputFour)
+  .complete();
 
 const signedTx = await blaze.signTransaction(tx);
 const txId = await blaze.submitTransaction(signedTx, true);
