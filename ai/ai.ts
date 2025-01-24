@@ -92,27 +92,10 @@ const hydra = new HydraMultiplayerClient({
 global.HydraMultiplayer = hydra;
 
 let gameId;
-let shouldPlay = false;
-
-hydra.onNewGame = async (newGameId, humanCount, botCount, _ephemeralKey) => {
-  console.log(
-    `Saw new game ${newGameId}, with ${humanCount} humans and ${botCount} bots, deciding whether to join...`,
-  );
-  if (botCount > bot_index) {
-    await new Promise((resolve) => setTimeout(resolve, 1000 * bot_index));
-    console.log(`Bot ${bot_index} joining game ${newGameId}`);
-    gameId = newGameId;
-    shouldPlay = true;
-  }
-};
 let timeout = 10_000;
 hydra.onTxSeen = async (tx) => {
   timeout = 10_000;
 };
-
-while (!shouldPlay) {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-}
 
 // await fetch(`http://localhost:8000/game/add_player?address=${keys.address}`);
 
