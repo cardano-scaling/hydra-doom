@@ -12,6 +12,7 @@
     <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+
     />
 
     <meta property="og:title" content="Hydra Doom"/>
@@ -233,28 +234,12 @@
         <div class="game-slot-container">
             <div class="game-slot">
                 <div class="game-slot__container">
-                    <div class="qr-code" id="qr-code">
-                        <p>
-                            Scan with your BEGIN, VESPR or YOROI mobile wallet to
-                            authenticate game session
-                        </p>
-                        <div id="qr-container"></div>
-                        <p>Or, jump straight into the action!</p>
-                        <button class="primary-button" id="skip-button">
-                            <span>Skip</span>
-                        </button>
-                    </div>
                     <div class="message" id="loading-message">Starting game...</div>
                     <div class="message" id="message">
                         <div>
                             <p>
-                                For this tech-demo we have 65 hydra heads, which can
-                                support 325 concurrent players, and we've reached that
-                                limit.
-                            </p>
-                            <p>
-                                At this point, a production-grade deployment could
-                                dynamically allocate a new hydra head to meet that demand!
+                                Having a problem connecting to the Hydra backend. Please try refreshing the page and
+                                try again.
                             </p>
                             <p>
                                 For now, try again in a few minutes and in the mean time,
@@ -283,7 +268,7 @@
         </button>
     </div>
 </div>
-<div id="modal-how-it-works" class="modal" role="dialog">
+<!--<div id="modal-how-it-works" class="modal" role="dialog">
     <div class="modal__outer-container">
         <div class="modal__container">
             <div class="modal__outer-border">
@@ -383,27 +368,37 @@
             </div>
         </div>
     </div>
-</div>
+</div>-->
 
 <script type="text/javascript">
     // Setup configuration for doom-wasm
     var Module = {
         noInitialRun: true,
         preRun: () => {
-            Module.FS.createPreloadedFile(
-                "",
-                "doom1.wad",
-                "doom1.wad",
-                true,
-                true,
-            );
-            Module.FS.createPreloadedFile(
-                "",
+            // Module.FS.createPreloadedFile(
+            //     "",
+            //     "doom1.wad",
+            //     "doom1.wad",
+            //     true,
+            //     true,
+            // );
+            // Module.FS.createPreloadedFile(
+            //     "",
+            //     "default.cfg",
+            //     "default.cfg",
+            //     true,
+            //     true,
+            // );
+            const files = [
+                "freedoom2.wad",
                 "default.cfg",
-                "default.cfg",
-                true,
-                true,
-            );
+                "dm_iog.wad",
+                "iog.wad",
+                "iog_assets.wad",
+            ];
+            files.forEach((file) => {
+                Module.FS.createPreloadedFile("/", file, file, true, true);
+            });
         },
         printErr: (text) => {
             console.error(text);
