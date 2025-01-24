@@ -87,7 +87,8 @@ const hydra = new HydraMultiplayerClient({
   networkId: NETWORK_ID,
 });
 global.HydraMultiplayer = hydra;
-await Promise.resolve((resolve) => setTimeout(resolve, 1500));
+console.log("Waiting 1.5s for hydra connection");
+await Promise.resolve((resolve) => setTimeout(resolve, 15000));
 
 let timeout = 10_000;
 hydra.onTxSeen = async (tx) => {
@@ -102,7 +103,6 @@ const args = [
   "-nodes",
   "2",
   "-ai",
-
   "-altdeath",
   "-iwad",
   "freedoom2.wad",
