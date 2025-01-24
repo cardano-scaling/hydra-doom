@@ -89,7 +89,7 @@ const hydra = new HydraMultiplayerClient({
 global.HydraMultiplayer = hydra;
 console.log("Waiting 1.5s for hydra connection");
 await Promise.resolve((resolve) => setTimeout(resolve, 15000));
-
+console.log("Done waiting");
 let timeout = 10_000;
 hydra.onTxSeen = async (tx) => {
   timeout = 10_000;
@@ -123,4 +123,9 @@ try {
   module.callMain(args);
 } catch (e) {
   console.error(e);
+}
+
+while (true) {
+  console.log("Running...");
+  await Promise.resolve((resolve) => setTimeout(resolve, 1000));
 }
