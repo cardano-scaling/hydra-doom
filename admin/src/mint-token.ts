@@ -93,7 +93,7 @@ const tx = await blaze
       0n,
       new Map(
         Object.entries({
-          [usdmAssetId]: BigInt(parseInt(args.amount)),
+          [usdmAssetId]: BigInt(parseInt(args.amount) * 1000000),
         }).map(([assetId, value]) => [Core.AssetId(assetId), value]),
       ),
     ),
@@ -119,3 +119,4 @@ console.log("Your signed mint trasaction:", signedTx.toCbor());
 const txHash = await blaze.submitTransaction(signedTx);
 console.log("Transaction Submitted!", txHash);
 console.log("OutputReference:", `${txHash}#0`);
+console.log(txHash);
