@@ -15,10 +15,8 @@ const networkId = parseInt(process.env.NETWORK_ID);
 
 const provider = new HydraProvider(process.env.URL, networkId);
 
-const wallet = new ColdWallet(
-  Core.Address.fromBech32(
-    "addr_test1qqzg3kmc2j27vu4uanz0fg7xpegjnf8zt47ldwgnexldc8fedfm56v6yzpt8n0ngw6zjtde2luq63pgkkc89mawce4gsfdhqlq",
-  ),
+const wallet = new HotSingleWallet(
+  Core.Ed25519PrivateNormalKeyHex(process.env.PRIVATE_KEY),
   networkId,
   provider,
 );
