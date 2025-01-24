@@ -53,6 +53,7 @@ export class TransactionBuilder {
     utxos: Core.TransactionUnspentOutput[],
     pkhs: string[],
     policies: string[],
+    distributePkhs: string[],
   ): Promise<Core.Transaction> {
     const multiasset = new Map();
 
@@ -69,6 +70,7 @@ export class TransactionBuilder {
         finishedGames: 0n,
         kills: [0n, 0n, 0n, 0n],
         pkhs,
+        distributePkhs,
         policies,
       },
       contracts.FinaleManagerSpend.datum,
