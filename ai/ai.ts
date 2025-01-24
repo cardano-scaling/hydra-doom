@@ -4,14 +4,11 @@ import { HydraMultiplayerClient } from "utils/HydraMultiplayer/client";
 import * as bech32 from "bech32-buffer";
 import { Core } from "@blaze-cardano/sdk";
 import * as ed25519 from "@noble/ed25519";
-import { sha512 } from "@noble/hashes/sha512";
 import { blake2b } from "@noble/hashes/blake2b";
 import { readFile } from "node:fs/promises";
 import { fromHex, toHex } from "utils/helpers.js";
 
-ed25519.etc.sha512Async = async (...m) => sha512(ed25519.etc.concatBytes(...m));
-
-const NETWORK_ID = 0;
+const NETWORK_ID = Number(process.env.NETWORK_ID);
 const HYDRA_NODE = "http://localhost:4001/";
 const bot_index = Number(process.env.BOT_INDEX ?? 1);
 
@@ -28,7 +25,7 @@ const adminPublicKeyHashBytes = blake2b(adminPublicKeyBytes, {
 });
 const adminPublicKeyHashHex = toHex(adminPublicKeyHashBytes);
 
-const privateKeyBytes = adminPrivateKeyBytes;
+const privateKeyBytes = ed25519.utils.randomPrivateKey();
 
 const publicKeyBytes = await ed25519.getPublicKeyAsync(privateKeyBytes);
 const publicKeyHashBytes = blake2b(publicKeyBytes, { dkLen: 224 / 8 });
@@ -92,16 +89,35 @@ const hydra = new HydraMultiplayerClient({
 global.HydraMultiplayer = hydra;
 
 let gameId;
+let shouldPlay = false;
+
+hydra.onNewGame = async (newGameId, humanCount, botCount, _ephemeralKey) => {
+  console.log(
+    `Saw new game ${newGameId}, with ${humanCount} humans and ${botCount} bots, deciding whether to join...`,
+  );
+  if (botCount > bot_index) {
+    await new Promise((resolve) => setTimeout(resolve, 1000 * bot_index));
+    console.log(`Bot ${bot_index} joining game ${newGameId}`);
+    gameId = newGameId;
+    shouldPlay = true;
+  }
+};
 let timeout = 10_000;
 hydra.onTxSeen = async (tx) => {
   timeout = 10_000;
 };
+
+while (!shouldPlay) {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+}
 
 // await fetch(`http://localhost:8000/game/add_player?address=${keys.address}`);
 
 // TODO: generate a fun pet name
 const args = [
   "-server",
+  "-nodes",
+  "2",
   "-altdeath",
   "-ai",
   "-iwad",
