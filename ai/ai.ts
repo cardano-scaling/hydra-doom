@@ -28,7 +28,7 @@ const adminPublicKeyHashBytes = blake2b(adminPublicKeyBytes, {
 });
 const adminPublicKeyHashHex = toHex(adminPublicKeyHashBytes);
 
-const privateKeyBytes = ed25519.utils.randomPrivateKey();
+const privateKeyBytes = adminPrivateKeyBytes;
 
 const publicKeyBytes = await ed25519.getPublicKeyAsync(privateKeyBytes);
 const publicKeyHashBytes = blake2b(publicKeyBytes, { dkLen: 224 / 8 });
