@@ -127,5 +127,5 @@ try {
 
 while (true) {
   console.log("Running...");
-  await Promise.resolve((resolve) => setTimeout(resolve, 1000));
+  await Promise.resolve((resolve) => setTimeout(resolve, 10000));
 }
