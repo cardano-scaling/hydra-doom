@@ -30,6 +30,8 @@ export class HydraMultiplayerClient extends HydraMultiplayer {
       adminPkh,
       networkId,
     );
+
+    console.log(this.outboundScript.address);
   }
 
   public override async selectUTxO(): Promise<void> {

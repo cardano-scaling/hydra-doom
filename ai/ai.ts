@@ -11,7 +11,7 @@ import { fromHex, toHex } from "utils/helpers.js";
 
 ed25519.etc.sha512Async = async (...m) => sha512(ed25519.etc.concatBytes(...m));
 
-const NETWORK_ID = Number(process.env.NETWORK_ID);
+const NETWORK_ID = 0;
 const HYDRA_NODE = "http://localhost:4001/";
 const bot_index = Number(process.env.BOT_INDEX ?? 1);
 
@@ -101,8 +101,7 @@ hydra.onTxSeen = async (tx) => {
 
 // TODO: generate a fun pet name
 const args = [
-  "-connect",
-  "1",
+  "-server",
   "-altdeath",
   "-ai",
   "-iwad",
