@@ -1,0 +1,11 @@
+{
+  "name": "uplc-wasm",
+  "version": "0.0.5",
+  "files": [
+    "pkg-node/uplc_wasm_bg.wasm",
+    "pkg-node/uplc_wasm.js",
+    "pkg-node/uplc_wasm.d.ts"
+  ],
+  "main": "pkg-node/uplc_wasm.js",
+  "types": "pkg-node/uplc_wasm.d.ts"
+}
