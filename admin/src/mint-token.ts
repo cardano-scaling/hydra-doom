@@ -88,7 +88,7 @@ const tx = await blaze
       0n,
       new Map(
         Object.entries({
-          [usdmAssetId]: BigInt(parseInt(args.amount) * 1_000_000),
+          [usdmAssetId]: BigInt(parseInt(args.amount)),
         }).map(([assetId, value]) => [Core.AssetId(assetId), value]),
       ),
     ),
