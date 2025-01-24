@@ -1,4 +1,4 @@
-import { Blaze, Core, HotSingleWallet } from "@blaze-cardano/sdk";
+import { Blaze, ColdWallet, Core, HotSingleWallet } from "@blaze-cardano/sdk";
 import minimist from "minimist";
 import * as dotenv from "dotenv";
 import { HydraProvider } from "./hydra/provider.js";
@@ -15,8 +15,10 @@ const networkId = parseInt(process.env.NETWORK_ID);
 
 const provider = new HydraProvider(process.env.URL, networkId);
 
-const wallet = new HotSingleWallet(
-  Core.Ed25519PrivateNormalKeyHex(process.env.PRIVATE_KEY),
+const wallet = new ColdWallet(
+  Core.Address.fromBech32(
+    "addr_test1qqzg3kmc2j27vu4uanz0fg7xpegjnf8zt47ldwgnexldc8fedfm56v6yzpt8n0ngw6zjtde2luq63pgkkc89mawce4gsfdhqlq",
+  ),
   networkId,
   provider,
 );
@@ -59,9 +61,11 @@ const tx = await txBuilder.newSeries(
   ],
 );
 
-const signedTx = await blaze.signTransaction(tx);
-console.log("Your new series tx:", signedTx.toCbor());
-const txId = await blaze.submitTransaction(signedTx, true);
+const txId = tx.toCore().id;
+
+// const signedTx = await blaze.signTransaction(tx);
+console.log("Your new series tx:", tx.toCbor());
+// const txId = await blaze.submitTransaction(signedTx, true);
 console.log("Transaction ID:", txId);
 console.log("Hitting control plane to update state...");
 try {
