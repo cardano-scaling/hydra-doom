@@ -30,6 +30,11 @@ const adminAddress = (await wallet.getUsedAddresses())[0];
 console.log("Your address:", adminAddress.toBech32());
 const adminKeyHash = adminAddress.asEnterprise().getPaymentCredential().hash;
 
+let refereeKeyHash = adminKeyHash;
+if (args.referee) {
+  const refereeAddress = Core.Address.fromBech32(args.referee);
+  refereeKeyHash = refereeAddress.asEnterprise().getPaymentCredential().hash;
+}
 const blaze = await Blaze.from(provider, wallet);
 const utxos = await blaze.provider.getUnspentOutputs(adminAddress);
 console.log(utxos[0].input().transactionId(), utxos[0].input().index());
@@ -47,7 +52,7 @@ if (!utxo) {
 
 const mintContract = new contracts.PrizePrizeMint(
   {
-    VerificationKey: [adminKeyHash],
+    VerificationKey: [refereeKeyHash],
   },
   {
     transactionId: utxo.input().transactionId(),
