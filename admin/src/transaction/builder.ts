@@ -24,6 +24,8 @@ export const PacketSchema = Data.Object({
   data: Data.Bytes(),
 });
 
+export const PacketArraySchema = Data.Array(PacketSchema);
+
 export type TPacket = Static<typeof PacketSchema>;
 export const Packet = PacketSchema as unknown as TPacket;
 
@@ -100,7 +102,9 @@ export class TransactionBuilder {
     for (const gameUtxo of gameUtxos) {
       const gameDatum = Core.PlutusData.fromCore(
         gameUtxo.output().datum().asInlineData().toCore(),
-      );
+      )
+        .asList()
+        .get(0);
       console.log(gameDatum.toCbor());
       const packet = Data.from(gameDatum, PacketSchema);
       const address = Core.fromHex(gameUtxo.output().address().toBytes());
