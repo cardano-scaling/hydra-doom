@@ -160,18 +160,21 @@ function encodePackets(
   packets: Packet[],
   state: "Finished" | "Running",
 ): string {
-  const data = packets[0];
-  return Data.to(
-    {
-      to: BigInt(data.to),
-      from: BigInt(data.from),
-      ephemeralKey: toHex(data.ephemeralKey),
-      kills: Array.from(data.kills).map((k) => BigInt(k)),
-      state,
-      data: toHex(data.data),
-    },
-    DatumPacket,
-  ).toCbor();
+  const packetData = packets.map((data) =>
+    Data.to(
+      {
+        to: BigInt(data.to),
+        from: BigInt(data.from),
+        ephemeralKey: toHex(data.ephemeralKey),
+        kills: Array.from(data.kills).map((k) => BigInt(k)),
+        state,
+        data: toHex(data.data),
+      },
+      DatumPacket,
+    ),
+  );
+
+  return Data.to(packetData, PacketArray).toCbor();
 }
 
 function decodePackets(raw: Uint8Array): Packet[] | undefined {
