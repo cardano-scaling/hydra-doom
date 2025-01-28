@@ -26,6 +26,48 @@ import {
 const CLAIM_LOCAL_STORAGE_KEY = "HYRDA_DOOM_CLAIMED";
 const USDM_ASSET_ID =
   "d8906ca5c7ba124a0407a32dab37b2c82b13b3dcd9111e42940dcea4.0014df105553444d";
+const PRIZES = [
+  {
+    userNft: `503aa923622f9de3fc524ac253fbbe93578d48a48acfdb49548c8620.487964726120446f6f6d2031737420506c616365`,
+    utxo: "2e976d6810b84fca603864bccd98c0de5a25072ef79e51fd432260221bca8323#0",
+    one_shot:
+      "510256a0aa0669137301bea89daed8b619e07aad3388708024805234156ca329#0",
+    amount: new AssetAmount(25_000_000_000n, {
+      decimals: 6,
+      assetId: USDM_ASSET_ID,
+    }),
+  },
+  {
+    userNft: `503aa923622f9de3fc524ac253fbbe93578d48a48acfdb49548c8620.487964726120446f6f6d20326e6420506c616365`,
+    utxo: "2e976d6810b84fca603864bccd98c0de5a25072ef79e51fd432260221bca8323#1",
+    one_shot:
+      "510256a0aa0669137301bea89daed8b619e07aad3388708024805234156ca329#1",
+    amount: new AssetAmount(15_000_000_000n, {
+      decimals: 6,
+      assetId: USDM_ASSET_ID,
+    }),
+  },
+  {
+    userNft: `503aa923622f9de3fc524ac253fbbe93578d48a48acfdb49548c8620.487964726120446f6f6d2033726420506c616365`,
+    utxo: "2e976d6810b84fca603864bccd98c0de5a25072ef79e51fd432260221bca8323#2",
+    one_shot:
+      "510256a0aa0669137301bea89daed8b619e07aad3388708024805234156ca329#2",
+    amount: new AssetAmount(5_000_000_000n, {
+      decimals: 6,
+      assetId: USDM_ASSET_ID,
+    }),
+  },
+  {
+    userNft: `503aa923622f9de3fc524ac253fbbe93578d48a48acfdb49548c8620.487964726120446f6f6d2034746820506c616365`,
+    utxo: "2e976d6810b84fca603864bccd98c0de5a25072ef79e51fd432260221bca8323#3",
+    one_shot:
+      "510256a0aa0669137301bea89daed8b619e07aad3388708024805234156ca329#3",
+    amount: new AssetAmount(5_000_000_000n, {
+      decimals: 6,
+      assetId: USDM_ASSET_ID,
+    }),
+  },
+];
 
 export const ClaimView: FC = withClaimWrapper(() => {
   const { disconnect, connectWallet, balance, mainAddress, observer } =
@@ -34,54 +76,17 @@ export const ClaimView: FC = withClaimWrapper(() => {
   const extensions = useAvailableExtensions();
   const extension = extensions.find((e) => e.name === "Lace");
   const [claimTx, setClaimTx] = useState<string | null>(
-    window.localStorage.getItem(CLAIM_LOCAL_STORAGE_KEY)
+    window.localStorage.getItem(CLAIM_LOCAL_STORAGE_KEY),
   );
   const prizeData = useMemo(() => {
-    const nft1 = balance.get(
-      `503aa923622f9de3fc524ac253fbbe93578d48a48acfdb49548c8620.12`
-    );
-    if (nft1) {
-      return {
-        userNft: nft1,
-        prize: new AssetAmount(20_000_000_000n, {
-          decimals: 6,
-          assetId: USDM_ASSET_ID,
-        }),
-        mintUtxo:
-          "510256a0aa0669137301bea89daed8b619e07aad3388708024805234156ca329#2",
-        usdmUtxo:
-          "2e976d6810b84fca603864bccd98c0de5a25072ef79e51fd432260221bca8323#0",
-      };
-    }
-
-    const nft2 = balance.get("nft2");
-    if (nft2) {
-      return {
-        userNft: nft2,
-        prize: new AssetAmount(15_000_000n, { decimals: 6, assetId: "" }),
-        mintUtxo: "",
-        usdmUtxo: "",
-      };
-    }
-
-    const nft3 = balance.get("nft3");
-    if (nft3) {
-      return {
-        userNft: nft3,
-        prize: new AssetAmount(30_000_000n, { decimals: 6, assetId: "" }),
-        mintUtxo: "",
-        usdmUtxo: "",
-      };
-    }
-
-    const nft4 = balance.get("nft4");
-    if (nft4) {
-      return {
-        userNft: nft4,
-        prize: new AssetAmount(50_000_000n, { decimals: 6, assetId: "" }),
-        mintUtxo: "",
-        usdmUtxo: "",
-      };
+    for (const prize of PRIZES) {
+      const userNft = balance.get(prize.userNft);
+      if (userNft) {
+        return {
+          userNft,
+          prize,
+        };
+      }
     }
 
     return undefined;
@@ -101,13 +106,13 @@ export const ClaimView: FC = withClaimWrapper(() => {
         network: NETWORK_ID === 1 ? "cardano-mainnet" : "cardano-preview",
         projectId: BLOCKFROST_API_KEY,
       }),
-      new WebWallet(observer.api as CIP30Interface)
+      new WebWallet(observer.api as CIP30Interface),
     );
 
     const [usdmUtxo] = await builder.provider.resolveUnspentOutputs([
       Core.TransactionInput.fromCore({
-        index: Number(prizeData.usdmUtxo.split("#")[1]),
-        txId: Core.TransactionId(prizeData.usdmUtxo.split("#")[0]),
+        index: Number(prizeData.prize.utxo.split("#")[1]),
+        txId: Core.TransactionId(prizeData.prize.utxo.split("#")[0]),
       }),
     ]);
 
@@ -118,11 +123,11 @@ export const ClaimView: FC = withClaimWrapper(() => {
 
     if (!adminKeyHash) {
       throw new Error(
-        "Could not generate a key hash from the CLAIM_ADMIN_ADDRESS env."
+        "Could not generate a key hash from the CLAIM_ADMIN_ADDRESS env.",
       );
     }
 
-    const [oneShotId, oneShotIx] = prizeData.mintUtxo.split("#");
+    const [oneShotId, oneShotIx] = prizeData.prize.one_shot.split("#");
     const mintContract = new contracts.PrizePrizeMint(
       {
         VerificationKey: [adminKeyHash],
@@ -130,11 +135,11 @@ export const ClaimView: FC = withClaimWrapper(() => {
       {
         transactionId: oneShotId,
         outputIndex: BigInt(oneShotIx),
-      }
+      },
     );
 
     const totalAssets = Core.Value.fromCore(
-      usdmUtxo.output().amount().toCore()
+      usdmUtxo.output().amount().toCore(),
     );
     totalAssets
       .multiasset()
@@ -210,7 +215,7 @@ export const ClaimView: FC = withClaimWrapper(() => {
                       >
                         Claim{" "}
                         {new Intl.NumberFormat("en-us").format(
-                          prizeData.prize.value.toNumber()
+                          prizeData.prize.amount.value.toNumber(),
                         )}{" "}
                         USDM!
                       </Button>
