@@ -25,43 +25,43 @@ import {
 
 const CLAIM_LOCAL_STORAGE_KEY = "HYRDA_DOOM_CLAIMED";
 const USDM_ASSET_ID =
-  "d8906ca5c7ba124a0407a32dab37b2c82b13b3dcd9111e42940dcea4.0014df105553444d";
+  "c48cbb3d5e57ed56e276bc45f99ab39abe94e6cd7ac39fb402da47ad.0014df105553444d";
 const PRIZES = [
   {
-    userNft: `503aa923622f9de3fc524ac253fbbe93578d48a48acfdb49548c8620.487964726120446f6f6d2031737420506c616365`,
-    utxo: "2e976d6810b84fca603864bccd98c0de5a25072ef79e51fd432260221bca8323#0",
+    userNft: `a6c92925ea63b76c3a65ab0a044b575b3ff8f6f30692c4032a1a0272.487964726120446f6f6d202d2031737420506c6163652054726f706879`,
+    utxo: "92d20eb1328b26cda00eb2a1fd62bee8ac5d27c4cd9fdd34d23e2be88f81002b#0",
     one_shot:
-      "510256a0aa0669137301bea89daed8b619e07aad3388708024805234156ca329#0",
+      "8baa5f9c563ec7f3035df7d534379cbfc499e61ebf96b5c1d2a76518833c3e24#2",
     amount: new AssetAmount(25_000_000_000n, {
       decimals: 6,
       assetId: USDM_ASSET_ID,
     }),
   },
   {
-    userNft: `503aa923622f9de3fc524ac253fbbe93578d48a48acfdb49548c8620.487964726120446f6f6d20326e6420506c616365`,
-    utxo: "2e976d6810b84fca603864bccd98c0de5a25072ef79e51fd432260221bca8323#1",
+    userNft: `91a2c299e2a9a3fbdc04ccbde34d1dc6a73c90b01fd7fa5a48bc5cbc.487964726120446f6f6d202d20326e6420506c6163652054726f706879`,
+    utxo: "8baa5f9c563ec7f3035df7d534379cbfc499e61ebf96b5c1d2a76518833c3e24#0",
     one_shot:
-      "510256a0aa0669137301bea89daed8b619e07aad3388708024805234156ca329#1",
+      "eea388cd241f143e2ccb3727a4e28cfe9983dee93aeabfed85e595535cc54c81#2",
     amount: new AssetAmount(15_000_000_000n, {
       decimals: 6,
       assetId: USDM_ASSET_ID,
     }),
   },
   {
-    userNft: `503aa923622f9de3fc524ac253fbbe93578d48a48acfdb49548c8620.487964726120446f6f6d2033726420506c616365`,
-    utxo: "2e976d6810b84fca603864bccd98c0de5a25072ef79e51fd432260221bca8323#2",
+    userNft: `f361cc4efb23c3e94f82908289ebf5f68bb00c381a0dc85f09fbf17f.487964726120446f6f6d202d2033726420506c6163652054726f706879`,
+    utxo: "eea388cd241f143e2ccb3727a4e28cfe9983dee93aeabfed85e595535cc54c81#0",
     one_shot:
-      "510256a0aa0669137301bea89daed8b619e07aad3388708024805234156ca329#2",
+      "0a1ad1024cbf5491e120d2f7ba5d247cd4dffcb6b55ad28a8de70e2cc9c8c121#2",
     amount: new AssetAmount(5_000_000_000n, {
       decimals: 6,
       assetId: USDM_ASSET_ID,
     }),
   },
   {
-    userNft: `503aa923622f9de3fc524ac253fbbe93578d48a48acfdb49548c8620.487964726120446f6f6d2034746820506c616365`,
-    utxo: "2e976d6810b84fca603864bccd98c0de5a25072ef79e51fd432260221bca8323#3",
+    userNft: `96bb6664f4d164668521ed6d44beb47d2cbf8dd2b8ecc55e7d12dd26.487964726120446f6f6d202d2034746820506c6163652054726f706879`,
+    utxo: "0a1ad1024cbf5491e120d2f7ba5d247cd4dffcb6b55ad28a8de70e2cc9c8c121#0",
     one_shot:
-      "510256a0aa0669137301bea89daed8b619e07aad3388708024805234156ca329#3",
+      "b2682caf54678057a014dfee496c36558261ac1d3d0890930ee81919007cb433#0",
     amount: new AssetAmount(5_000_000_000n, {
       decimals: 6,
       assetId: USDM_ASSET_ID,
@@ -74,10 +74,11 @@ export const ClaimView: FC = withClaimWrapper(() => {
     useWalletObserver();
   const { ready, connectingWallet } = useWalletLoadingState();
   const extensions = useAvailableExtensions();
-  const extension = extensions.find((e) => e.name === "Lace");
+  const [extension, setExtension] = useState<string>();
   const [claimTx, setClaimTx] = useState<string | null>(
-    window.localStorage.getItem(CLAIM_LOCAL_STORAGE_KEY),
+    window.localStorage.getItem(CLAIM_LOCAL_STORAGE_KEY)
   );
+  const [error, setError] = useState<string>();
   const prizeData = useMemo(() => {
     for (const prize of PRIZES) {
       const userNft = balance.get(prize.userNft);
@@ -92,9 +93,10 @@ export const ClaimView: FC = withClaimWrapper(() => {
     return undefined;
   }, [balance]);
 
-  const handleConnect = useCallback(async () => {
-    await connectWallet("lace");
-  }, [connectWallet]);
+  const handleConnect = useCallback(
+    (extension: string) => connectWallet(extension),
+    [connectWallet],
+  );
 
   const handleClaim = useCallback(async () => {
     if (!prizeData || !observer.api) {
@@ -106,7 +108,7 @@ export const ClaimView: FC = withClaimWrapper(() => {
         network: NETWORK_ID === 1 ? "cardano-mainnet" : "cardano-preview",
         projectId: BLOCKFROST_API_KEY,
       }),
-      new WebWallet(observer.api as CIP30Interface),
+      new WebWallet(observer.api as CIP30Interface)
     );
 
     const [usdmUtxo] = await builder.provider.resolveUnspentOutputs([
@@ -123,40 +125,54 @@ export const ClaimView: FC = withClaimWrapper(() => {
 
     if (!adminKeyHash) {
       throw new Error(
-        "Could not generate a key hash from the CLAIM_ADMIN_ADDRESS env.",
+        "Could not generate a key hash from the CLAIM_ADMIN_ADDRESS env."
       );
     }
 
     const [oneShotId, oneShotIx] = prizeData.prize.one_shot.split("#");
-    const mintContract = new contracts.PrizePrizeMint(
+    const mintContract = new contracts.PrizePrizeSpend(
       {
         VerificationKey: [adminKeyHash],
       },
       {
         transactionId: oneShotId,
         outputIndex: BigInt(oneShotIx),
-      },
+      }
     );
 
     const totalAssets = Core.Value.fromCore(
-      usdmUtxo.output().amount().toCore(),
+      usdmUtxo.output().amount().toCore()
     );
     totalAssets
       .multiasset()
       ?.set(Core.AssetId(prizeData.userNft.metadata.assetId), 1n);
 
-    const tx = await builder
-      .newTransaction()
-      .addInput(usdmUtxo, Data.void())
-      .provideScript(mintContract)
-      .payAssets(Core.Address.fromBech32(mainAddress), totalAssets)
-      .complete();
+    try {
+      const tx = await builder
+        .newTransaction()
+        .addInput(usdmUtxo, Data.void())
+        .provideScript(mintContract)
+        .payAssets(Core.Address.fromBech32(mainAddress), totalAssets)
+        .complete();
 
-    const signedTx = await builder.signTransaction(tx);
-    const txHash = await builder.submitTransaction(signedTx);
-    if (txHash) {
-      setClaimTx(txHash);
-      localStorage.setItem(CLAIM_LOCAL_STORAGE_KEY, txHash);
+      const signedTx = await builder.signTransaction(tx);
+      const txHash = await builder.submitTransaction(signedTx);
+      if (txHash) {
+        setClaimTx(txHash);
+        localStorage.setItem(CLAIM_LOCAL_STORAGE_KEY, txHash);
+      }
+    } catch (e) {
+      if (
+        (e as Error)?.message ===
+        "prepareCollateral: could not find enough collateral (5 ada minimum)"
+      ) {
+        setError(
+          "Not enough ADA for collateral. Please send an additional 5 ADA to your wallet and try again."
+        );
+        setTimeout(() => {
+          setError(undefined);
+        }, 5000);
+      }
     }
   }, [prizeData, observer.api, mainAddress]);
 
@@ -172,23 +188,25 @@ export const ClaimView: FC = withClaimWrapper(() => {
       ) : (
         <>
           <div className="flex flex-col items-center justify-center gap-2">
-            {!ready && extension && (
+            {!ready && extensions && (
               <>
                 <p className="text-3xl mb-8 text-center max-w-[600px] mx-auto">
                   Connect your wallet to claim your prize for the Hydra Doom
                   Tournament!
                 </p>
-                <Button
-                  onClick={handleConnect}
-                  className="w-96 h-16 inline-flex gap-4"
-                >
-                  <img
-                    className="w-6 h-6"
-                    src={extension.reference.icon}
-                    alt={extension.name}
-                  />{" "}
-                  Connect with {extension.name}
-                </Button>
+                {extensions.map((extension) => (
+                  <Button
+                    onClick={() => handleConnect(extension.property)}
+                    className="w-96 h-16 inline-flex gap-4"
+                  >
+                    <img
+                      className="w-6 h-6"
+                      src={extension.reference.icon}
+                      alt={extension.name}
+                    />{" "}
+                    Connect with {extension.name}
+                  </Button>
+                ))}
               </>
             )}
             {ready && (
@@ -209,16 +227,23 @@ export const ClaimView: FC = withClaimWrapper(() => {
                         <span className="text-lg">{claimTx}</span>
                       </p>
                     ) : (
-                      <Button
-                        onClick={handleClaim}
-                        className="w-96 h-16 inline-flex gap-4"
-                      >
-                        Claim{" "}
-                        {new Intl.NumberFormat("en-us").format(
-                          prizeData.prize.amount.value.toNumber(),
-                        )}{" "}
-                        USDM!
-                      </Button>
+                      <>
+                        <Button
+                          onClick={handleClaim}
+                          className="w-96 h-16 inline-flex gap-4"
+                        >
+                          Claim{" "}
+                          {new Intl.NumberFormat("en-us").format(
+                            prizeData.prize.amount.value.toNumber()
+                          )}{" "}
+                          USDM!
+                        </Button>
+                        {error && (
+                          <p className="text-3xl mb-8 text-center max-w-[600px] mx-auto">
+                            {error}
+                          </p>
+                        )}
+                      </>
                     )}
                   </>
                 )}
