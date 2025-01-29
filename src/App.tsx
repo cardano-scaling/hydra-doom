@@ -33,7 +33,7 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {url === "claim-reward" ? <LazyClaimView /> : normalView}
+      {url === "claim" ? <LazyClaimView /> : normalView}
     </QueryClientProvider>
   );
 }
