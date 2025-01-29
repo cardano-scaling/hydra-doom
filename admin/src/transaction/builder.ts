@@ -98,8 +98,7 @@ export class TransactionBuilder {
     );
     const seriesState = Data.from(datum, contracts.FinaleManagerSpend.datum);
     const kills: bigint[] = seriesState.kills;
-    const pkhs: string[] = seriesState.pkhs;
-    for (const gameUtxo of gameUtxos) {
+    gameUtxos.forEach((gameUtxo, i) => {
       const gameDatum = Core.PlutusData.fromCore(
         gameUtxo.output().datum().asInlineData().toCore(),
       )
@@ -107,11 +106,8 @@ export class TransactionBuilder {
         .get(0);
       console.log(gameDatum.toCbor());
       const packet = Data.from(gameDatum, PacketSchema);
-      const address = Core.fromHex(gameUtxo.output().address().toBytes());
-      const pkh = address.subarray(1);
-      const index = pkhs.indexOf(Core.toHex(pkh));
-      kills[index] = kills[index] + packet.kills[index];
-    }
+      kills[i] = kills[i] + packet.kills[i];
+    });
 
     seriesState.finishedGames += 1n;
     console.log("new series state", seriesState);
