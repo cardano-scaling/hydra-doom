@@ -42,6 +42,9 @@ jobs:
         env:
           VITE_API_URL: https://rewardengine.dripdropz.io/api/v1
           VITE_API_KEY: d93212b3-dbdc-40d0-befd-f90508c6232d
+          VITE_NETWORK_ID: 1
+          VITE_BLOCKFROST_PROJECT_ID: mainnetmZQ6q6Fp590rcyC5ujK0S3rJHETPed01
+          VITE_CLAIM_ADMIN_ADDRESS: addr1v96knkqk38yt2y7fzwt84xmz6k6nq6eqf7teecvply7ukmss9yvgc
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
