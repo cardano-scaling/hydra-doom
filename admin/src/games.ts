@@ -1,5 +1,5 @@
 import { Blaze, Core, Data, HotSingleWallet } from "@blaze-cardano/sdk";
-import { PacketSchema } from "./transaction/builder.js";
+import { PacketArraySchema, PacketSchema } from "./transaction/builder.js";
 import * as dotenv from "dotenv";
 import { HydraProvider } from "./hydra/provider.js";
 import minimist from "minimist";
@@ -37,15 +37,17 @@ const playerFour = Core.Address.fromBech32(args.playerFour);
 const getDatum = (ephemeralKey: string) =>
   Core.Datum.fromCore(
     Data.to(
-      {
-        to: 0n,
-        from: 1n,
-        ephemeralKey,
-        kills: [1n, 2n, 3n, 4n],
-        state: "Finished",
-        data: "0000",
-      },
-      PacketSchema,
+      [
+        {
+          to: 0n,
+          from: 1n,
+          ephemeralKey,
+          kills: [1n, 2n, 3n, 4n],
+          state: "Finished",
+          data: "0000",
+        },
+      ],
+      PacketArraySchema,
     ).toCore(),
   );
 
