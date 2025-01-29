@@ -7,7 +7,6 @@ import SetNameModal from "../SetNameModal";
 import LoginModal from "../LoginModal/LoginModal";
 import { useAppContext } from "../../context/useAppContext";
 import { EGameType } from "../../types";
-import { useSessionIdKeyCache } from "../../utils/localStorage";
 
 import { IS_HOST } from "../../constants.js";
 
@@ -16,16 +15,10 @@ interface InitialViewProps {
 }
 
 const InitialView: FC<InitialViewProps> = ({ startGame }) => {
-  const {
-    isLoadingUserData,
-    isUserDataFetched,
-    keys,
-    setAccountData,
-    setGameData,
-    setIsQualified,
-  } = useAppContext();
+  const { isLoadingUserData, isUserDataFetched, keys, setGameData } =
+    useAppContext();
   const publicKeyHashHex = keys?.publicKeyHashHex;
-  const [, setSessionId] = useSessionIdKeyCache();
+  // const [, setSessionId] = useSessionIdKeyCache();
   const pathSegments = window.location.hash.split("/").filter(Boolean);
   const code = pathSegments[2];
   const [modalTitle, setModalTitle] = useState("Join Multiplayer");
@@ -34,7 +27,7 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
 
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [displayActionButtons, setDisplayActionButtons] = useState(false);
+  const [, setDisplayActionButtons] = useState(false);
 
   useEffect(() => {
     if (code) {
@@ -74,11 +67,11 @@ const InitialView: FC<InitialViewProps> = ({ startGame }) => {
     setDisplayActionButtons(true);
   };
 
-  const onLogout = () => {
-    setAccountData(undefined);
-    setIsQualified(false);
-    setSessionId("");
-  };
+  // const onLogout = () => {
+  //   setAccountData(undefined);
+  //   setIsQualified(false);
+  //   setSessionId("");
+  // };
 
   const renderButtons = () => {
     if (isLoadingUserData) {

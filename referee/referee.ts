@@ -59,7 +59,7 @@ async function reportResults(gameId, results) {
     `Reporting results for game ${gameId}\n`,
     JSON.stringify(results, null, 2),
   );
-  let now = Date.now();
+  const now = Date.now();
   for (let i = 0; i < 10; i++) {
     try {
       console.log("Sending to dynamodb");
@@ -73,7 +73,7 @@ async function reportResults(gameId, results) {
         }),
       );
       console.log("Sending to discord bot");
-      let resp = await fetch(DISCORD_BOT, {
+      const resp = await fetch(DISCORD_BOT, {
         method: "POST",
         body: JSON.stringify(results),
       });
@@ -139,7 +139,7 @@ async function cleanupGame() {
   let status = 0;
   while (![200, 201].includes(status)) {
     try {
-      let response = await fetch("http://localhost:8000/game/cleanup", {
+      const response = await fetch("http://localhost:8000/game/cleanup", {
         method: "POST",
       });
       status = response.status;
@@ -205,7 +205,9 @@ const hydra = new HydraMultiplayerDedicated({
           gameId: hydra.gameId,
           result: "error",
         });
-      } catch (e) {}
+      } catch (e) {
+        // Do nothing.
+      }
     }
     connected = false;
     process.exit(1);
@@ -281,9 +283,9 @@ global.playerConnected = async (addr: number, player: number) => {
 };
 global.playerDisconnected = async (addr: number, player: number) => {
   console.log(`Someone disconnected, ending the game`);
-  let [player1Key, player1] =
+  const [player1Key, player1] =
     Object.entries(players).find(([_, p]) => p.playerNumber === 0) ?? [];
-  let [player2Key, player2] =
+  const [player2Key, player2] =
     Object.entries(players).find(([_, p]) => p.playerNumber === 1) ?? [];
   await reportResults(gameId, {
     gameId: gameId,
@@ -400,9 +402,9 @@ while (!done) {
   timer -= 1000;
   if (timer <= 0) {
     console.log("Game ended.");
-    let [player1Key, player1] =
+    const [player1Key, player1] =
       Object.entries(players).find(([_, p]) => p.playerNumber === 0) ?? [];
-    let [player2Key, player2] =
+    const [player2Key, player2] =
       Object.entries(players).find(([_, p]) => p.playerNumber === 1) ?? [];
     await reportResults(gameId, {
       gameId: gameId,
@@ -420,9 +422,9 @@ while (!done) {
   }
   if (timeout <= 0) {
     console.log("Game timed out.");
-    let [player1Key, player1] =
+    const [player1Key, player1] =
       Object.entries(players).find(([_, p]) => p.playerNumber === 0) ?? [];
-    let [player2Key, player2] =
+    const [player2Key, player2] =
       Object.entries(players).find(([_, p]) => p.playerNumber === 1) ?? [];
     await reportResults(gameId, {
       gameId: gameId,

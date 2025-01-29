@@ -74,9 +74,8 @@ export const ClaimView: FC = withClaimWrapper(() => {
     useWalletObserver();
   const { ready, connectingWallet } = useWalletLoadingState();
   const extensions = useAvailableExtensions();
-  const [extension, setExtension] = useState<string>();
   const [claimTx, setClaimTx] = useState<string | null>(
-    window.localStorage.getItem(CLAIM_LOCAL_STORAGE_KEY)
+    window.localStorage.getItem(CLAIM_LOCAL_STORAGE_KEY),
   );
   const [error, setError] = useState<string>();
   const prizeData = useMemo(() => {
@@ -108,7 +107,7 @@ export const ClaimView: FC = withClaimWrapper(() => {
         network: NETWORK_ID === 1 ? "cardano-mainnet" : "cardano-preview",
         projectId: BLOCKFROST_API_KEY,
       }),
-      new WebWallet(observer.api as CIP30Interface)
+      new WebWallet(observer.api as CIP30Interface),
     );
 
     const [usdmUtxo] = await builder.provider.resolveUnspentOutputs([
@@ -125,7 +124,7 @@ export const ClaimView: FC = withClaimWrapper(() => {
 
     if (!adminKeyHash) {
       throw new Error(
-        "Could not generate a key hash from the CLAIM_ADMIN_ADDRESS env."
+        "Could not generate a key hash from the CLAIM_ADMIN_ADDRESS env.",
       );
     }
 
@@ -137,11 +136,11 @@ export const ClaimView: FC = withClaimWrapper(() => {
       {
         transactionId: oneShotId,
         outputIndex: BigInt(oneShotIx),
-      }
+      },
     );
 
     const totalAssets = Core.Value.fromCore(
-      usdmUtxo.output().amount().toCore()
+      usdmUtxo.output().amount().toCore(),
     );
     totalAssets
       .multiasset()
@@ -167,7 +166,7 @@ export const ClaimView: FC = withClaimWrapper(() => {
         "prepareCollateral: could not find enough collateral (5 ada minimum)"
       ) {
         setError(
-          "Not enough ADA for collateral. Please send an additional 5 ADA to your wallet and try again."
+          "Not enough ADA for collateral. Please send an additional 5 ADA to your wallet and try again.",
         );
         setTimeout(() => {
           setError(undefined);
@@ -234,7 +233,7 @@ export const ClaimView: FC = withClaimWrapper(() => {
                         >
                           Claim{" "}
                           {new Intl.NumberFormat("en-us").format(
-                            prizeData.prize.amount.value.toNumber()
+                            prizeData.prize.amount.value.toNumber(),
                           )}{" "}
                           USDM!
                         </Button>

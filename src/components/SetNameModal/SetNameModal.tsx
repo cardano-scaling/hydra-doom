@@ -5,9 +5,6 @@ import { FaArrowRotateRight } from "react-icons/fa6";
 import Button from "../Button";
 import { generateRandomName } from "./petNameWords";
 import { useAppContext } from "../../context/useAppContext";
-import { MAX_PLAYERS } from "../../constants";
-import RegionSelector from "../RegionSelector";
-import cx from "classnames";
 
 interface SetNameModalProps extends Omit<ModalProps, "children"> {
   submit: () => void;
@@ -20,16 +17,7 @@ const SetNameModal: FC<SetNameModalProps> = ({
   submit,
   title,
 }) => {
-  const {
-    accountData,
-    bots,
-    gameData,
-    players,
-    region,
-    setBots,
-    setGameData,
-    setPlayers,
-  } = useAppContext();
+  const { accountData, gameData, setGameData } = useAppContext();
 
   useEffect(() => {
     const petName = accountData ? accountData.auth_name : generateRandomName();

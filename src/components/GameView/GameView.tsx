@@ -1,10 +1,7 @@
 import DoomCanvas from "../DoomCanvas";
-import GlobalTotals from "../GlobalTotals";
-import GlobalTPS from "../GlobalTPS";
 import Layout from "../Layout";
 import MusicPlayer from "../MusicPlayer";
 import RestartButton from "../RestartButton";
-import SessionStats from "../SessionStats";
 import TopLinks from "../TopLinks";
 
 const GameView = () => {

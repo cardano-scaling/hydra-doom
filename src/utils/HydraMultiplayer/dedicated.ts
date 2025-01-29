@@ -5,7 +5,7 @@ import { EmscriptenModule, Keys, UTxO } from "../../types";
 import { fromHex, toHex } from "../helpers";
 
 interface Client {
-    kills: number[];
+  kills: number[];
 }
 
 export class HydraMultiplayerDedicated extends HydraMultiplayer {
@@ -61,14 +61,14 @@ export class HydraMultiplayerDedicated extends HydraMultiplayer {
     this.clients[packet.from] = this.clients[packet.from] || { kills: [] };
     this.clients[packet.from].kills = packet.kills;
 
-    let keys = Object.keys(this.clients);
+    const keys = Object.keys(this.clients);
     let allAgree = true;
-    for(let i = 0; i < keys.length; i++) {
-      for(let j = i + 1; j < keys.length; j++) {
+    for (let i = 0; i < keys.length; i++) {
+      for (let j = i + 1; j < keys.length; j++) {
         const clientA = this.clients[keys[i]];
         const clientB = this.clients[keys[j]];
-        if(clientA && clientB) {
-          if(clientA.kills.toString() != clientB.kills.toString()) {
+        if (clientA && clientB) {
+          if (clientA.kills.toString() != clientB.kills.toString()) {
             allAgree = false;
           }
         }
@@ -76,7 +76,9 @@ export class HydraMultiplayerDedicated extends HydraMultiplayer {
     }
     if (!allAgree) {
       this.disagreeementTimer++;
-      console.log(`Players disagree on kills! They have ${10 - this.disagreeementTimer} to resolve this`);
+      console.log(
+        `Players disagree on kills! They have ${10 - this.disagreeementTimer} to resolve this`,
+      );
       if (this.disagreeementTimer > 35) {
         console.log(`Players disagree on kills for too long; cancelling game!`);
         this.onDisagreement?.();
@@ -84,7 +86,7 @@ export class HydraMultiplayerDedicated extends HydraMultiplayer {
     } else {
       this.disagreeementTimer = 0;
     }
-  } 
+  }
 
   protected override buildTx(datum: string): [UTxO, string] {
     if (!this.latestUTxO) {
