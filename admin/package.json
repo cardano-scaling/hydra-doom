@@ -4,7 +4,7 @@
   "module": "ES2022",
   "target": "ES2022",
   "dependencies": {
-    "@blaze-cardano/sdk": "^0.2.19",
+    "@blaze-cardano/sdk": "^0.2.20",
     "@types/minimist": "^1.2.5",
     "dotenv": "^16.4.7",
     "global-agent": "^3.0.0",

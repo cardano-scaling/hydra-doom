@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "react-error-boundary": "^5.0.0",
     "@cardano-sdk/dapp-connector": "^0.13.3",
     "@blaze-cardano/sdk": "^0.2.20",
     "@noble/ed25519": "^2.1.0",
