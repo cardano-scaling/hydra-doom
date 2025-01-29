@@ -12,11 +12,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@blaze-cardano/sdk": "^0.2.17",
+    "@cardano-sdk/dapp-connector": "^0.13.3",
+    "@blaze-cardano/sdk": "^0.2.20",
     "@noble/ed25519": "^2.1.0",
     "@noble/hashes": "^1.5.0",
     "@sundaeswap/asset": "^1.0.6",
-    "@sundaeswap/wallet-lite": "^0.0.67",
+    "@sundaeswap/wallet-lite": "^0.0.72",
     "@tanstack/react-query": "^5.55.4",
     "bech32-buffer": "^0.2.1",
     "cbor-x": "^1.6.0",
