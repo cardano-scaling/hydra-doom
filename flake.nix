@@ -8,6 +8,7 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
     hydra-control-plane.url = "github:cardano-scaling/hydra-control-plane";
+    hydra-coding-standards.url = "github:cardano-scaling/hydra-coding-standards/0.6.6";
     doom-wasm.url = "github:cardano-scaling/doom-wasm";
     nix-inclusive.url = "github:input-output-hk/nix-inclusive";
     colmena.url = "github:zhaofengli/colmena";

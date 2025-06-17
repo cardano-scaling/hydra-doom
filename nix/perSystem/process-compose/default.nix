@@ -1,7 +1,7 @@
 # TODO: use process-compose-services flake utilizing nixos modules
 
-{ inputs, ... }: {
-  perSystem = {config, system, pkgs, lib, ...}: {
+_: {
+  perSystem = { config, ... }: {
     process-compose."default" =
       {
         # httpServer.enable = true;
@@ -70,5 +70,5 @@
           };
         };
       };
-    };
+  };
 }

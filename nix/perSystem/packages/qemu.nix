@@ -1,5 +1,5 @@
-{ inputs, ... }: {
-  perSystem = {config, system, pkgs, lib, ...}:
+_: {
+  perSystem = { pkgs, ... }:
     {
       packages = {
         qemu-run-iso = pkgs.writeShellApplication {

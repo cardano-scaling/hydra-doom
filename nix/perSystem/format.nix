@@ -1,5 +1,5 @@
-{ inputs, ... }: {
-  perSystem = {config, system, pkgs, lib, ...}: {
-    treefmt.projectRootFile = "flake.nix";
+_: {
+  perSystem = _: {
+    coding.standards.hydra.enable = true;
   };
 }
