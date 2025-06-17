@@ -5002,6 +5002,21 @@
         "type": "indirect"
       }
     },
+    "import-tree": {
+      "locked": {
+        "lastModified": 1749958812,
+        "narHash": "sha256-zdo2CwxdUK3FpQjLBjkJnXvl7OPoTpjdW5OvOzQffoQ=",
+        "owner": "vic",
+        "repo": "import-tree",
+        "rev": "6fcfa909614de6dd6c712db8229b8c0261791e39",
+        "type": "github"
+      },
+      "original": {
+        "owner": "vic",
+        "repo": "import-tree",
+        "type": "github"
+      }
+    },
     "incl": {
       "inputs": {
         "nixlib": [
@@ -9078,6 +9093,7 @@
         "flake-utils": "flake-utils_9",
         "hydra": "hydra_2",
         "hydra-control-plane": "hydra-control-plane",
+        "import-tree": "import-tree",
         "nix-inclusive": "nix-inclusive_2",
         "nixpkgs": "nixpkgs_46",
         "process-compose-flake": "process-compose-flake_2",
