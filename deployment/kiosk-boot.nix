@@ -1,16 +1,17 @@
-{
-  lib,
-  modulesPath,
-  pkgs,
-  self,
-  config,
-  system,
-  ...
-}: let
+{ lib
+, modulesPath
+, pkgs
+, self
+, config
+, system
+, ...
+}:
+let
   # change to false when running in qemu
   prodImage = false;
   inherit (self) nixosModules;
-in {
+in
+{
   imports = [
     (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix")
     nixosModules.hydra-node
@@ -35,9 +36,9 @@ in {
       "usb-storage"
     ];
 
-    kernelModules = ["kvm-intel"];
+    kernelModules = [ "kvm-intel" ];
 
-    supportedFilesystems = ["zfs"];
+    supportedFilesystems = [ "zfs" ];
 
     # To address build time warn
     swraid.enable = lib.mkForce false;
@@ -122,9 +123,9 @@ in {
       accept-flake-config = true
     '';
 
-    nixPath = ["nixpkgs=${pkgs.path}"];
+    nixPath = [ "nixpkgs=${pkgs.path}" ];
     settings = {
-      substituters = lib.mkForce [];
+      substituters = lib.mkForce [ ];
     };
   };
 
@@ -168,7 +169,7 @@ in {
       enable = true;
       virtualHosts = {
         "offline.doom.local" = {
-          root = self.packages.${system}.hydra-doom-static.overrideAttrs (finalAttrs: prevAttrs: {
+          root = self.packages.${system}.hydra-doom-static.overrideAttrs (_finalAttrs: prevAttrs: {
             passthru = prevAttrs.passthru // {
               serverUrl = "http://offline.doom.local:8000";
               useMouse = "1";

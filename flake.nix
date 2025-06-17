@@ -8,28 +8,16 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
     hydra-control-plane.url = "github:cardano-scaling/hydra-control-plane";
+    hydra-coding-standards.url = "github:cardano-scaling/hydra-coding-standards/0.6.6";
     doom-wasm.url = "github:cardano-scaling/doom-wasm";
     nix-inclusive.url = "github:input-output-hk/nix-inclusive";
     colmena.url = "github:zhaofengli/colmena";
     sops-nix.url = "github:Mic92/sops-nix";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
+    import-tree.url = "github:vic/import-tree";
   };
 
-  outputs = { self, flake-parts, nixpkgs, ... }@ inputs:
-    let
-      inherit ((import ./flake/lib.nix { inherit inputs; }).flake.lib) recursiveImports;
-    in
-    flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = recursiveImports [
-        ./flake
-        ./perSystem
-      ] ++ [
-        inputs.process-compose-flake.flakeModule
-        inputs.treefmt-nix.flakeModule
-      ];
-      systems = [
-        "x86_64-linux"
-      ];
-    };
+  outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./nix);
+
 }

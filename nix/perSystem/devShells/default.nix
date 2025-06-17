@@ -1,5 +1,5 @@
 { inputs, ... }: {
-  perSystem = { config, system, pkgs, lib, ... }: {
+  perSystem = { config, system, pkgs, ... }: {
     devShells.default = pkgs.mkShell
       {
         nativeBuildInputs =

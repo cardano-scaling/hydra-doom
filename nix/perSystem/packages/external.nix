@@ -1,5 +1,5 @@
 { inputs, ... }: {
-  perSystem = {config, system, pkgs, lib, ...}:
+  perSystem = { system, ... }:
     {
       packages = {
         inherit (inputs.hydra.packages.${system}) hydra-cluster hydra-tui hydra-node;
