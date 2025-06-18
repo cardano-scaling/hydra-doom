@@ -1,5 +1,5 @@
-import {fetchNewGame, hydraRecv, hydraSend} from "./game";
-import {generatePooQrUri, keys} from "./keys";
+import { fetchNewGame, hydraRecv, hydraSend } from "./game";
+import { generatePooQrUri, keys } from "./keys";
 import "./osano.js";
 // import { startQueryingAPI, truncateString } from "./stats";
 import "./styles.css";
@@ -31,7 +31,7 @@ const tabButtons = document.querySelectorAll(".js-tab-button");
 // );
 
 // Stuff for POO
-const {sessionPkh} = keys;
+const { sessionPkh } = keys;
 let pollingInterval: any = undefined;
 let qrCode = await generatePooQrUri();
 let qrShown = false;
@@ -41,7 +41,9 @@ let qrShown = false;
 // }
 
 async function pollForPoo(ephemeralKeyHash: string) {
-    const request = await fetch(`https://auth.hydradoom.fun/v1/${ephemeralKeyHash}`);
+    const request = await fetch(
+        `https://auth.hydradoom.fun/v1/${ephemeralKeyHash}`,
+    );
     const status = request.status;
     if (status === 401) {
         throw new Error("Invalid Key");
@@ -58,14 +60,9 @@ async function pollForPoo(ephemeralKeyHash: string) {
 (window as any).hydraSend = hydraSend;
 (window as any).hydraRecv = hydraRecv;
 
-if (process.env.REGION) {
-    if (selectContinent) selectContinent.style.display = "none";
-    startButton?.addEventListener("click", async () => {
-        !!qrCode && !qrShown ? await showQrCode() : await startGame();
-    });
-} else {
-    if (startButton) startButton.style.display = "none";
-}
+startButton?.addEventListener("click", async () => {
+    !!qrCode && !qrShown ? await showQrCode() : await startGame();
+});
 
 tabButtons.forEach((button) => {
     button.addEventListener("click", () => {
@@ -92,7 +89,6 @@ tabButtons.forEach((button) => {
         }
     });
 });
-
 
 // "-iwad",
 //     "freedoom2.wad",
@@ -160,7 +156,9 @@ const savedMuteState = localStorage.getItem("isMuted");
 if (savedMuteState !== null) {
     isMuted = JSON.parse(savedMuteState);
     if (muteIcon) {
-        muteIcon.className = isMuted ? "fas fa-volume-mute" : "fas fa-volume-up";
+        muteIcon.className = isMuted
+            ? "fas fa-volume-mute"
+            : "fas fa-volume-up";
     }
 }
 
@@ -198,7 +196,9 @@ muteButton?.addEventListener("click", () => {
         currentAudio.muted = isMuted;
     }
     if (muteIcon) {
-        muteIcon.className = isMuted ? "fas fa-volume-mute" : "fas fa-volume-up";
+        muteIcon.className = isMuted
+            ? "fas fa-volume-mute"
+            : "fas fa-volume-up";
     }
     localStorage.setItem("isMuted", JSON.stringify(isMuted));
 });
