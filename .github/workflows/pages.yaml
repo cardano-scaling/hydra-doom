@@ -32,7 +32,7 @@ jobs:
       - name: Build
         run: |
           cat > .env << EOF
-          SERVER_URL=http://explorer.hydra.family:8000
+          SERVER_URL=https://doom-api.hydra.family
           EOF
           yarn
           yarn build
