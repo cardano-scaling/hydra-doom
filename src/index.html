@@ -1,274 +1,273 @@
 <!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8"/>
+  <head>
+    <meta charset="UTF-8" />
     <title>Hydra Doom</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
-            name="description"
-            content="Experience Doom running on Blockchain powered by Cardano’s Hydra technology in this tech demo."
+      name="description"
+      content="Experience Doom running on Blockchain powered by Cardano’s Hydra technology in this tech demo."
     />
-    <link rel="icon" type="image/png" href="/assets/images/favicon.png"/>
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
     <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
 
-    <meta property="og:title" content="Hydra Doom"/>
+    <meta property="og:title" content="Hydra Doom" />
     <meta
-            property="og:description"
-            content="Experience Doom running on Blockchain powered by Cardano’s Hydra technology in this tech demo."
+      property="og:description"
+      content="Experience Doom running on Blockchain powered by Cardano’s Hydra technology in this tech demo."
     />
-    <meta property="og:type" content="website"/>
-    <meta property="og:url" content="https://hydra.family"/>
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://hydra.family" />
     <meta
-            property="og:image"
-            content="https://doom.hydra.family/assets/images/social-image.png"
+      property="og:image"
+      content="https://doom.hydra.family/assets/images/social-image.png"
     />
 
-    <meta name="twitter:card" content="summary_large_image"/>
-    <meta name="twitter:title" content="Hydra Doom"/>
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Hydra Doom" />
     <meta
-            name="twitter:image"
-            content="https://doom.hydra.family/assets/images/social-image-twitter.png"
+      name="twitter:image"
+      content="https://doom.hydra.family/assets/images/social-image-twitter.png"
     />
-</head>
-<body>
-<div class="layer--wrapper">
-    <main class="layer--base">
+  </head>
+  <body>
+    <div class="layer--wrapper">
+      <main class="layer--base">
         <h1 class="doom-logo js-hide-when-modal-opens">
-            <img
-                    srcset="
+          <img
+            srcset="
               assets/images/hydra-text-1-0x.png 1200w,
               assets/images/hydra-text-1-5x.png 1920w
             "
-                    sizes="(max-width: 1200px) 1200px, 1920px"
-                    src="assets/images/hydra-text-1-0x.png"
-                    alt="Hydra Doom"
-            />
+            sizes="(max-width: 1200px) 1200px, 1920px"
+            src="assets/images/hydra-text-1-0x.png"
+            alt="Hydra Doom"
+          />
         </h1>
         <div class="js-hide-when-modal-opens">
-            <button
-                    id="select-continent"
-                    class="play-doom-button"
-                    data-modal-target="modal-continent"
-            >
-                <span>Play Doom On Hydra</span>
-            </button>
-            <button
-                    id="start"
-                    class="play-doom-button"
-                    data-modal-target="modal-game"
-            >
-                <span>Play Doom On Hydra</span>
-            </button>
+          <button
+            id="select-continent"
+            class="play-doom-button"
+            data-modal-target="modal-continent"
+          >
+            <span>Play Doom On Hydra</span>
+          </button>
+          <button
+            id="start"
+            class="play-doom-button"
+            data-modal-target="modal-game"
+          >
+            <span>Play Doom On Hydra</span>
+          </button>
         </div>
-    </main>
-    <div class="layer--bg">
+      </main>
+      <div class="layer--bg">
         <img
-                class="bg--main"
-                srcset="
+          class="bg--main"
+          srcset="
             assets/images/bg-0-5x.jpg  768w,
             assets/images/bg-1-0x.jpg 1200w,
             assets/images/bg-1-5x.jpg 1920w
           "
-                sizes="(max-width: 768px) 768px, (max-width: 1200px) 1200px, 1920px"
-                src="assets/images/bg-1-0x.jpg"
-                alt=""
+          sizes="(max-width: 768px) 768px, (max-width: 1200px) 1200px, 1920px"
+          src="assets/images/bg-1-0x.jpg"
+          alt=""
         />
-    </div>
-    <div class="layer--foreground">
+      </div>
+      <div class="layer--foreground">
         <div class="bg--guy"></div>
+      </div>
     </div>
-</div>
-<div id="modal-fallback" class="modal" role="dialog">
-    <div class="modal__outer-container">
+    <div id="modal-fallback" class="modal" role="dialog">
+      <div class="modal__outer-container">
         <div class="modal__container">
-            <div class="modal__outer-border">
-                <div class="modal__top-left-bar"></div>
-                <div class="modal__top-right-bar"></div>
-                <div class="modal__bottom-left-bar"></div>
-                <div class="modal__bottom-right-bar"></div>
-                <div class="modal__mid-gradient">
-                    <div class="modal__inner-border">
-                        <div class="modal__content">
-                            <p>To experience DOOM on Hydra, please visit on desktop.</p>
-                        </div>
-                    </div>
+          <div class="modal__outer-border">
+            <div class="modal__top-left-bar"></div>
+            <div class="modal__top-right-bar"></div>
+            <div class="modal__bottom-left-bar"></div>
+            <div class="modal__bottom-right-bar"></div>
+            <div class="modal__mid-gradient">
+              <div class="modal__inner-border">
+                <div class="modal__content">
+                  <p>To experience DOOM on Hydra, please visit on desktop.</p>
                 </div>
+              </div>
             </div>
+          </div>
         </div>
         <div class="logos">
-            <a target="_blank" href="https://hydra.family">
-                <img src="assets/images/hydra-logo-2-0x.png" alt="Hydra Logo"/>
-            </a>
-            <a target="_blank" href="https://sundae.fi/">
-                <img
-                        src="assets/images/sundae-labs-logo.svg"
-                        alt="Sundae Labs Logo"
-                />
-            </a>
-            <a target="_blank" href="https://iog.io" class="iog-logo">
-                <img src="assets/images/iog-logo.png" alt="IOG Logo"/>
-            </a>
-            <a
-                    target="_blank"
-                    href="http://onboard.ninja"
-                    class="js-cabinet-logos onboard-logo"
-            >
-                <img src="assets/images/onboard-logo.png" alt="Onboard Logo"/>
-            </a>
-            <a
-                    target="_blank"
-                    href="https://x.com/PopupVirtualEnt"
-                    class="popup-logo js-cabinet-logos"
-            >
-                <img src="assets/images/popup-logo.png" alt="Popup Logo"/>
-            </a>
+          <a target="_blank" href="https://hydra.family">
+            <img src="assets/images/hydra-logo-2-0x.png" alt="Hydra Logo" />
+          </a>
+          <a target="_blank" href="https://sundae.fi/">
+            <img
+              src="assets/images/sundae-labs-logo.svg"
+              alt="Sundae Labs Logo"
+            />
+          </a>
+          <a target="_blank" href="https://iog.io" class="iog-logo">
+            <img src="assets/images/iog-logo.png" alt="IOG Logo" />
+          </a>
+          <a
+            target="_blank"
+            href="http://onboard.ninja"
+            class="js-cabinet-logos onboard-logo"
+          >
+            <img src="assets/images/onboard-logo.png" alt="Onboard Logo" />
+          </a>
+          <a
+            target="_blank"
+            href="https://x.com/PopupVirtualEnt"
+            class="popup-logo js-cabinet-logos"
+          >
+            <img src="assets/images/popup-logo.png" alt="Popup Logo" />
+          </a>
         </div>
+      </div>
     </div>
-</div>
-<div id="modal-intro" class="modal" role="dialog">
-    <div class="modal__outer-container">
+    <div id="modal-intro" class="modal" role="dialog">
+      <div class="modal__outer-container">
         <div class="modal__container">
-            <div class="modal__outer-border">
-                <div class="modal__top-left-bar"></div>
-                <div class="modal__top-right-bar"></div>
-                <div class="modal__bottom-left-bar"></div>
-                <div class="modal__bottom-right-bar"></div>
-                <div class="modal__mid-gradient">
-                    <div class="modal__inner-border">
-                        <div class="modal__content">
-                            <button
-                                    type="button"
-                                    class="modal__close-btn"
-                                    data-modal-close
-                                    aria-label="Close modal"
-                            >
-                                X
-                            </button>
-                            <h1>Welcome to Hydra Doom</h1>
-                            <p>
-                                Hydra Doom is a technology demonstration showcasing one of
-                                Cardano’s scaling solutions called Hydra using the shareware
-                                levels of the 1993 id software game Doom.
-                            </p>
-                            <p>
-                                While you are playing, the game states will be streamed into
-                                a Hydra head, which uses Cardano smart contracts to validate
-                                the game transition for every frame, in real time. It’s a
-                                passion project put together by a small team, including
-                                Sundae Labs, Adam Dean, and a few folks from IOG, in a short
-                                amount of time. All the code is fully open sourced.
-                            </p>
-                            <p>
-                                Hydra Doom is intended as a light-hearted tech demo and is
-                                not a commercial product.
-                            </p>
-                        </div>
-                    </div>
+          <div class="modal__outer-border">
+            <div class="modal__top-left-bar"></div>
+            <div class="modal__top-right-bar"></div>
+            <div class="modal__bottom-left-bar"></div>
+            <div class="modal__bottom-right-bar"></div>
+            <div class="modal__mid-gradient">
+              <div class="modal__inner-border">
+                <div class="modal__content">
+                  <button
+                    type="button"
+                    class="modal__close-btn"
+                    data-modal-close
+                    aria-label="Close modal"
+                  >
+                    X
+                  </button>
+                  <h1>Welcome to Hydra Doom</h1>
+                  <p>
+                    Hydra Doom is a technology demonstration showcasing one of
+                    Cardano’s scaling solutions called Hydra using the shareware
+                    levels of the 1993 id software game Doom.
+                  </p>
+                  <p>
+                    While you are playing, the game states will be streamed into
+                    a Hydra head, which uses Cardano smart contracts to validate
+                    the game transition for every frame, in real time. It’s a
+                    passion project put together by a small team, including
+                    Sundae Labs, Adam Dean, and a few folks from IOG, in a short
+                    amount of time. All the code is fully open sourced.
+                  </p>
+                  <p>
+                    Hydra Doom is intended as a light-hearted tech demo and is
+                    not a commercial product.
+                  </p>
                 </div>
+              </div>
             </div>
+          </div>
         </div>
         <div class="logos">
-            <a target="_blank" href="https://hydra.family">
-                <img src="assets/images/hydra-logo-2-0x.png" alt="Hydra Logo"/>
-            </a>
-            <a target="_blank" href="https://sundae.fi/">
-                <img
-                        src="assets/images/sundae-labs-logo.svg"
-                        alt="Sundae Labs Logo"
-                />
-            </a>
-            <a target="_blank" href="https://iog.io" class="iog-logo">
-                <img src="assets/images/iog-logo.png" alt="IOG Logo"/>
-            </a>
-            <a
-                    target="_blank"
-                    href="http://onboard.ninja"
-                    class="js-cabinet-logos onboard-logo"
-            >
-                <img src="assets/images/onboard-logo.png" alt="Onboard Logo"/>
-            </a>
-            <a
-                    target="_blank"
-                    href="https://x.com/PopupVirtualEnt"
-                    class="popup-logo js-cabinet-logos"
-            >
-                <img src="assets/images/popup-logo.png" alt="Popup Logo"/>
-            </a>
+          <a target="_blank" href="https://hydra.family">
+            <img src="assets/images/hydra-logo-2-0x.png" alt="Hydra Logo" />
+          </a>
+          <a target="_blank" href="https://sundae.fi/">
+            <img
+              src="assets/images/sundae-labs-logo.svg"
+              alt="Sundae Labs Logo"
+            />
+          </a>
+          <a target="_blank" href="https://iog.io" class="iog-logo">
+            <img src="assets/images/iog-logo.png" alt="IOG Logo" />
+          </a>
+          <a
+            target="_blank"
+            href="http://onboard.ninja"
+            class="js-cabinet-logos onboard-logo"
+          >
+            <img src="assets/images/onboard-logo.png" alt="Onboard Logo" />
+          </a>
+          <a
+            target="_blank"
+            href="https://x.com/PopupVirtualEnt"
+            class="popup-logo js-cabinet-logos"
+          >
+            <img src="assets/images/popup-logo.png" alt="Popup Logo" />
+          </a>
         </div>
+      </div>
     </div>
-</div>
-<div id="modal-game" class="modal modal--game" role="dialog">
-    <div class="logos">
+    <div id="modal-game" class="modal modal--game" role="dialog">
+      <div class="logos">
         <a target="_blank" href="https://hydra.family">
-            <img src="assets/images/hydra-logo-2-0x.png" alt="Hydra Logo"/>
+          <img src="assets/images/hydra-logo-2-0x.png" alt="Hydra Logo" />
         </a>
         <a target="_blank" href="https://sundae.fi/">
-            <img
-                    src="assets/images/sundae-labs-logo.svg"
-                    alt="Sundae Labs Logo"
-            />
+          <img
+            src="assets/images/sundae-labs-logo.svg"
+            alt="Sundae Labs Logo"
+          />
         </a>
         <a target="_blank" href="https://iog.io" class="iog-logo">
-            <img src="assets/images/iog-logo.png" alt="IOG Logo"/>
+          <img src="assets/images/iog-logo.png" alt="IOG Logo" />
         </a>
         <a
-                target="_blank"
-                href="http://onboard.ninja"
-                class="js-cabinet-logos onboard-logo"
+          target="_blank"
+          href="http://onboard.ninja"
+          class="js-cabinet-logos onboard-logo"
         >
-            <img src="assets/images/onboard-logo.png" alt="Onboard Logo"/>
+          <img src="assets/images/onboard-logo.png" alt="Onboard Logo" />
         </a>
         <a
-                target="_blank"
-                href="https://x.com/PopupVirtualEnt"
-                class="popup-logo js-cabinet-logos"
+          target="_blank"
+          href="https://x.com/PopupVirtualEnt"
+          class="popup-logo js-cabinet-logos"
         >
-            <img src="assets/images/popup-logo.png" alt="Popup Logo"/>
+          <img src="assets/images/popup-logo.png" alt="Popup Logo" />
         </a>
-    </div>
-    <div class="game-view-wrapper">
+      </div>
+      <div class="game-view-wrapper">
         <div class="game-slot-container">
-            <div class="game-slot">
-                <div class="game-slot__container">
-                    <div class="message" id="loading-message">Starting game...</div>
-                    <div class="message" id="message">
-                        <div>
-                            <p>
-                                Having a problem connecting to the Hydra backend. Please try refreshing the page and
-                                try again.
-                            </p>
-                            <p>
-                                For now, try again in a few minutes and in the mean time,
-                                why not check out
-                                <a href="https://hydra.family" target="_blank"
-                                >hydra.family</a
-                                >?
-                            </p>
-                        </div>
-                    </div>
-                    <canvas
-                            id="canvas"
-                            oncontextmenu="event.preventDefault()"
-                            tabindex="-1"
-                    ></canvas>
+          <div class="game-slot">
+            <div class="game-slot__container">
+              <div class="message" id="loading-message">Starting game...</div>
+              <div class="message" id="message">
+                <div>
+                  <p>
+                    Having a problem connecting to the Hydra backend. Please try
+                    refreshing the page and try again.
+                  </p>
+                  <p>
+                    For now, try again in a few minutes and in the mean time,
+                    why not check out
+                    <a href="https://hydra.family" target="_blank"
+                      >hydra.family</a
+                    >?
+                  </p>
                 </div>
+              </div>
+              <canvas
+                id="canvas"
+                oncontextmenu="event.preventDefault()"
+                tabindex="-1"
+              ></canvas>
             </div>
+          </div>
         </div>
-    </div>
-    <div class="game-header">
+      </div>
+      <div class="game-header">
         <button id="mute-button" class="mute-button">
-            <i id="mute-icon" class="fas fa-volume-up"></i>
+          <i id="mute-icon" class="fas fa-volume-up"></i>
         </button>
         <button class="header__restart" id="restart-button">
-            <span>Restart</span>
+          <span>Restart</span>
         </button>
+      </div>
     </div>
-</div>
-<!--<div id="modal-how-it-works" class="modal" role="dialog">
+    <!--<div id="modal-how-it-works" class="modal" role="dialog">
     <div class="modal__outer-container">
         <div class="modal__container">
             <div class="modal__outer-border">
@@ -370,61 +369,60 @@
     </div>
 </div>-->
 
-<script type="text/javascript">
-    // Setup configuration for doom-wasm
-    var Module = {
+    <script type="text/javascript">
+      // Setup configuration for doom-wasm
+      var Module = {
         noInitialRun: true,
         preRun: () => {
-            // Module.FS.createPreloadedFile(
-            //     "",
-            //     "doom1.wad",
-            //     "doom1.wad",
-            //     true,
-            //     true,
-            // );
-            // Module.FS.createPreloadedFile(
-            //     "",
-            //     "default.cfg",
-            //     "default.cfg",
-            //     true,
-            //     true,
-            // );
-            const files = [
-                "freedoom2.wad",
-                "default.cfg",
-                "dm_iog.wad",
-                "iog.wad",
-                "iog_assets.wad",
-            ];
-            files.forEach((file) => {
-                Module.FS.createPreloadedFile("/", file, file, true, true);
-            });
+          // Module.FS.createPreloadedFile(
+          //     "",
+          //     "doom1.wad",
+          //     "doom1.wad",
+          //     true,
+          //     true,
+          // );
+          // Module.FS.createPreloadedFile(
+          //     "",
+          //     "default.cfg",
+          //     "default.cfg",
+          //     true,
+          //     true,
+          // );
+          const files = [
+            "freedoom2.wad",
+            "default.cfg",
+            "dm_iog.wad",
+            "iog.wad",
+            "iog_assets.wad",
+          ];
+          files.forEach((file) => {
+            Module.FS.createPreloadedFile("/", file, file, true, true);
+          });
         },
         printErr: (text) => {
-            console.error(text);
+          console.error(text);
         },
-        postRun: () => {
-        },
+        postRun: () => {},
         canvas: (function () {
-            var canvas = document.getElementById("canvas");
-            canvas.addEventListener(
-                "webglcontextlost",
-                function (e) {
-                    alert("WebGL context lost. You will need to reload the page.");
-                    e.preventDefault();
-                },
-                false,
-            );
-            return canvas;
+          var canvas = document.getElementById("canvas");
+          canvas.addEventListener(
+            "webglcontextlost",
+            function (e) {
+              alert("WebGL context lost. You will need to reload the page.");
+              e.preventDefault();
+            },
+            false,
+          );
+          return canvas;
         })(),
         print: (text) => {
-            console.log("stdout", text);
+          console.log("stdout", text);
         },
         setStatus: (text) => {
-            console.log("setStatus", text);
+          console.log("setStatus", text);
         },
-    };
-</script>
-<script defer type="text/javascript" src="websockets-doom.js"></script>
-</body>
+      };
+    </script>
+    <script defer type="text/javascript" src="websockets-doom.js"></script>
+  </body>
 </html>
