@@ -35,6 +35,8 @@ There is a way to start all required processes using `nix` and `process-compose`
 nix run
 ```
 
+The browser session will be available at `localhost:3000`.
+
 ## Persistent sessions
 
 If we want to keep using the same key and remote node configuration between runs, set the `PERSISTENT_SESSION=true` variable in the `.env` file before starting the dev web server.
