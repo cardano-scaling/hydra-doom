@@ -2,7 +2,6 @@
   description = "Hydra Doom";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
-    flake-utils.url = "github:numtide/flake-utils";
     hydra.url = "github:input-output-hk/hydra/doom";
     cardano-node.url = "github:intersectmbo/cardano-node/8.9.4";
     flake-parts.url = "github:hercules-ci/flake-parts";
