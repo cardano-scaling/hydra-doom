@@ -3,7 +3,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
     hydra.url = "github:input-output-hk/hydra/doom";
-    cardano-node.url = "github:intersectmbo/cardano-node/8.9.4";
+    cardano-node.follows = "hydra/cardano-node";
     flake-parts.url = "github:hercules-ci/flake-parts";
     process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
     hydra-control-plane.url = "github:cardano-scaling/hydra-control-plane";
