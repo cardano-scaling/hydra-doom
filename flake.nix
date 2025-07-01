@@ -1,5 +1,19 @@
 {
+
+  nixConfig = {
+    extra-substituters = [
+      "https://cache.iog.io"
+      "https://cardano-scaling.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ="
+      "cardano-scaling.cachix.org-1:QNK4nFrowZ/aIJMCBsE35m+O70fV6eewsBNdQnCSMKA="
+    ];
+    allow-import-from-derivation = true;
+  };
+
   description = "Hydra Doom";
+
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
     hydra.url = "github:input-output-hk/hydra/doom";
