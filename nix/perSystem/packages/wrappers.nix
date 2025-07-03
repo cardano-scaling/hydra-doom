@@ -1,5 +1,5 @@
 { inputs, ... }: {
-  perSystem = {config, system, pkgs, lib, ...}:
+  perSystem = { config, pkgs, lib, ... }:
     let
       hydraDataDir = "state-hydra";
       # edit these to override defaults for serverUrl and doom wad file
@@ -13,21 +13,22 @@
         url = "https://distro.ibiblio.org/slitaz/sources/packages/d/doom1.wad";
         sha256 = "sha256-HX1DvlAeZ9kn5BXguPPinDvzMHXoWXIYFvZSpSbKx3E=";
       };
-      hydra-doom-static = let
-        serverUrl = controlPlaneUrl;
-        wadFile = doomWad;
-        cabinetKey = null;
-        region = "local";
-        useMouse = "1";
-        src = "${inputs.self}/web";
+      hydra-doom-static =
+        let
+          serverUrl = controlPlaneUrl;
+          wadFile = doomWad;
+          cabinetKey = null;
+          region = "local";
+          useMouse = "1";
+          src = "${inputs.self}/web";
 
-        nodeModules = pkgs.mkYarnPackage {
-          name = "hydra-doom-node-modules";
-          inherit src;
-          packageJSON = "${src}/package.json";
-          yarnLock = "${src}/yarn.lock";
-          nodejs = pkgs.nodejs;
-         };
+          nodeModules = pkgs.mkYarnPackage {
+            name = "hydra-doom-node-modules";
+            inherit src;
+            packageJSON = "${src}/package.json";
+            yarnLock = "${src}/yarn.lock";
+            inherit (pkgs) nodejs;
+          };
 
         in
         pkgs.stdenv.mkDerivation (finalAttrs: {

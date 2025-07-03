@@ -1,10 +1,10 @@
-{
-  self,
-  inputs,
-  config,
-  lib,
-  ...
-}: let
+{ self
+, inputs
+, config
+, lib
+, ...
+}:
+let
   inherit (config.flake) nixosModules;
   mkWireGuardTunnel = ips: privateKeyFile: {
     networking.wireguard.interfaces.wg0 = {
@@ -48,14 +48,16 @@
       pkgs.polychromatic
     ];
   };
-  miniHardware = { config, pkgs, lib, ... }: let
+  miniHardware = { config, pkgs, lib, ... }:
+    let
       inherit (builtins) map;
       externalInterface = "enp2s0";
       internalInterfaces = [
         "enp3s0"
         "wg0"
       ];
-    in {
+    in
+    {
       boot.kernel.sysctl = {
         "net.ipv4.conf.all.forwarding" = 1;
         "net.ipv4.conf.default.forwarding" = 1;
@@ -83,78 +85,80 @@
         firewall = {
           enable = true;
           allowPing = true;
-          extraCommands = let
-            dropPortNoLog = port:
-              ''
-                ip46tables -A nixos-fw -p tcp \
-                  --dport ${toString port} -j nixos-fw-refuse
-                ip46tables -A nixos-fw -p udp \
-                  --dport ${toString port} -j nixos-fw-refuse
-              '';
+          extraCommands =
+            let
+              dropPortNoLog = port:
+                ''
+                  ip46tables -A nixos-fw -p tcp \
+                    --dport ${toString port} -j nixos-fw-refuse
+                  ip46tables -A nixos-fw -p udp \
+                    --dport ${toString port} -j nixos-fw-refuse
+                '';
 
-            dropPortIcmpLog =
-              ''
-                iptables -A nixos-fw -p icmp \
-                  -j LOG --log-prefix "iptables[icmp]: "
-                ip6tables -A nixos-fw -p ipv6-icmp \
-                  -j LOG --log-prefix "iptables[icmp-v6]: "
-              '';
+              dropPortIcmpLog =
+                ''
+                  iptables -A nixos-fw -p icmp \
+                    -j LOG --log-prefix "iptables[icmp]: "
+                  ip6tables -A nixos-fw -p ipv6-icmp \
+                    -j LOG --log-prefix "iptables[icmp-v6]: "
+                '';
 
-            refusePortOnInterface = port: interface:
-              ''
-                ip46tables -A nixos-fw -i ${interface} -p tcp \
-                  --dport ${toString port} -j nixos-fw-log-refuse
-                ip46tables -A nixos-fw -i ${interface} -p udp \
-                  --dport ${toString port} -j nixos-fw-log-refuse
-              '';
-            acceptPortOnInterface = port: interface:
-              ''
-                ip46tables -A nixos-fw -i ${interface} -p tcp \
-                  --dport ${toString port} -j nixos-fw-accept
-                ip46tables -A nixos-fw -i ${interface} -p udp \
-                  --dport ${toString port} -j nixos-fw-accept
-              '';
-            privatelyAcceptPort = port:
-              lib.concatMapStrings
-                (interface: acceptPortOnInterface port interface)
-                internalInterfaces;
+              refusePortOnInterface = port: interface:
+                ''
+                  ip46tables -A nixos-fw -i ${interface} -p tcp \
+                    --dport ${toString port} -j nixos-fw-log-refuse
+                  ip46tables -A nixos-fw -i ${interface} -p udp \
+                    --dport ${toString port} -j nixos-fw-log-refuse
+                '';
+              acceptPortOnInterface = port: interface:
+                ''
+                  ip46tables -A nixos-fw -i ${interface} -p tcp \
+                    --dport ${toString port} -j nixos-fw-accept
+                  ip46tables -A nixos-fw -i ${interface} -p udp \
+                    --dport ${toString port} -j nixos-fw-accept
+                '';
+              privatelyAcceptPort = port:
+                lib.concatMapStrings
+                  (interface: acceptPortOnInterface port interface)
+                  internalInterfaces;
 
-            publiclyRejectPort = port:
-              refusePortOnInterface port externalInterface;
+              publiclyRejectPort = port:
+                refusePortOnInterface port externalInterface;
 
-            allowPortOnlyPrivately = port:
+              allowPortOnlyPrivately = port:
+                ''
+                  ${privatelyAcceptPort port}
+                  ${publiclyRejectPort port}
+                '';
+            in
+            lib.concatStrings [
+              (lib.concatMapStrings allowPortOnlyPrivately
+                [
+                  67 # DHCP
+                  53 # DNS
+                  80 # nginx
+                  4001 # hydra api
+                  8000 # hydra control plane
+                ])
+              (lib.concatMapStrings dropPortNoLog
+                [
+                  23 # Common from public internet
+                  143 # Common from public internet
+                  139 # From RT AP
+                  515 # From RT AP
+                  9100 # From RT AP
+                ])
+              dropPortIcmpLog
               ''
-                ${privatelyAcceptPort port}
-                ${publiclyRejectPort port}
-              '';
-          in lib.concatStrings [
-            (lib.concatMapStrings allowPortOnlyPrivately
-              ([
-                67    # DHCP
-                53    # DNS
-                80    # nginx
-                4001  # hydra api
-                8000  # hydra control plane
-              ]))
-            (lib.concatMapStrings dropPortNoLog
-              [
-                23   # Common from public internet
-                143  # Common from public internet
-                139  # From RT AP
-                515  # From RT AP
-                9100 # From RT AP
-              ])
-            (dropPortIcmpLog)
-            ''
-              # allow from trusted interfaces
-              ip46tables -A FORWARD -m state --state NEW -i br0 -o ${externalInterface} -j ACCEPT
-              ip46tables -A FORWARD -m state --state NEW -i wg0 -o ${externalInterface} -j ACCEPT
-              # allow traffic with existing state
-              ip46tables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
-              # block forwarding from external interface
-              ip6tables -A FORWARD -i ${externalInterface} -j DROP
-            ''
-          ];
+                # allow from trusted interfaces
+                ip46tables -A FORWARD -m state --state NEW -i br0 -o ${externalInterface} -j ACCEPT
+                ip46tables -A FORWARD -m state --state NEW -i wg0 -o ${externalInterface} -j ACCEPT
+                # allow traffic with existing state
+                ip46tables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+                # block forwarding from external interface
+                ip6tables -A FORWARD -i ${externalInterface} -j DROP
+              ''
+            ];
           allowedTCPPorts = [ 32400 22 ];
           allowedUDPPorts = [ 51820 ];
         };
@@ -207,14 +211,16 @@
           enable = true;
           settings = {
             bind-interfaces = true;
-            address = let
-              cnames = [
-                "router"
-                "offline"
-              ];
-              ipv4 = "10.15.0.1";
-              createAddress = domain: ipv4: name: "/${name}.${domain}/${ipv4}";
-            in map (createAddress "doom.lan" ipv4) cnames;
+            address =
+              let
+                cnames = [
+                  "router"
+                  "offline"
+                ];
+                ipv4 = "10.15.0.1";
+                createAddress = domain: ipv4: name: "/${name}.${domain}/${ipv4}";
+              in
+              map (createAddress "doom.lan" ipv4) cnames;
           };
 
         };
@@ -286,23 +292,23 @@
         ];
       };
 
-    boot.extraModprobeConfig = ''
-      options kvm_intel nested=1
-      options kvm_intel emulate_invalid_guest_state=0
-      options kvm ignore_msrs=1
-    '';
-    networking.networkmanager.enable = lib.mkForce false;
-    nixpkgs.config.pulseaudio = true;
-    hardware = {
-      opengl.enable = true;
-      opengl.driSupport32Bit = true;
-      opengl.extraPackages = [ pkgs.vaapiIntel ];
-      pulseaudio.enable = true;
-    };
-    sound.enable = true;
+      boot.extraModprobeConfig = ''
+        options kvm_intel nested=1
+        options kvm_intel emulate_invalid_guest_state=0
+        options kvm ignore_msrs=1
+      '';
+      networking.networkmanager.enable = lib.mkForce false;
+      nixpkgs.config.pulseaudio = true;
+      hardware = {
+        opengl.enable = true;
+        opengl.driSupport32Bit = true;
+        opengl.extraPackages = [ pkgs.vaapiIntel ];
+        pulseaudio.enable = true;
+      };
+      sound.enable = true;
 
-  };
-  adminGui = { config, pkgs, ... }: {
+    };
+  adminGui = { pkgs, ... }: {
     environment.systemPackages = [
       pkgs.sway
     ];
@@ -312,98 +318,83 @@
     #  #desktopManager.gnome.enable = true;
     #};
   };
-  hydraCageLocal = { config, pkgs, ... }: let
-    system = "x86_64-linux";
-    chrome-kiosk-wrapper = pkgs.writeShellApplication {
-      name = "chrome-kiosk-wrapper";
-      text = ''
-        rm -f ~/.config/google-chrome/Singleton
-        ${pkgs.google-chrome}/bin/google-chrome-stable --app=http://doom-offline.local
-      '';
-    };
-  in {
-    services = {
-      cage = {
-        enable = true;
-        program = "${chrome-kiosk-wrapper}/bin/chrome-kiosk-wrapper";
-        user = "doom";
+  hydraCageRemote = { pkgs, ... }:
+    let
+      chrome-kiosk-wrapper = pkgs.writeShellApplication {
+        name = "chrome-kiosk-wrapper";
+        text = ''
+          rm -f ~/.config/google-chrome/Singleton
+          ${pkgs.google-chrome}/bin/google-chrome-stable --app=http://doom-offline.local
+        '';
+      };
+    in
+    {
+      services = {
+        cage = {
+          enable = true;
+          program = "${chrome-kiosk-wrapper}/bin/chrome-kiosk-wrapper";
+          user = "doom";
+        };
       };
     };
-  };
-  hydraCageRemote = { config, pkgs, ... }: let
-    system = "x86_64-linux";
-    chrome-kiosk-wrapper = pkgs.writeShellApplication {
-      name = "chrome-kiosk-wrapper";
-      text = ''
-        rm -f ~/.config/google-chrome/Singleton
-        ${pkgs.google-chrome}/bin/google-chrome-stable --app=http://doom-offline.local
-      '';
-    };
-  in {
-    services = {
-      cage = {
-        enable = true;
-        program = "${chrome-kiosk-wrapper}/bin/chrome-kiosk-wrapper";
-        user = "doom";
-      };
-    };
-  };
-  hydraBase = {inputs, config, pkgs,  ...}: let
-    system = "x86_64-linux";
-  in {
+  hydraBase = _:
+    let
+      system = "x86_64-linux";
+    in
+    {
 
-    imports = [
-      nixosModules.hydra-node
-      nixosModules.hydra-control-plane
-    ];
-    networking.hosts = lib.mkForce {
-      "127.0.0.1" = [ "localhost" "doom-remote.local" "doom-offline.local" ];
-      "::1" = [ "localhost" "doom-remote.local" "doom-offline.local" ];
-    };
-    environment.systemPackages = with self.packages.${system}; [
-      hydra-tui-wrapper
-    ];
-    users = {
-      users."doom" = {
-        createHome = true;
-        group = "doom";
-        extraGroups = ["plugdev"];
-        home = "/home/doom";
-        uid = 9999;
-        isNormalUser = true;
+      imports = [
+        nixosModules.hydra-node
+        nixosModules.hydra-control-plane
+      ];
+      networking.hosts = lib.mkForce {
+        "127.0.0.1" = [ "localhost" "doom-remote.local" "doom-offline.local" ];
+        "::1" = [ "localhost" "doom-remote.local" "doom-offline.local" ];
       };
-      groups.doom = {};
-      groups.plugdev = {};
-    };
-    services = {
-      hydra-node = {
-        enable = true;
+      environment.systemPackages = with self.packages.${system}; [
+        hydra-tui-wrapper
+      ];
+      users = {
+        users."doom" = {
+          createHome = true;
+          group = "doom";
+          extraGroups = [ "plugdev" ];
+          home = "/home/doom";
+          uid = 9999;
+          isNormalUser = true;
+        };
+        groups.doom = { };
+        groups.plugdev = { };
       };
-      hydra-control-plane = {
-        enable = true;
-        reserved = true;
-      };
-      nginx = {
-        enable = true;
-        virtualHosts = {
-          "offline.doom.lan" = {
-            root = self.packages.${system}.hydra-doom-static.overrideAttrs (finalAttrs: prevAttrs: {
-              passthru = prevAttrs.passthru // {
-                serverUrl = "http://offline.doom.lan:8000";
-                useMouse = "1";
-                cabinetKey = import ../deployment/cabinet-key.nix;
-              };
-            });
-            extraConfig = ''
-              disable_symlinks off;
-              try_files $uri $uri /index.html;
-            '';
+      services = {
+        hydra-node = {
+          enable = true;
+        };
+        hydra-control-plane = {
+          enable = true;
+          reserved = true;
+        };
+        nginx = {
+          enable = true;
+          virtualHosts = {
+            "offline.doom.lan" = {
+              root = self.packages.${system}.hydra-doom-static.overrideAttrs (_finalAttrs: prevAttrs: {
+                passthru = prevAttrs.passthru // {
+                  serverUrl = "http://offline.doom.lan:8000";
+                  useMouse = "1";
+                  cabinetKey = import ../deployment/cabinet-key.nix;
+                };
+              });
+              extraConfig = ''
+                disable_symlinks off;
+                try_files $uri $uri /index.html;
+              '';
+            };
           };
         };
       };
     };
-  };
-  baseConfig = { pkgs, ...}: {
+  baseConfig = { pkgs, ... }: {
     boot = {
       loader.grub = {
         enable = true;
@@ -450,114 +441,115 @@
       "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDHRjFKHOS4lOw907VWvDMrx/XawRMV2wyc+VSbA4YHnG2ecv6y/JT3gBjmdNw0bgltgQqeBBG/iTciio+Zax8I36rPWMEomDvpgq8B7i1L23eWoK9cKMqYNAUpIAfManhJKvZfBjJ9dRLz4hfUGo2Gah5reuweFrkzWGb2zqILNXoM2KowlkqMOFrd09SgP52sUuwNmaCJaPba7IdqzLqxotWaY420Msd5c8B2l/0E/hNgRu6m5qbZpidmQQJsTk2tq4CWP5xB2SbgEwAuZZ6AUOn2IqGfF8bkLfwHb5qdtss0jxZm47s5Fag9T9MzzbXCAHEdyO01+q83FKIxkiW/ sebastian"
     ];
   };
-in {
-    flake.colmena = {
-      meta = {
-        nixpkgs = import inputs.nixpkgs {
-          system = "x86_64-linux";
-        };
-      };
-      hydra-arcade-test = { config, pkgs, ... }: {
-        deployment = {
-          targetHost = "hydra-arcade-test";
-          targetPort = 22;
-          targetUser = "root";
-        };
-        imports = [
-          inputs.sops-nix.nixosModules.sops
-          baseConfig
-          hydraBase
-          hydraCageRemote
-          #adminGui
-          ../deployment/hydra-arcade-test/hardware-configuration.nix
-          (mkWireGuardTunnel [ "10.40.9.8/24" "fd00::8" ] config.sops.secrets.wg0PrivateKey.path)
-        ];
-        networking.hostId = "ca488476"; # required for zfs use
-        sops = {
-         defaultSopsFile = ../deployment/hydra-arcade-test/secrets.yaml;
-         age = {
-           sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
-         };
-         secrets.wg0PrivateKey = {};
-         };
-      };
-      hydra-arcade-1 = { config, pkgs, ... }: {
-        deployment = {
-          targetHost = "hydra-arcade-1";
-          targetPort = 22;
-          targetUser = "root";
-        };
-        networking.hostName = "hydra-arcade-1";
-        imports = [
-          inputs.sops-nix.nixosModules.sops
-          baseConfig
-          arcadeHardware
-          hydraBase
-          hydraCageRemote
-          #adminGui
-          ../deployment/hydra-arcade-1/hardware-configuration.nix
-          (mkWireGuardTunnel [ "10.40.9.6/24" "fd00::6" ] config.sops.secrets.wg0PrivateKey.path)
-        ];
-        networking.hostId = "4e825531"; # required for zfs use
-        sops = {
-         defaultSopsFile = ../deployment/hydra-arcade-1/secrets.yaml;
-         age = {
-           sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
-         };
-         secrets.wg0PrivateKey = {};
-         };
-      };
-      hydra-arcade-2 = { config, pkgs, ... }: {
-        deployment = {
-          targetHost = "hydra-arcade-2";
-          targetPort = 22;
-          targetUser = "root";
-        };
-        networking.hostName = "hydra-arcade-2";
-        imports = [
-          inputs.sops-nix.nixosModules.sops
-          baseConfig
-          arcadeHardware
-          hydraBase
-          hydraCageRemote
-          #adminGui
-          ../deployment/hydra-arcade-2/hardware-configuration.nix
-          (mkWireGuardTunnel [ "10.40.9.7/24" "fd00::7" ] config.sops.secrets.wg0PrivateKey.path)
-        ];
-        networking.hostId = "0904bbe4"; # required for zfs use
-        sops = {
-         defaultSopsFile = ../deployment/hydra-arcade-2/secrets.yaml;
-         age = {
-           sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
-         };
-         secrets.wg0PrivateKey = {};
-         };
-      };
-      hydra-doom-mini = { config, pkgs, ... }: {
-        deployment = {
-          targetHost = "hydra-doom-mini";
-          targetPort = 22;
-          targetUser = "root";
-        };
-        networking.hostName = "hydra-doom-mini";
-        imports = [
-          inputs.sops-nix.nixosModules.sops
-          baseConfig
-          miniHardware
-          hydraBase
-          #hydraCageLocal
-          adminGui
-          ../deployment/hydra-doom-mini/hardware-configuration.nix
-          (mkWireGuardTunnel [ "10.40.9.9/24" "fd00::9" ] config.sops.secrets.wg0PrivateKey.path)
-        ];
-        networking.hostId = "37f9660d"; # required for zfs use
-        sops = {
-         defaultSopsFile = ../deployment/hydra-doom-mini/secrets.yaml;
-         age = {
-           sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
-         };
-         secrets.wg0PrivateKey = {};
-         };
+in
+{
+  flake.colmena = {
+    meta = {
+      nixpkgs = import inputs.nixpkgs {
+        system = "x86_64-linux";
       };
     };
+    hydra-arcade-test = { config, ... }: {
+      deployment = {
+        targetHost = "hydra-arcade-test";
+        targetPort = 22;
+        targetUser = "root";
+      };
+      imports = [
+        inputs.sops-nix.nixosModules.sops
+        baseConfig
+        hydraBase
+        hydraCageRemote
+        #adminGui
+        ../deployment/hydra-arcade-test/hardware-configuration.nix
+        (mkWireGuardTunnel [ "10.40.9.8/24" "fd00::8" ] config.sops.secrets.wg0PrivateKey.path)
+      ];
+      networking.hostId = "ca488476"; # required for zfs use
+      sops = {
+        defaultSopsFile = ../deployment/hydra-arcade-test/secrets.yaml;
+        age = {
+          sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+        };
+        secrets.wg0PrivateKey = { };
+      };
+    };
+    hydra-arcade-1 = { config, ... }: {
+      deployment = {
+        targetHost = "hydra-arcade-1";
+        targetPort = 22;
+        targetUser = "root";
+      };
+      networking.hostName = "hydra-arcade-1";
+      imports = [
+        inputs.sops-nix.nixosModules.sops
+        baseConfig
+        arcadeHardware
+        hydraBase
+        hydraCageRemote
+        #adminGui
+        ../deployment/hydra-arcade-1/hardware-configuration.nix
+        (mkWireGuardTunnel [ "10.40.9.6/24" "fd00::6" ] config.sops.secrets.wg0PrivateKey.path)
+      ];
+      networking.hostId = "4e825531"; # required for zfs use
+      sops = {
+        defaultSopsFile = ../deployment/hydra-arcade-1/secrets.yaml;
+        age = {
+          sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+        };
+        secrets.wg0PrivateKey = { };
+      };
+    };
+    hydra-arcade-2 = { config, ... }: {
+      deployment = {
+        targetHost = "hydra-arcade-2";
+        targetPort = 22;
+        targetUser = "root";
+      };
+      networking.hostName = "hydra-arcade-2";
+      imports = [
+        inputs.sops-nix.nixosModules.sops
+        baseConfig
+        arcadeHardware
+        hydraBase
+        hydraCageRemote
+        #adminGui
+        ../deployment/hydra-arcade-2/hardware-configuration.nix
+        (mkWireGuardTunnel [ "10.40.9.7/24" "fd00::7" ] config.sops.secrets.wg0PrivateKey.path)
+      ];
+      networking.hostId = "0904bbe4"; # required for zfs use
+      sops = {
+        defaultSopsFile = ../deployment/hydra-arcade-2/secrets.yaml;
+        age = {
+          sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+        };
+        secrets.wg0PrivateKey = { };
+      };
+    };
+    hydra-doom-mini = { config, ... }: {
+      deployment = {
+        targetHost = "hydra-doom-mini";
+        targetPort = 22;
+        targetUser = "root";
+      };
+      networking.hostName = "hydra-doom-mini";
+      imports = [
+        inputs.sops-nix.nixosModules.sops
+        baseConfig
+        miniHardware
+        hydraBase
+        #hydraCageLocal
+        adminGui
+        ../deployment/hydra-doom-mini/hardware-configuration.nix
+        (mkWireGuardTunnel [ "10.40.9.9/24" "fd00::9" ] config.sops.secrets.wg0PrivateKey.path)
+      ];
+      networking.hostId = "37f9660d"; # required for zfs use
+      sops = {
+        defaultSopsFile = ../deployment/hydra-doom-mini/secrets.yaml;
+        age = {
+          sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+        };
+        secrets.wg0PrivateKey = { };
+      };
+    };
+  };
 }
