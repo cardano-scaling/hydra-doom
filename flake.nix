@@ -15,17 +15,16 @@
   description = "Hydra Doom";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
-    hydra.url = "github:input-output-hk/hydra/doom";
     cardano-node.follows = "hydra/cardano-node";
-    flake-parts.url = "github:hercules-ci/flake-parts";
-    process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
-    hydra-control-plane.url = "github:cardano-scaling/hydra-control-plane";
     doom-wasm.url = "github:cardano-scaling/doom-wasm";
-    nix-inclusive.url = "github:input-output-hk/nix-inclusive";
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    hydra-control-plane.url = "github:cardano-scaling/hydra-control-plane";
+    hydra.url = "github:input-output-hk/hydra/doom";
+    import-tree.url = "github:vic/import-tree";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
+    process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
-    import-tree.url = "github:vic/import-tree";
   };
 
   outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./nix);
