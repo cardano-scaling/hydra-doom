@@ -27,20 +27,9 @@
     sops-nix.url = "github:Mic92/sops-nix";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
+    import-tree.url = "github:vic/import-tree";
   };
 
-  outputs = { self, flake-parts, nixpkgs, ... }@ inputs: let
-    inherit ((import ./flake/lib.nix {inherit inputs;}).flake.lib) recursiveImports;
-    in flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = recursiveImports [
-        ./flake
-        ./perSystem
-      ] ++ [
-        inputs.process-compose-flake.flakeModule
-        inputs.treefmt-nix.flakeModule
-      ];
-      systems = [
-        "x86_64-linux"
-      ];
-    };
+  outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./nix);
+
 }

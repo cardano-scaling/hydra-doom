@@ -19,20 +19,13 @@
         cabinetKey = null;
         region = "local";
         useMouse = "1";
-        src = inputs.nix-inclusive.lib.inclusive ../../. [
-          ../../src
-          ../../assets
-          ../../package.json
-          ../../yarn.lock
-          ../../tsconfig.json
-          ../../webpack.config.js
-        ];
+        src = "${inputs.self}/web";
 
         nodeModules = pkgs.mkYarnPackage {
           name = "hydra-doom-node-modules";
           inherit src;
-          packageJSON = ../../package.json;
-          yarnLock = ../../yarn.lock;
+          packageJSON = "${src}/package.json";
+          yarnLock = "${src}/yarn.lock";
           nodejs = pkgs.nodejs;
          };
 
@@ -87,7 +80,7 @@
             pushd ${hydraDataDir}
             ${lib.getExe' config.packages.hydra-node "hydra-node"} gen-hydra-key --output-file hydra
             curl https://raw.githubusercontent.com/cardano-scaling/hydra/0.17.0/hydra-cluster/config/protocol-parameters.json | jq '.utxoCostPerByte = 0' > protocol-parameters.json
-            cp ${../../initial-utxo.json} utxo.json
+            cp "${inputs.self}/initial-utxo.json" utxo.json
             sed -i "s/YOURADDRESSHERE/$(cardano-cli address build --verification-key-file ../admin.vk --testnet-magic 1)/g" utxo.json
             ${lib.getExe' config.packages.hydra-node "hydra-node"} offline \
               --hydra-signing-key hydra.sk \
