@@ -23,8 +23,6 @@
     hydra-control-plane.url = "github:cardano-scaling/hydra-control-plane";
     doom-wasm.url = "github:cardano-scaling/doom-wasm";
     nix-inclusive.url = "github:input-output-hk/nix-inclusive";
-    colmena.url = "github:zhaofengli/colmena";
-    sops-nix.url = "github:Mic92/sops-nix";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     import-tree.url = "github:vic/import-tree";
