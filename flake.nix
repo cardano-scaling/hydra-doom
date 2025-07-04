@@ -22,7 +22,7 @@
     hydra-coding-standards.url = "github:cardano-scaling/hydra-coding-standards";
     hydra.url = "github:input-output-hk/hydra/doom";
     import-tree.url = "github:vic/import-tree";
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
   };
 
