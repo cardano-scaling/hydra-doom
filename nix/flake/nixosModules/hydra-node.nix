@@ -1,4 +1,4 @@
-{ moduleWithSystem, ... }: {
+{ inputs, moduleWithSystem, ... }: {
   flake.nixosModules.hydra-node = moduleWithSystem ({ self', inputs' }: { pkgs
                                                                         , lib
                                                                         , config
@@ -52,7 +52,7 @@
             Defaults to `cfg.host`
           '';
         };
-        initalUtxo = mkOption {
+        initialUtxo = mkOption {
           type = str;
           default = "utxo.json";
           description = ''
@@ -75,8 +75,8 @@
             ${lib.optionalString cfg.clearState "rm -rf *"}
             ${getExe' self'.packages.cardano-cli "cardano-cli"} address key-gen --normal-key --verification-key-file admin.vk --signing-key-file admin.sk
             ${getExe' self'.packages.hydra-node "hydra-node"} gen-hydra-key --output-file hydra
-            cp ${../../pparams.json} pparams.json
-            cp ${../../initial-utxo.json} utxo.json
+            cp "${inputs.self}/config/pparams.json" pparams.json
+            cp "${inputs.self}/config/initial-utxo.json" utxo.json
             sed -i "s/YOURADDRESSHERE/$(${getExe' self'.packages.cardano-cli "cardano-cli"} address build --verification-key-file admin.vk --testnet-magic 1)/g" utxo.json
           '';
           description = ''
@@ -92,7 +92,7 @@
               --ledger-protocol-parameters ${cfg.pparams} \
               --host ${cfg.host} \
               --api-host ${cfg.apiHost} \
-              --initial-utxo ${cfg.initalUtxo}
+              --initial-utxo ${cfg.initialUtxo}
           '';
           description = ''
             Script to run starting hydra-node

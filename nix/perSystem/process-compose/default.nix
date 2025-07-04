@@ -1,6 +1,6 @@
 # TODO: use process-compose-services flake utilizing nixos modules
 
-_: {
+{
   perSystem = { config, ... }: {
     process-compose."default" =
       {
@@ -54,19 +54,6 @@ _: {
               disabled = true;
             };
 
-            # If a process is named 'test', it will be ignored. But a new
-            # flake check will be created that runs it so as to test the
-            # other processes.
-            #test = {
-            #  command = pkgs.writeShellApplication {
-            #    name = "hydra-doom-tests";
-            #    runtimeInputs = [ pkgs.curl ];
-            #    text = ''
-            #      curl -v http://localhost:${builtins.toString port}/
-            #    '';
-            #  };
-            #  depends_on."sqlite-web".condition = "process_healthy";
-            #};
           };
         };
       };
