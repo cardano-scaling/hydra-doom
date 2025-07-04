@@ -19,7 +19,7 @@
     doom-wasm.url = "github:cardano-scaling/doom-wasm";
     flake-parts.url = "github:hercules-ci/flake-parts";
     hydra-control-plane.url = "github:cardano-scaling/hydra-control-plane";
-    hydra-coding-standards.url = "github:cardano-scaling/hydra-coding-standards";
+    hydra-coding-standards.url = "github:cardano-scaling/hydra-coding-standards/0.7.0";
     hydra.url = "github:input-output-hk/hydra/doom";
     import-tree.url = "github:vic/import-tree";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";

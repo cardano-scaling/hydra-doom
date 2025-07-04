@@ -3931,6 +3931,7 @@
       },
       "original": {
         "owner": "cardano-scaling",
+        "ref": "0.7.0",
         "repo": "hydra-coding-standards",
         "type": "github"
       }
