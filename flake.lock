@@ -7759,8 +7759,7 @@
         "hydra-control-plane": "hydra-control-plane",
         "import-tree": "import-tree_4",
         "nixpkgs": "nixpkgs_44",
-        "process-compose-flake": "process-compose-flake",
-        "treefmt-nix": "treefmt-nix_5"
+        "process-compose-flake": "process-compose-flake"
       }
     },
     "rust-analyzer-src": {
@@ -8627,26 +8626,6 @@
         "owner": "numtide",
         "repo": "treefmt-nix",
         "rev": "e497a9ddecff769c2a7cbab51e1ed7a8501e7a3a",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "treefmt-nix",
-        "type": "github"
-      }
-    },
-    "treefmt-nix_5": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1722330636,
-        "narHash": "sha256-uru7JzOa33YlSRwf9sfXpJG+UAV+bnBEYMjrzKrQZFw=",
-        "owner": "numtide",
-        "repo": "treefmt-nix",
-        "rev": "768acdb06968e53aa1ee8de207fd955335c754b7",
         "type": "github"
       },
       "original": {
