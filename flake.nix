@@ -20,7 +20,7 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     hydra-control-plane.url = "github:cardano-scaling/hydra-control-plane";
     hydra-coding-standards.url = "github:cardano-scaling/hydra-coding-standards/0.7.0";
-    hydra.url = "github:input-output-hk/hydra/doom";
+    hydra.url = "github:input-output-hk/hydra/0.20.0";
     import-tree.url = "github:vic/import-tree";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
