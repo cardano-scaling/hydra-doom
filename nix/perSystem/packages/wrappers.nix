@@ -80,14 +80,17 @@
             cardano-cli address key-gen --normal-key --verification-key-file admin.vk --signing-key-file admin.sk
             pushd ${hydraDataDir}
             ${lib.getExe' config.packages.hydra-node "hydra-node"} gen-hydra-key --output-file hydra
-            curl https://raw.githubusercontent.com/cardano-scaling/hydra/0.20.0/hydra-cluster/config/protocol-parameters.json | jq '.utxoCostPerByte = 0' > protocol-parameters.json
+            curl https://raw.githubusercontent.com/cardano-scaling/hydra/0.22.2/hydra-cluster/config/protocol-parameters.json \
+              | jq '.utxoCostPerByte = 0' \
+              | jq '.minFeeRefScriptCostPerByte = 0' > protocol-parameters.json
             cp "${inputs.self}/config/initial-utxo.json" utxo.json
             sed -i "s/YOURADDRESSHERE/$(cardano-cli address build --verification-key-file ../admin.vk --testnet-magic 1)/g" utxo.json
-            ${lib.getExe' config.packages.hydra-node "hydra-node"} offline \
+            ${lib.getExe' config.packages.hydra-node "hydra-node"} \
               --hydra-signing-key hydra.sk \
               --ledger-protocol-parameters protocol-parameters.json \
-              --host 0.0.0.0 \
               --api-host 0.0.0.0 \
+              --api-port 4001 \
+              --offline-head-seed "0000000000000000" \
               --initial-utxo utxo.json
             popd
           '';
