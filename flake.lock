@@ -4291,16 +4291,16 @@
         "process-compose-flake": "process-compose-flake"
       },
       "locked": {
-        "lastModified": 1751297921,
-        "narHash": "sha256-ziiJH9vCambiGZ2okkJP1BMub7mGGRdPkGe4SlkGDIE=",
+        "lastModified": 1753131278,
+        "narHash": "sha256-m7b4b6v7oOQOYh+cxviwyp+AwyIsOUNSd/K5b8RFyBc=",
         "owner": "input-output-hk",
         "repo": "hydra",
-        "rev": "b984abccf65921decc0e36452fb59cd3f478ba7d",
+        "rev": "49d1f221c3d0930f57ab5b53e0e8a2989bbcf3b2",
         "type": "github"
       },
       "original": {
         "owner": "input-output-hk",
-        "ref": "0.22.2",
+        "ref": "0.22.3",
         "repo": "hydra",
         "type": "github"
       }
