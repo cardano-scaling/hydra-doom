@@ -4391,16 +4391,16 @@
         "rust-overlay": "rust-overlay_4"
       },
       "locked": {
-        "lastModified": 1751985245,
-        "narHash": "sha256-wvIaYFAtJBkWZIq9u/I9B8aUWROnd0EmlgUunIMn7Xc=",
+        "lastModified": 1753105788,
+        "narHash": "sha256-uLP0leyY/92nCwsv+APyzMzpTCVHH9KdZAJi9QlBVVs=",
         "owner": "cardano-scaling",
         "repo": "hydra-control-plane",
-        "rev": "19b78c818be827420f229adacbab0de39e541728",
+        "rev": "7fd7854d3e35a486c070544ddbc4337e6a9314c9",
         "type": "github"
       },
       "original": {
         "owner": "cardano-scaling",
-        "ref": "master",
+        "ref": "0.1.0",
         "repo": "hydra-control-plane",
         "type": "github"
       }
