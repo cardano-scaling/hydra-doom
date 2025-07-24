@@ -44,9 +44,9 @@
           buildPhase = ''
             ln -s ${nodeModules}/libexec/hydra-doom/node_modules node_modules
             ln -sf ${finalAttrs.passthru.wadFile} assets/doom1.wad
-            ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
-            ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm assets/websockets-doom.wasm
-            ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
+            ln -sf ${pkgs.doom-wasm.site}/websockets-doom.js assets/websockets-doom.js
+            ln -sf ${pkgs.doom-wasm.site}/websockets-doom.wasm assets/websockets-doom.wasm
+            ln -sf ${pkgs.doom-wasm.site}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
 
             cat > .env << EOF
             SERVER_URL=${finalAttrs.passthru.serverUrl}
@@ -65,7 +65,10 @@
       packages = {
         hydra-cluster-wrapper = pkgs.writeShellApplication {
           name = "hydra-cluster-wrapper";
-          runtimeInputs = [ config.packages.cardano-node config.packages.cardano-cli ];
+          runtimeInputs = [
+            pkgs.cardano-node
+            pkgs.cardano-cli
+          ];
           text = ''
             rm -rf "${hydraDataDir}"
             ${lib.getExe' config.packages.hydra-cluster "hydra-cluster"} --devnet --publish-hydra-scripts --state-directory ${hydraDataDir}
@@ -73,19 +76,19 @@
         };
         hydra-offline-wrapper = pkgs.writeShellApplication {
           name = "hydra-offline-wrapper";
-          runtimeInputs = [ config.packages.cardano-node config.packages.cardano-cli pkgs.jq pkgs.curl ];
+          runtimeInputs = [ pkgs.cardano-node pkgs.cardano-cli pkgs.jq pkgs.curl ];
           text = ''
             rm -rf "${hydraDataDir}"
             mkdir -p "${hydraDataDir}"
             cardano-cli address key-gen --normal-key --verification-key-file admin.vk --signing-key-file admin.sk
             pushd ${hydraDataDir}
-            ${lib.getExe' config.packages.hydra-node "hydra-node"} gen-hydra-key --output-file hydra
+            ${lib.getExe' pkgs.hydra-node "hydra-node"} gen-hydra-key --output-file hydra
             curl https://raw.githubusercontent.com/cardano-scaling/hydra/0.22.2/hydra-cluster/config/protocol-parameters.json \
               | jq '.utxoCostPerByte = 0' \
               | jq '.minFeeRefScriptCostPerByte = 0' > protocol-parameters.json
             cp "${inputs.self}/config/initial-utxo.json" utxo.json
             sed -i "s/YOURADDRESSHERE/$(cardano-cli address build --verification-key-file ../admin.vk --testnet-magic 1)/g" utxo.json
-            ${lib.getExe' config.packages.hydra-node "hydra-node"} \
+            ${lib.getExe' pkgs.hydra-node "hydra-node"} \
               --hydra-signing-key hydra.sk \
               --ledger-protocol-parameters protocol-parameters.json \
               --api-host 0.0.0.0 \
@@ -98,15 +101,15 @@
         inherit hydra-doom-static;
         hydra-doom-wrapper = pkgs.writeShellApplication {
           name = "hydra-doom-wrapper";
-          runtimeInputs = [ config.packages.bech32 pkgs.jq pkgs.git pkgs.nodejs pkgs.python3 ];
+          runtimeInputs = [ pkgs.bech32 pkgs.jq pkgs.git pkgs.nodejs pkgs.python3 ];
           text = ''
             export STATIC="''${STATIC:-1}"
             if [ "''${STATIC}" -eq 0 ]; then
               echo "running npm..."
               [ -f assets/doom1.wad ] || ln -s ${doomWad} assets/doom1.wad
-              ln -sf ${config.packages.doom-wasm}/websockets-doom.js assets/websockets-doom.js
-              ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm assets/websockets-doom.wasm
-              ln -sf ${config.packages.doom-wasm}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
+              ln -sf ${pkgs.doom-wasm.site}/websockets-doom.js assets/websockets-doom.js
+              ln -sf ${pkgs.doom-wasm.site}/websockets-doom.wasm assets/websockets-doom.wasm
+              ln -sf ${pkgs.doom-wasm.site}/websockets-doom.wasm.map assets/websockets-doom.wasm.map
               npm install
               npm start
             else
@@ -118,9 +121,9 @@
         };
         hydra-tui-wrapper = pkgs.writeShellApplication {
           name = "hydra-tui-wrapper";
-          runtimeInputs = [ config.packages.hydra-tui ];
+          runtimeInputs = [ pkgs.hydra-tui ];
           text = ''
-            ${lib.getExe' config.packages.hydra-tui "hydra-tui"} -k admin.sk
+            ${lib.getExe' pkgs.hydra-tui "hydra-tui"} -k admin.sk
           '';
         };
         hydra-control-plane-wrapper = pkgs.writeShellApplication {
@@ -149,7 +152,7 @@
             stats-file = "local-stats"
             EOF
             fi
-            ${lib.getExe' config.packages.hydra-control-plane "hydra_control_plane"}
+            ${lib.getExe' pkgs.hydra-control-plane "hydra_control_plane"}
           '';
         };
       };

@@ -1505,11 +1505,11 @@
         "nixpkgs": "nixpkgs_16"
       },
       "locked": {
-        "lastModified": 1753349860,
-        "narHash": "sha256-sqamZdXoSWYP0D21Vz999kMaMJQGH5Pr25+Ncsmohkk=",
+        "lastModified": 1753368648,
+        "narHash": "sha256-TCxx4ADxFE3d00CQ6cjIHYVwEzNkeZsNl3DptGaFY8w=",
         "owner": "cardano-scaling",
         "repo": "doom-wasm",
-        "rev": "9e7b2d54c5707c565eded170e4fdaf6fd6cc993a",
+        "rev": "815e743f34dc173da05c261cf5c107d8aabac739",
         "type": "github"
       },
       "original": {
@@ -1527,16 +1527,16 @@
         "nixpkgs": "nixpkgs_8"
       },
       "locked": {
-        "lastModified": 1753176652,
-        "narHash": "sha256-JIY1B3GDFCFWnX8mVtVLYOB4iSCqnTSyAGDA8NsORMA=",
+        "lastModified": 1753368209,
+        "narHash": "sha256-lSn7L6WAvFwkkVnsEqV4RYkNcTLvxx55TN99WP6XocA=",
         "owner": "cardano-scaling",
         "repo": "doom-wasm-flake",
-        "rev": "f61ef36c5b95d0f232f66ce5487586d8729e10e5",
+        "rev": "20b65ae59643be49f83a395772cb7acd35164052",
         "type": "github"
       },
       "original": {
         "owner": "cardano-scaling",
-        "ref": "0.3.1",
+        "ref": "0.3.2",
         "repo": "doom-wasm-flake",
         "type": "github"
       }
