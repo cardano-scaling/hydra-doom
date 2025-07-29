@@ -1,5 +1,9 @@
 # ChangeLog for hydra-doom
 
+## 0.0.0.2
+
+* Support online hydra heads.
+
 ## 0.0.0.1
 
 * Initial version of `hydra-doom`. Uses process-compose to run a collection of services providing a

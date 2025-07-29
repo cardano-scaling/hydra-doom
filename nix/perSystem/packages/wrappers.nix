@@ -1,7 +1,6 @@
 { inputs, ... }: {
   perSystem = { config, pkgs, lib, ... }:
     let
-      hydraDataDir = "state-hydra";
       # edit these to override defaults for serverUrl and doom wad file
       controlPlaneListenAddr = "0.0.0.0";
       controlPlaneHost = "localhost";
@@ -20,7 +19,7 @@
           cabinetKey = null;
           region = "local";
           useMouse = "1";
-          src = "${inputs.self}/web";
+          src = lib.cleanSource "${inputs.self}/web";
 
           nodeModules = pkgs.mkYarnPackage {
             name = "hydra-doom-node-modules";
@@ -63,39 +62,41 @@
     in
     {
       packages = {
-        hydra-cluster-wrapper = pkgs.writeShellApplication {
-          name = "hydra-cluster-wrapper";
+        cardano-node-wrapper = let
+          network = "preprod";
+          configDir = lib.cleanSource "${inputs.self}/config/${network}";
+          in
+          pkgs.writeShellApplication {
+          name = "cardano-node-wrapper";
           runtimeInputs = [
             pkgs.cardano-node
-            pkgs.cardano-cli
           ];
           text = ''
-            rm -rf "${hydraDataDir}"
-            ${lib.getExe' config.packages.hydra-cluster "hydra-cluster"} --devnet --publish-hydra-scripts --state-directory ${hydraDataDir}
+            cardano-node run \
+              --config ${configDir}/config.json \
+              --topology ${configDir}/topology.json \
+              --database-path state-cardano/${network}/db \
+              --socket-path node.socket \
+              +RTS -N
           '';
         };
         hydra-offline-wrapper = pkgs.writeShellApplication {
           name = "hydra-offline-wrapper";
           runtimeInputs = [ pkgs.cardano-node pkgs.cardano-cli pkgs.jq pkgs.curl ];
           text = ''
-            rm -rf "${hydraDataDir}"
-            mkdir -p "${hydraDataDir}"
-            cardano-cli address key-gen --normal-key --verification-key-file admin.vk --signing-key-file admin.sk
-            pushd ${hydraDataDir}
-            ${lib.getExe' pkgs.hydra-node "hydra-node"} gen-hydra-key --output-file hydra
             curl https://raw.githubusercontent.com/cardano-scaling/hydra/0.22.2/hydra-cluster/config/protocol-parameters.json \
               | jq '.utxoCostPerByte = 0' \
               | jq '.minFeeRefScriptCostPerByte = 0' > protocol-parameters.json
-            cp "${inputs.self}/config/initial-utxo.json" utxo.json
-            sed -i "s/YOURADDRESSHERE/$(cardano-cli address build --verification-key-file ../admin.vk --testnet-magic 1)/g" utxo.json
             ${lib.getExe' pkgs.hydra-node "hydra-node"} \
-              --hydra-signing-key hydra.sk \
               --ledger-protocol-parameters protocol-parameters.json \
               --api-host 0.0.0.0 \
               --api-port 4001 \
-              --offline-head-seed "0000000000000000" \
-              --initial-utxo utxo.json
-            popd
+              --testnet-magic 1 \
+              --hydra-signing-key "credentials/hydra.sk" \
+              --cardano-signing-key "credentials/fuel.cardano.sk"  \
+              --hydra-scripts-tx-id "c9c4d820d5575173cfa81ba2d2d1096fc40f84d16d8c17284da410a4fb5e64eb,ae4443b46f550289337fc5c2c52b24f1288dab36d1a229167a6e04f056a966fe,48bd29e43dd01d12ab464f75fe40eed80e4051c8d3409e1cb20b8c01120b425e" \
+              --node-socket node.socket \
+              --persistence-dir "state-hydra"
           '';
         };
         inherit hydra-doom-static;
@@ -123,7 +124,9 @@
           name = "hydra-tui-wrapper";
           runtimeInputs = [ pkgs.hydra-tui ];
           text = ''
-            ${lib.getExe' pkgs.hydra-tui "hydra-tui"} -k admin.sk
+            ${lib.getExe' pkgs.hydra-tui "hydra-tui"} \
+              -k credentials/funds.cardano.sk \
+              --testnet-magic 1
           '';
         };
         hydra-control-plane-wrapper = pkgs.writeShellApplication {
@@ -145,7 +148,7 @@
             remote_url = "ws://${hydraHost}"
             port = ${hydraPort}
             max_players = 100
-            admin_key_file = "admin.sk"
+            admin_key_file = "credentials/funds.cardano.sk"
             persisted = false
             reserved = ''${RESERVED}
             region = "local"

@@ -13,6 +13,9 @@
             #hydra-cluster = {
             #  command = config.packages.hydra-cluster-wrapper;
             #};
+            cardano-node = {
+              command = config.packages.cardano-node-wrapper;
+            };
             hydra-offline = {
               command = config.packages.hydra-offline-wrapper;
               readiness_probe = {
@@ -23,6 +26,7 @@
                   path = "/protocol-parameters";
                 };
               };
+              disabled = true;
             };
             hydra-doom = {
               command = config.packages.hydra-doom-wrapper;
