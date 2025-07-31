@@ -1,5 +1,10 @@
 # ChangeLog for hydra-doom
 
+## 0.0.0.3
+
+* Fix new-game behaviour.
+* Update to `hydra-control-plane-0.2.1`
+
 ## 0.0.0.2
 
 * Support online hydra heads.

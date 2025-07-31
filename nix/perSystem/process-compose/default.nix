@@ -18,14 +18,6 @@
             };
             hydra-offline = {
               command = config.packages.hydra-offline-wrapper;
-              readiness_probe = {
-                http_get = {
-                  host = "127.0.0.1";
-                  scheme = "http";
-                  port = 4001;
-                  path = "/protocol-parameters";
-                };
-              };
               disabled = true;
             };
             hydra-doom = {

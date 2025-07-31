@@ -127,29 +127,6 @@ export class Hydra {
                 tx.txComplete.free();
             }
                 break;
-            case "TxInvalid": {
-                console.error("TxInvalid", data);
-                const txid = data.transaction.txId;
-                if (this.tx_timings[txid]?.sent) {
-                    const invTime = now - this.tx_timings[txid].sent;
-                    this.tx_timings[txid].invalid = invTime;
-                }
-                this.onTxInvalid?.(txid);
-            }
-                break;
-            case "SnapshotConfirmed": {
-                // console.log("SnapshotConfirmed", data.snapshot.snapshotNumber, data.snapshot.confirmedTransactions.length);
-                for (const txid of data.snapshot.confirmedTransactions) {
-                    if (!this.tx_timings[txid]?.sent) {
-                        continue;
-                    }
-                    const confirmationTime = now - this.tx_timings[txid].sent;
-                    this.tx_timings[txid].confirmed = confirmationTime;
-                    this.onTxConfirmed?.(txid);
-                    // console.log(`confirmed ${txid} after ${confirmationTime}ms`);
-                }
-            }
-                break;
             default:
                 console.warn("Unexpected message: " + data);
         }
