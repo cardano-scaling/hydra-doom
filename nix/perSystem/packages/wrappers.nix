@@ -84,6 +84,7 @@
           name = "hydra-offline-wrapper";
           runtimeInputs = [ pkgs.cardano-node pkgs.cardano-cli pkgs.jq pkgs.curl ];
           text = ''
+            cp state-hydra/state.reset state-hydra/state
             curl https://raw.githubusercontent.com/cardano-scaling/hydra/0.22.2/hydra-cluster/config/protocol-parameters.json \
               | jq '.utxoCostPerByte = 0' \
               | jq '.minFeeRefScriptCostPerByte = 0' > protocol-parameters.json

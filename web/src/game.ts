@@ -95,7 +95,10 @@ export async function fetchNewGame(region: string) {
     hydra = new Hydra(`${protocol}://${node}`, 100);
     await hydra.init();
     await hydra.populateUTxO();
-    hydra.onTxSeen = (_txId, tx) => {
+    hydra.onTxSeen = (_txId) => {
+          };
+    hydra.onTxConfirmed = (txId, tx) => {
+
       const redeemer: Uint8Array | undefined = tx.txComplete
         .witness_set()
         .redeemers()
@@ -105,9 +108,11 @@ export async function fetchNewGame(region: string) {
       if (!redeemer) {
         return;
       }
+      console.log("Redeemer:", redeemer);
       const cmds = decodeRedeemer(toHex(redeemer));
       cmds.forEach((cmd) => {
-        false && cmdQueue.push(cmd);
+        cmdQueue.push(cmd);
+        console.log(cmd);
         // append some representation of the tx into the UI
         appendTx(cmd);
         if (cmdQueue.length > 1000) {
@@ -115,8 +120,6 @@ export async function fetchNewGame(region: string) {
           cmdQueue = cmdQueue.slice(-100);
         }
       });
-    };
-    hydra.onTxConfirmed = (txId) => {
       // XXX: TPS only computed when tx confirmed -> does not go to 0 after some time
       const now = performance.now();
       let tps = 0;
@@ -137,7 +140,6 @@ export async function fetchNewGame(region: string) {
     // HACK: until hydra returns the datum bytes, all the datum bytes will be wrong
     // so we return it from the newGameResponse and set it manually here
     latestUTxO.datum = newGameResponse.player_utxo_datum_hex;
-
     // This is temporary, the initial game state is stored in a UTxO created by the control plane.
     // We need to add the ability to parse game state from the datum here.
     gameData = initialGameData(pkh, player_pkh!);
@@ -248,6 +250,7 @@ export async function hydraSend(
     collateralUTxO = utxos[0];
   }
 
+  console.log("Command In:", cmd);
   redeemerQueue.push(cmd);
 
   if (frameNumber % 1 == 0) {
@@ -277,21 +280,10 @@ export async function hydraSend(
   frameNumber++;
 }
 
-export function hydraRecv(): Cmd {
+export function hydraRecv(): Cmd | null {
   // console.log("hydraRecv", cmdQueue.length);
   if (cmdQueue.length == 0) {
-    return {
-      forwardMove: 0,
-      sideMove: 0,
-      angleTurn: 0,
-      chatChar: 0,
-      buttons: 0,
-      buttons2: 0,
-      consistancy: 0,
-      inventory: 0,
-      lookFly: 0,
-      arti: 0,
-    };
+    return null;
   }
   const cmd = cmdQueue.pop()!;
   return cmd;

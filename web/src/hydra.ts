@@ -37,8 +37,8 @@ export class Hydra {
     utxos: { [txRef: string]: UTxO };
     tombstones: { [txRef: string]: boolean };
 
-    onTxSeen?: (txId: TxHash, tx: TxComplete) => void;
-    onTxConfirmed?: (txid: TxHash) => void;
+    onTxSeen?: (txId: TxHash) => void;
+    onTxConfirmed?: (txid: TxHash, tx: TxComplete) => void;
     onTxInvalid?: (txid: TxHash) => void;
 
     tx_count: number;
@@ -99,14 +99,31 @@ export class Hydra {
             case "Greetings":
                 break;
             case "TxValid": {
-                const txid = data.transaction.txId;
+                const txid = data.transactionId;
                 // Record seen time
                 if (this.tx_timings[txid]?.sent) {
                     const seenTime = now - this.tx_timings[txid].sent;
                     this.tx_timings[txid].seen = seenTime;
                     // console.log(`seen ${txid} after ${seenTime}ms`);
                 }
-                const tx = tx_parser.fromTx(data.transaction.cborHex);
+                  this.onTxSeen?.(txid);
+                break;
+            }
+            case "TxInvalid": {
+               console.error("TxInvalid", data);
+               const txid = data.transactionId;
+                if (this.tx_timings[txid]?.sent) {
+                    const invTime = now - this.tx_timings[txid].sent;
+                    this.tx_timings[txid].invalid = invTime;
+                }
+                this.onTxInvalid?.(txid);
+                break;
+            }
+            case "SnapshotConfirmed": {
+                for (const x of data.snapshot.confirmed) {
+
+              const tx = tx_parser.fromTx(x.cborHex);
+              const txid = x.txId;
                 for (const input of tx.txComplete.body().inputs().to_js_value()) {
                     const ref = `${input.transaction_id}#${input.index}`;
                     if (this.utxos[ref]) {
@@ -123,12 +140,19 @@ export class Hydra {
                     }
                     idx++;
                 }
-                this.onTxSeen?.(txid, tx);
-                tx.txComplete.free();
-            }
+                    if (!this.tx_timings[txid]?.sent) {
+                        continue;
+                    }
+                    const confirmationTime = now - this.tx_timings[txid].sent;
+                    this.tx_timings[txid].confirmed = confirmationTime;
+                    this.onTxConfirmed?.(txid, tx);
+                    tx.txComplete.free();
+                    // console.log(`confirmed ${txid} after ${confirmationTime}ms`);
+                }
                 break;
+            }
             default:
-                console.warn("Unexpected message: " + data);
+                console.warn("Unexpected message: " , data);
         }
 
         if (this.tx_count > 10000) {
