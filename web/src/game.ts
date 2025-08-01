@@ -222,6 +222,7 @@ export async function hydraSend(
     gameData.leveltime[0] = leveltime;
   }
   // TODO: the latestUTxO should be fetched from the script address, filtering by admin in datum.
+  console.log(scriptAddress);
   if (latestUTxO == null) {
     const utxos = await hydra.getUtxos(scriptAddress);
     const runningGames = [];
