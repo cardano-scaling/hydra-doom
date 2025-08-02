@@ -108,11 +108,9 @@ export async function fetchNewGame(region: string) {
       if (!redeemer) {
         return;
       }
-      console.log("Redeemer:", redeemer);
       const cmds = decodeRedeemer(toHex(redeemer));
       cmds.forEach((cmd) => {
         cmdQueue.push(cmd);
-        console.log(cmd);
         // append some representation of the tx into the UI
         appendTx(cmd);
         if (cmdQueue.length > 1000) {
@@ -222,7 +220,6 @@ export async function hydraSend(
     gameData.leveltime[0] = leveltime;
   }
   // TODO: the latestUTxO should be fetched from the script address, filtering by admin in datum.
-  console.log(scriptAddress);
   if (latestUTxO == null) {
     const utxos = await hydra.getUtxos(scriptAddress);
     const runningGames = [];
@@ -251,7 +248,6 @@ export async function hydraSend(
     collateralUTxO = utxos[0];
   }
 
-  console.log("Command In:", cmd);
   redeemerQueue.push(cmd);
 
   if (frameNumber % 1 == 0) {
