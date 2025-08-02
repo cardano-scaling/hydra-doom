@@ -16,7 +16,7 @@
 
   inputs = {
     cardano-node.url = "github:IntersectMBO/cardano-node/10.5.1";
-    doom-wasm.url = "github:cardano-scaling/doom-wasm/0.0.0.2";
+    doom-wasm.url = "github:cardano-scaling/doom-wasm/0.0.0.3";
     flake-parts.url = "github:hercules-ci/flake-parts";
     hydra-control-plane.url = "github:cardano-scaling/hydra-control-plane/0.2.2";
     hydra-coding-standards.url = "github:cardano-scaling/hydra-coding-standards/0.7.0";
