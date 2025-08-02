@@ -1,5 +1,11 @@
 # ChangeLog for hydra-doom
 
+## 0.0.0.4
+
+* Update to `doom-wasm-0.0.0.2`.
+* Update to `hydra-control-plane-0.2.2`.
+* Use always true validator.
+
 ## 0.0.0.3
 
 * Fix new-game behaviour.
